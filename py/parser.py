@@ -142,8 +142,15 @@ def get_info_from_excel(filename):
         data[key]['part_type'] = get_part_type(matrix, c)
 
         # основной алгоритм заполнения данных для docx таблиц
-        data[key]['universal_competences'] = get_info_for_table(matrix, skill_types[0], c)
-        data[key]['general_professional_competencies'] = get_info_for_table(matrix, skill_types[1], c)
-        data[key]['professional_competencies'] = get_info_for_table(matrix, skill_types[2], c)
+        universal_competences = get_info_for_table(matrix, skill_types[0], c)
+        general_professional_competencies = get_info_for_table(matrix, skill_types[1], c)
+        professional_competencies = get_info_for_table(matrix, skill_types[2], c)
+
+        if len(universal_competences) > 0:
+            data[key]['universal_competences'] = universal_competences
+        if len(general_professional_competencies) > 0:
+            data[key]['general_professional_competencies'] = general_professional_competencies
+        if len(professional_competencies) > 0:
+            data[key]['professional_competencies'] = professional_competencies
 
     return data
