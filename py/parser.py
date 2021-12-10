@@ -1,5 +1,4 @@
 
-from re import DEBUG
 import xlrd
 import datetime
 import openpyxl
@@ -152,7 +151,7 @@ def get_info_from_excel(filename):
     for c in range(cols)[3::]:
         key = matrix[2][c]
         if key == '': continue
-        
+
         data[key] = {}
         data[key]['program_name'] = key
         data[key]['profile_name'] = title['profile_name']
