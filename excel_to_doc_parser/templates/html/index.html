@@ -9,11 +9,11 @@
     {% if step == 1 %}
     <form id="profiles" action="" method="POST">
         {% csrf_token %}
-    {% for profile in profiles %}
-        <div>
-            <input type="submit" name="profile" value="{{ profile }}">
-        </div>
-    {% endfor %}
+        {% for profile in profiles %}
+            <div>
+                <input type="submit" name="profile" value="{{ profile }}">
+            </div>
+        {% endfor %}
     </form>
     {% endif %}
     {% if step == 2 %}

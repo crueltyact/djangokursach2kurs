@@ -45,6 +45,11 @@ def index(request):
             discipline = request.POST.get('discipline')
             doc = DocxTemplate("../excel_to_doc_parser/templates/template.docx")
             doc.render(data[discipline])
+            for i in range(len(doc.tables)):
+                table = doc.tables[i]._tbl
+                for row in doc.tables[i].rows:
+                    if len(row.cells[0].text.strip()) == 0 and len(set(row.cells)) == 1:
+                        table.remove(row._tr)
             doc.save("../excel_to_doc_parser/media/generated_files/{}.docx".format(data[discipline]['program_name']))
             context['path'] = "../excel_to_doc_parser/media/generated_files/{}.docx".format(data[discipline]['program_name'])
             context['name'] = data[discipline]['program_name'] + '.docx'
