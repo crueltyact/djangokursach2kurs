@@ -1,37 +1,43 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Excel parser</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}" type="text/css">
+
 </head>
+
 <body>
-<div>
-    {% if step == 1 %}
-    <form id="profiles" action="" method="POST">
-        {% csrf_token %}
-        {% for profile in profiles %}
+    <div>
+        {% if step == 1 %}
+        <form id="profiles" action="" method="POST">
+            {% csrf_token %}
+            {% for profile in profiles %}
             <div>
                 <input type="submit" name="profile" value="{{ profile }}">
             </div>
-        {% endfor %}
-    </form>
-    {% endif %}
-    {% if step == 2 %}
-    <form id="disciplines" action="" method="POST">
-        {% csrf_token %}
-        <input type="hidden" name="profile" value="{{ profile }}">
-        {% for key, value in data.items %}
-        <div>
-            <input type="submit" name="discipline" value="{{ key }}">
-        </div>
-        {% endfor %}
-    </form>
-    {% endif %}
-    {% if step == 3 %}
-    <form id="download" action="" method="GET">
-        <input type="submit" value="Download" onclick="window.open('download/?file={{ path }}&name={{ name }}')">
-    </form>
-    {% endif %}
-</div>
+            {% endfor %}
+        </form>
+        {% endif %}
+        {% if step == 2 %}
+        <form id="disciplines" action="" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="profile" value="{{ profile }}">
+            {% for key, value in data.items %}
+            <div>
+                <input type="submit" name="discipline" value="{{ key }}">
+            </div>
+            {% endfor %}
+        </form>
+        {% endif %}
+        {% if step == 3 %}
+        <form id="download" action="" method="GET">
+            <input type="submit" value="Download" onclick="window.open('download/?file={{ path }}&name={{ name }}')">
+        </form>
+        {% endif %}
+    </div>
 </body>
+
 </html>
