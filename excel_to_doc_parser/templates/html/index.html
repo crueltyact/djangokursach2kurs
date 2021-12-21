@@ -11,31 +11,76 @@
 
 <body>
     <div>
+        <!--First page-->
         {% if step == 1 %}
-        <form id="profiles" action="" method="POST">
-            {% csrf_token %}
-            {% for profile in profiles %}
-            <div>
-                <input type="submit" name="profile" value="{{ profile }}">
+        <header class="header">
+            <div class="header-wrapper">
+                <h1 class="header__title">Excel parser app</h1>
             </div>
-            {% endfor %}
-        </form>
+        </header>
+
+        <section class="main">
+            <div class="main__line"></div>
+            <div class="main-wrapper">
+
+                <h1 class="main__title">Выберите необходимый факультет:</h1>
+                <form class="main-form" id="profiles" action="" method="POST">
+                    {% csrf_token %}
+                    {% for profile in profiles %}
+                    <div>
+                        <input class="main__btn" type="submit" name="profile" value="{{ profile }}">
+                    </div>
+                    {% endfor %}
+                </form>
+            </div>
+        </section>
         {% endif %}
+
+        <!--Second page-->
         {% if step == 2 %}
-        <form id="disciplines" action="" method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="profile" value="{{ profile }}">
-            {% for key, value in data.items %}
-            <div>
-                <input type="submit" name="discipline" value="{{ key }}">
+        <header class="header">
+            <div class="header-wrapper">
+                <h1 class="header__title">Excel parser app</h1>
             </div>
-            {% endfor %}
-        </form>
+        </header>
+
+        <section class="main">
+            <div class="main__line"></div>
+            <div class="main-wrapper">
+
+                <h1 class="main__title">Выберите необходимый предмет:</h1>
+                <form class="main-form" id="disciplines" action="" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="profile" value="{{ profile }}">
+                    {% for key, value in data.items %}
+                    <div>
+                        <input class="main__btn" type="submit" name="discipline" value="{{ key }}">
+                    </div>
+                    {% endfor %}
+                </form>
+            </div>
+        </section>
+
         {% endif %}
+
+        <!--Third page-->
         {% if step == 3 %}
-        <form id="download" action="" method="GET">
-            <input type="submit" value="Download" onclick="window.open('download/?file={{ path }}&name={{ name }}')">
-        </form>
+        <header class="header">
+            <div class="header-wrapper">
+                <h1 class="header__title">Excel parser app</h1>
+            </div>
+        </header>
+
+        <section class="main">
+            <div class="main__line"></div>
+            <div class="main-wrapper">
+                <h1 class="main__title">Скачать готовый документ:</h1>
+                <form class="main-form" id="download" action="" method="GET">
+                    <input class="main__btn" type="submit" value="Скачать документ"
+                        onclick="window.open('download/?file={{ path }}&name={{ name }}')">
+                </form>
+            </div>
+        </section>
         {% endif %}
     </div>
 </body>
