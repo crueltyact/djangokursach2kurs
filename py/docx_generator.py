@@ -1,3 +1,5 @@
+from difflib import SequenceMatcher
+
 from docxtpl import DocxTemplate
 
 from py.parser import get_info_from_excel
@@ -17,7 +19,13 @@ def main():
     contexts = get_info_from_excel("../templates/09_03_01_Информатика_и_ВТ,_Матрица_ВЕБ_технологии_2020.xlsx")
     for key in contexts:
         context_lesson = contexts[key]
-        context_plane = get_info_from_education_plane("../templates/03-5190 - ВЕБ 2020 (1).xlsx")[key]
+        try:
+            context_plane = get_info_from_education_plane("../templates/03-5190 - ВЕБ 2020 (1).xlsx")[key]
+        except KeyError:
+            for error_key in get_info_from_education_plane("../templates/03-5190 - ВЕБ 2020 (1).xlsx"):
+                if SequenceMatcher(None, key, error_key).ratio() >= 0.8:
+                    context_plane = get_info_from_education_plane("../templates/03-5190 - ВЕБ 2020 (1).xlsx")[error_key]
+                    break
         context_plane['intensity_ZET_check'] = check_number(context_plane['intensity_ZET'])
         context_plane['intensity_hours_check'] = check_number(context_plane['intensity_hours'])
         context_plane['total_homework_hours_check'] = check_number(context_plane['total_homework_hours'])
