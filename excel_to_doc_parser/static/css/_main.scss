@@ -1,4 +1,5 @@
 @import "./fonts";
+@import "./colors";
 
 .main {
     height: auto;
@@ -20,11 +21,42 @@
         max-width: 1024px;
     }
 
+    &-header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+    }
+
     &__title {
         font-family: "Roboto-thin", sans-serif;
         font-size: 1.7em;
         text-align: center;
         letter-spacing: 0.2em;
+    }
+
+    &__themebtn {
+        height: 2em;
+        width: 4em;
+        background-color: rgb(20, 20, 20);
+        border-radius: 3em;
+        margin-left: 2em;
+        cursor: pointer;
+    }
+
+    &-btn__container {
+        position: absolute;
+        right: 4em;
+        top: -0.1em;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        border: 0.13em solid $main-black;;
+        border-radius: 100%;
+        padding: 0.18em 0.18em;
+
     }
 
     &-form {
@@ -37,7 +69,8 @@
         outline: none;
         margin: 0.3em 0;
         background-color: #fff;
-        border: 1px solid rgb(155, 155, 155);
+        border: 1px solid $btn-border;
+        border-radius: 0.5em;
         padding: 0.5em 0.6em;
         font-family: "Roboto-regular", sans-serif;
         width: 100%;
@@ -46,8 +79,39 @@
 
 
         &:hover {
+            border: 1px solid #fff;
             background: rgb(255,202,126);
             background: linear-gradient(90deg, rgba(255,202,126,1) 0%, rgba(255,219,119,1) 27%, rgba(255,220,102,1) 61%, rgba(233,255,15,1) 100%);
+            
+        }
+    }
+
+    &__changetheme {
+        position: absolute;
+        right: 4.5em;
+        top: 3.5em;
+        font-family: "Roboto-regular", sans-serif;
+        font-size: 0.7em;
+    }
+
+
+    &-label {
+        display: flex;
+        justify-content: center;
+    }
+
+    &__search {
+        width: 30em;
+        height: 2.5em;
+        border-radius: 2em;
+        border: 1px solid $btn-border;
+        outline: none;
+        padding: 0 1em;
+        font-family: "Roboto-regular", sans-serif;
+
+        &:required {
+            background-color: $main-black;
         }
     }
 }
+

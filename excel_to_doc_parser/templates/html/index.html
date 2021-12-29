@@ -13,6 +13,7 @@
     <div>
         <!--First page-->
         {% if step == 1 %}
+        <div class="step-1" style="display: none;"></div>
         <header class="header">
             <div class="header-wrapper">
                 <h1 class="header__title">Excel parser app</h1>
@@ -22,8 +23,17 @@
         <section class="main">
             <div class="main__line"></div>
             <div class="main-wrapper">
+                <div class="main-header">
+                    <h1 class="main__title">Выберите необходимый факультет:</h1>
+                    <div class="main-btn__container">
+                        <div class="circle">
+                            <div class="left-half"></div>
+                            <div class="right-half"></div>
+                        </div>
+                    </div>
+                    <p class="main__changetheme">Change theme</p>
+                </div>
 
-                <h1 class="main__title">Выберите необходимый факультет:</h1>
                 <form class="main-form" id="profiles" action="" method="POST">
                     {% csrf_token %}
                     {% for profile in profiles %}
@@ -38,6 +48,7 @@
 
         <!--Second page-->
         {% if step == 2 %}
+        <div class="step-2" style="display: none;"></div>
         <header class="header">
             <div class="header-wrapper">
                 <h1 class="header__title">Excel parser app</h1>
@@ -48,7 +59,16 @@
             <div class="main__line"></div>
             <div class="main-wrapper">
 
-                <h1 class="main__title">Выберите необходимый предмет:</h1>
+                <div class="main-header">
+                    <h1 class="main__title">Выберите необходимый предмет:</h1>
+                    <div class="main-btn__container">
+                        <div class="circle">
+                            <div class="left-half"></div>
+                            <div class="right-half"></div>
+                        </div>
+                    </div>
+                    <p class="main__changetheme">Change theme</p>
+                </div>
                 <form class="main-form" id="disciplines" action="" method="POST">
                     {% csrf_token %}
                     <input type="hidden" name="profile" value="{{ profile }}">
@@ -65,6 +85,7 @@
 
         <!--Third page-->
         {% if step == 3 %}
+        <div class="step-3" style="display: none;"></div>
         <header class="header">
             <div class="header-wrapper">
                 <h1 class="header__title">Excel parser app</h1>
@@ -74,7 +95,16 @@
         <section class="main">
             <div class="main__line"></div>
             <div class="main-wrapper">
-                <h1 class="main__title">Скачать готовый документ:</h1>
+                <div class="main-header">
+                    <h1 class="main__title">Скачать готовый документ:</h1>
+                    <div class="main-btn__container">
+                        <div class="circle">
+                            <div class="left-half"></div>
+                            <div class="right-half"></div>
+                        </div>
+                    </div>
+                    <p class="main__changetheme">Change theme</p>
+                </div>
                 <form class="main-form" id="download" action="" method="GET">
                     <input class="main__btn" type="submit" value="Скачать документ"
                         onclick="window.open('download/?file={{ path }}&name={{ name }}')">
@@ -83,6 +113,9 @@
         </section>
         {% endif %}
     </div>
+
+
+    <script src="../../static/js/darktheme.js"></script>
 </body>
 
 </html>
