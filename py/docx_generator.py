@@ -23,7 +23,7 @@ def main():
             context_plane = get_info_from_education_plane("../templates/03-5190 - ВЕБ 2020 (1).xlsx")[key]
         except KeyError:
             for error_key in get_info_from_education_plane("../templates/03-5190 - ВЕБ 2020 (1).xlsx"):
-                if SequenceMatcher(None, key, error_key).ratio() >= 0.8:
+                if SequenceMatcher(None, key, error_key).ratio() >= 0.75:
                     context_plane = get_info_from_education_plane("../templates/03-5190 - ВЕБ 2020 (1).xlsx")[error_key]
                     break
         context_plane['intensity_ZET_check'] = check_number(context_plane['intensity_ZET'])
