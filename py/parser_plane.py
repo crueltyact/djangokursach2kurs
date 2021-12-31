@@ -98,10 +98,9 @@ def get_courses(arr, imp_cols, met='moduls'):
         res[-1]['course'] = number_to_words(int(round(sem / 2 + 0.1)))
         res[-1]['test'] = 'экзамен' if str(sem) in arr[imp_cols['exam']] else 'зачет'
         
-        res[-1]['hours'] = to_int(time)
-        res[-1]['ZET'] = hours_to_zet(res[-1]['hours'])
-
         res[-1]['homework_time'] = to_int(homeworks[sem])
+        res[-1]['hours'] = to_int(time)
+        res[-1]['ZET'] = hours_to_zet(to_int(res[-1]['hours']) + res[-1]['homework_time'])
         
     return res
 
