@@ -7,13 +7,13 @@
     <title>Excel parser</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
 
+
 </head>
 
 <body>
     <div>
         <!--First page-->
         {% if step == 1 %}
-        <div class="step-1" style="display: none;"></div>
         <header class="header">
             <div class="header-wrapper">
                 <h1 class="header__title">Excel parser app</h1>
@@ -36,11 +36,26 @@
 
                 <form class="main-form" id="profiles" action="" method="POST">
                     {% csrf_token %}
-                    {% for profile in profiles %}
-                    <div>
-                        <input class="main__btn" type="submit" name="profile" value="{{ profile }}">
-                    </div>
-                    {% endfor %}
+                    <table id="example" class="table table-striped" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Название факультета</th>    
+                                <th>Кнопка</th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for profile in profiles %}
+                            <tr>
+                                <td>
+                                    {{ profile }}
+                                </td>
+                                <td>
+                                    <input class="main__btn" type="submit" name="profile" value="{{ profile }}">
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </form>
             </div>
         </section>
@@ -48,7 +63,7 @@
 
         <!--Second page-->
         {% if step == 2 %}
-        <div class="step-2" style="display: none;"></div>
+
         <header class="header">
             <div class="header-wrapper">
                 <h1 class="header__title">Excel parser app</h1>
@@ -71,12 +86,30 @@
                 </div>
                 <form class="main-form" id="disciplines" action="" method="POST">
                     {% csrf_token %}
-                    <input type="hidden" name="profile" value="{{ profile }}">
-                    {% for key, value in data.items %}
-                    <div>
-                        <input class="main__btn" type="submit" name="discipline" value="{{ key }}">
-                    </div>
-                    {% endfor %}
+
+                    <table id="example" class="table table-striped" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Название факультета</th>    
+                                <th>Кнопка</th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for profile in profiles %}
+                            <tr>
+                                {% for key, value in data.items %}
+                                <td>
+                                    {{ key }}
+                                </td>
+                                <td>
+                                    <input type="hidden" name="profile" value="{{ profile }}">
+                                    <input class="main__btn" type="submit" name="discipline" value="{{ key }}">                      
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </form>
             </div>
         </section>
@@ -85,7 +118,7 @@
 
         <!--Third page-->
         {% if step == 3 %}
-        <div class="step-3" style="display: none;"></div>
+
         <header class="header">
             <div class="header-wrapper">
                 <h1 class="header__title">Excel parser app</h1>
@@ -116,6 +149,11 @@
 
 
     <script src="../../static/js/darktheme.js"></script>
+    <script src="../../static/js/jQuery.js"></script>
+    <script src="../../static/js/jQuery-datatables.min.js"></script>
+    <script src="../../static/js/jQuery-datatables-bootstrap5.min.js"></script>
+    <script src="../../static/js/data-table.js"></script>
+    <script src="../../static/js/dataTable-custom.js"></script>
 </body>
 
 </html>

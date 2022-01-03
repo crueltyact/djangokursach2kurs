@@ -47,7 +47,7 @@
     &-btn__container {
         position: absolute;
         right: 4em;
-        top: -0.1em;
+        top: -0.001em;
         cursor: pointer;
         display: flex;
         justify-content: center;
@@ -95,23 +95,6 @@
     }
 
 
-    &-label {
-        display: flex;
-        justify-content: center;
-    }
 
-    &__search {
-        width: 30em;
-        height: 2.5em;
-        border-radius: 2em;
-        border: 1px solid $btn-border;
-        outline: none;
-        padding: 0 1em;
-        font-family: "Roboto-regular", sans-serif;
-
-        &:required {
-            background-color: $main-black;
-        }
-    }
 }
 
