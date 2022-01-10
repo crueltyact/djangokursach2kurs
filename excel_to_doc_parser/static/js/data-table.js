@@ -1,3 +1,4 @@
 $(document).ready(function() {
-    $('#example').DataTable();
+    $('#profile').DataTable();
+    $('#discipline').DataTable();
 } );

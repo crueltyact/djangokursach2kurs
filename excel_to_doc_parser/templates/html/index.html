@@ -6,154 +6,112 @@
     <meta charset="UTF-8">
     <title>Excel parser</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
-
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap5.min.css">
 </head>
 
 <body>
-    <div>
-        <!--First page-->
-        {% if step == 1 %}
-        <header class="header">
-            <div class="header-wrapper">
-                <h1 class="header__title">Excel parser app</h1>
-            </div>
-        </header>
-
-        <section class="main">
-            <div class="main__line"></div>
-            <div class="main-wrapper">
-                <div class="main-header">
-                    <h1 class="main__title">Выберите необходимый факультет:</h1>
-                    <div class="main-btn__container">
-                        <div class="circle">
-                            <div class="left-half"></div>
-                            <div class="right-half"></div>
-                        </div>
+<div>
+    <header class="header">
+        <div class="header-wrapper">
+            <h1 class="header__title">Excel parser app</h1>
+        </div>
+    </header>
+    <section class="main">
+        <div class="main__line"></div>
+        <div class="main-wrapper">
+            <!--First page-->
+            {% if step == 1 %}
+            <div class="main-header">
+                <h1 class="main__title">Выберите необходимый факультет:</h1>
+                <div class="main-btn__container">
+                    <div class="circle">
+                        <div class="left-half"></div>
+                        <div class="right-half"></div>
                     </div>
-                    <p class="main__changetheme">Change theme</p>
                 </div>
-
-                <form class="main-form" id="profiles" action="" method="POST">
-                    {% csrf_token %}
-                    <table id="example" class="table table-striped" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th>Название факультета</th>    
-                                <th>Кнопка</th> 
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for profile in profiles %}
-                            <tr>
-                                <td>
-                                    {{ profile }}
-                                </td>
-                                <td>
-                                    <input class="main__btn" type="submit" name="profile" value="{{ profile }}">
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </form>
+                <p class="main__changetheme">Change theme</p>
             </div>
-        </section>
-        {% endif %}
-
-        <!--Second page-->
-        {% if step == 2 %}
-
-        <header class="header">
-            <div class="header-wrapper">
-                <h1 class="header__title">Excel parser app</h1>
-            </div>
-        </header>
-
-        <section class="main">
-            <div class="main__line"></div>
-            <div class="main-wrapper">
-
-                <div class="main-header">
-                    <h1 class="main__title">Выберите необходимый предмет:</h1>
-                    <div class="main-btn__container">
-                        <div class="circle">
-                            <div class="left-half"></div>
-                            <div class="right-half"></div>
-                        </div>
+            <form class="main-form" id="profiles" action="" method="POST">
+                {% csrf_token %}
+                <table id="profile" class="table table-striped" style="width:100%">
+                    <thead>
+                    <tr>
+                        <th>Название профиля</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for profile in profiles %}
+                    <tr>
+                        <td>
+                            <input class="main__btn" type="submit" name="profile" value="{{ profile }}">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+            {% endif %}
+            <!--Second page-->
+            {% if step == 2 %}
+            <div class="main-header">
+                <h1 class="main__title">Выберите необходимый предмет:</h1>
+                <div class="main-btn__container">
+                    <div class="circle">
+                        <div class="left-half"></div>
+                        <div class="right-half"></div>
                     </div>
-                    <p class="main__changetheme">Change theme</p>
                 </div>
-                <form class="main-form" id="disciplines" action="" method="POST">
-                    {% csrf_token %}
-
-                    <table id="example" class="table table-striped" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th>Название факультета</th>    
-                                <th>Кнопка</th> 
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for profile in profiles %}
-                            <tr>
-                                {% for key, value in data.items %}
-                                <td>
-                                    {{ key }}
-                                </td>
-                                <td>
-                                    <input type="hidden" name="profile" value="{{ profile }}">
-                                    <input class="main__btn" type="submit" name="discipline" value="{{ key }}">                      
-                                </td>
-                                {% endfor %}
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </form>
+                <p class="main__changetheme">Change theme</p>
             </div>
-        </section>
-
-        {% endif %}
-
-        <!--Third page-->
-        {% if step == 3 %}
-
-        <header class="header">
-            <div class="header-wrapper">
-                <h1 class="header__title">Excel parser app</h1>
-            </div>
-        </header>
-
-        <section class="main">
-            <div class="main__line"></div>
-            <div class="main-wrapper">
-                <div class="main-header">
-                    <h1 class="main__title">Скачать готовый документ:</h1>
-                    <div class="main-btn__container">
-                        <div class="circle">
-                            <div class="left-half"></div>
-                            <div class="right-half"></div>
-                        </div>
+            <form class="main-form" id="disciplines" action="" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="profile" value="{{ profile }}">
+                <table id="discipline" class="table table-striped" style="width:100%">
+                    <thead>
+                    <tr>
+                        <th>Название дисциплины</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for key, value in data.items %}
+                    <tr>
+                        <td>
+                            <input class="main__btn" type="submit" name="discipline" value="{{ key }}">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+            {% endif %}
+            <!--Third page-->
+            {% if step == 3 %}
+            <div class="main-header">
+                <h1 class="main__title">Скачать готовый документ:</h1>
+                <div class="main-btn__container">
+                    <div class="circle">
+                        <div class="left-half"></div>
+                        <div class="right-half"></div>
                     </div>
-                    <p class="main__changetheme">Change theme</p>
                 </div>
-                <form class="main-form" id="download" action="" method="GET">
-                    <input class="main__btn" type="submit" value="Скачать документ"
-                        onclick="window.open('download/?file={{ path }}&name={{ name }}')">
-                </form>
+                <p class="main__changetheme">Change theme</p>
             </div>
-        </section>
-        {% endif %}
-    </div>
+            <form class="main-form" id="download" action="" method="GET">
+                <input class="main__btn" type="submit" value="Скачать документ"
+                       onclick="window.open('download/?file={{ path }}&name={{ name }}')">
+            </form>
+            {% endif %}
+        </div>
+    </section>
+</div>
 
 
-    <script src="../../static/js/darktheme.js"></script>
-    <script src="../../static/js/jQuery.js"></script>
-    <script src="../../static/js/jQuery-datatables.min.js"></script>
-    <script src="../../static/js/jQuery-datatables-bootstrap5.min.js"></script>
-    <script src="../../static/js/data-table.js"></script>
-    <script src="../../static/js/dataTable-custom.js"></script>
+<script src="../../static/js/darktheme.js"></script>
+<script src="../../static/js/jQuery.js"></script>
+<script src="../../static/js/jQuery-datatables.min.js"></script>
+<script src="../../static/js/jQuery-datatables-bootstrap5.min.js"></script>
+<script src="../../static/js/data-table.js"></script>
+<script src="../../static/js/dataTable-custom.js"></script>
 </body>
-
 </html>
