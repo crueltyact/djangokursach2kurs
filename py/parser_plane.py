@@ -36,7 +36,6 @@ def number_to_words(n):
 def hours_to_zet(z):
     h = round(z / 36, 1)
     if h == int(h):
-
         return int(h)
     else:
         return h
@@ -98,11 +97,9 @@ def get_courses(arr, imp_cols, met='moduls'):
         res[-1]['semester'] = number_to_words(sem)
         res[-1]['course'] = number_to_words(int(round(sem / 2 + 0.1)))
         res[-1]['test'] = 'экзамен' if str(sem) in arr[imp_cols['exam']] else 'зачет'
-
-        res[-1]['hours'] = to_int(time)
-        res[-1]['ZET'] = hours_to_zet(res[-1]['hours'])
-
         res[-1]['homework_time'] = to_int(homeworks[sem])
+        res[-1]['hours'] = to_int(time)
+        res[-1]['ZET'] = hours_to_zet(to_int(res[-1]['hours']) + res[-1]['homework_time'])
 
     return res
 
@@ -137,22 +134,22 @@ def get_info_from_education_plane(filename):
     }, matrix, 0)
 
     imp_cols = find_from_matrix({
-        'credit': 'зачетов',
-        'exam': 'экзаменов',
-        'hours': 'ВСЕГО по структуре',
-        'ZET': 'Всего, ЗЕТ',
-        'homework': 'Самостоятельная работа',
-        'sems': 'Распределение по курсам и семестрам, ауд. час.',
-        'subjects': 'Обязательная часть',
-        'B.1': 'Б.1',
-        'elective': 'Факультативные дисциплины',
-        'elective_sem': 'Семестр',
-        'elective_hours': 'Ауд. часов',
+        'credit'         : 'зачетов',
+        'exam'           : 'экзаменов',
+        'hours'          : 'ВСЕГО по структуре',
+        'ZET'            : 'Всего, ЗЕТ',
+        'homework'       : 'Самостоятельная работа',
+        'sems'           : 'Распределение по курсам и семестрам, ауд. час.',
+        'subjects'       : 'Обязательная часть',
+        'B.1'            : 'Б.1',
+        'elective'       : 'Факультативные дисциплины',
+        'elective_sem'   : 'Семестр',
+        'elective_hours' : 'Ауд. часов',
     }, matrix, 1)
 
     # преобразуем названия дисциплин к нормальному виду
     for i in range(len(matrix))[imp_rows['subjects']::]:
-        matrix[i][imp_cols['subjects']] = matrix[i][imp_cols['subjects']].split('*')[0].strip()
+        matrix[i][imp_cols['subjects']] =  matrix[i][imp_cols['subjects']].split('*')[0].strip()
 
     # создаем и заполняем выходную структуру дисциплинами из блока "Модули"
     data = {}
@@ -180,7 +177,7 @@ def get_info_from_education_plane(filename):
             data[key]['courses'] = get_courses(matrix[i], imp_cols, met='practice')
 
     # заполняем выходную структуру дисциплинами из блока "Факультативные дисциплины"
-    i = imp_rows['elective'] + 1
+    i = imp_rows['elective']+1
     while matrix[i][imp_cols['elective']] != '':
         key = matrix[i][imp_cols['elective']]
 
