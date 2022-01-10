@@ -31,6 +31,8 @@ def index(request):
     folder = join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files")
     for filename in os.listdir(folder):
         file_path = os.path.join(folder, filename)
+        if filename == ".gitkeep":
+            continue
         try:
             if os.path.isfile(file_path) or os.path.islink(file_path):
                 os.unlink(file_path)
