@@ -1,13 +1,19 @@
+import csv
 import os.path
 import shutil
+import time
 import urllib
 from difflib import SequenceMatcher
 from os import listdir
 from os.path import isfile, join
 from wsgiref.util import FileWrapper
 
+from django.contrib import messages
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from docxtpl import DocxTemplate
 
 from excel_to_doc_parser.py.parser import get_info_from_excel
@@ -24,68 +30,85 @@ def check_number(num):
         return '3'
 
 
+@login_required(login_url='/login/')
 def index(request):
     context = {}
-    path = join(str(BASE_DIR), "excel_to_doc_parser/media/excel")
-    files_dict = {}
-    folder = join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files")
-    for filename in os.listdir(folder):
-        file_path = os.path.join(folder, filename)
-        if filename == ".gitkeep":
-            continue
-        try:
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-        except Exception as e:
-            print('An error appear ' + str(e))
-    for file in listdir(join(path, "matrices")):
-        if isfile(join(path, "matrices", file)):
-            files_dict[" ".join(file.split(',')[1][:-5].split("_")[2:])] = file
-    if request.method == "GET":
-        context['step'] = 1
-        profiles = []
-        for key in files_dict:
-            profiles.append(key)
-        context['profiles'] = profiles
-    if request.method == "POST":
-        context['step'] = 2
-        data = get_info_from_excel(
-            path + "/matrices/" + files_dict[request.POST.get("profile")])
-        context['data'] = data
-        context['profile'] = request.POST.get('profile')
-        if request.POST.get('discipline'):
-            context['step'] = 3
-            discipline = request.POST.get('discipline')
-            try:
-                context_plane = get_info_from_education_plane(path + "/planes/03-5190 - ВЕБ 2020 (1).xlsx")[discipline]
-            except KeyError:
-                for error_key in get_info_from_education_plane(path + "/planes/planes/03-5190 - ВЕБ 2020 (1).xlsx"):
-                    if SequenceMatcher(None, discipline, error_key).ratio() >= 0.75:
-                        context_plane = get_info_from_education_plane(path + "/planes/planes/03-5190 - ВЕБ 2020 (1).xlsx")[error_key]
-                        break
-            context_plane['intensity_ZET_check'] = check_number(context_plane['intensity_ZET'])
-            context_plane['intensity_hours_check'] = check_number(context_plane['intensity_hours'])
-            context_plane['total_homework_hours_check'] = check_number(context_plane['total_homework_hours'])
-            for i, _ in enumerate(context_plane['courses']):
-                context_plane['courses'][i]['ZET_check'] = check_number(context_plane['courses'][i]['ZET'])
-                context_plane['courses'][i]['hours_check'] = check_number(context_plane['courses'][i]['hours'])
-                context_plane['courses'][i]['homework_time_check'] = check_number(
-                    context_plane['courses'][i]['homework_time'])
-            doc = DocxTemplate(
-                join(str(BASE_DIR), "excel_to_doc_parser/templates/template.docx"))
-            doc.render(dict(data[discipline], **context_plane))
-            for i in range(len(doc.tables)):
-                table = doc.tables[i]._tbl
-                for row in doc.tables[i].rows:
-                    if len(row.cells[0].text.strip()) == 0 and len(set(row.cells)) == 1:
-                        table.remove(row._tr)
-            doc.save(join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files/{}.docx".format(
-                data[discipline]['program_name'])))
-            context['path'] = "excel_to_doc_parser/media/generated_files/{}.docx".format(
-                data[discipline]['program_name'])
-            context['name'] = data[discipline]['program_name'] + '.docx'
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            header = request.POST.get('header')
+            description = request.POST.get('description')
+            classwork_hours = request.POST.get('classwork_hours')
+            homework_hours = request.POST.get('homework_hours')
+            print(header, description, classwork_hours, homework_hours)
+            with open(join(str(BASE_DIR), 'excel_to_doc_parser/media/temporary_text/{}.csv'.format(str(request.user) + '_' + header)), 'w') as f:
+                writer = csv.writer(f)
+                writer.writerow(['header', 'description', 'classwork_hours', 'homework_hours'])
+                writer.writerow([header, description, classwork_hours, homework_hours])
+        # path = join(str(BASE_DIR), "excel_to_doc_parser/media/excel")
+        # files_dict = {}
+        # folder = join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files")
+        # for filename in os.listdir(folder):
+        #     file_path = os.path.join(folder, filename)
+        #     if filename == ".gitkeep":
+        #         continue
+        #     try:
+        #         if os.path.isfile(file_path) or os.path.islink(file_path):
+        #             os.unlink(file_path)
+        #         elif os.path.isdir(file_path):
+        #             shutil.rmtree(file_path)
+        #     except Exception as e:
+        #         print('An error appear ' + str(e))
+        # for file in listdir(join(path, "matrices")):
+        #     if isfile(join(path, "matrices", file)):
+        #         files_dict[" ".join(file.split(',')[1][:-5].split("_")[2:])] = file
+        # if request.method == "GET":
+        #     context['step'] = 1
+        #     profiles = []
+        #     for key in files_dict:
+        #         profiles.append(key)
+        #     context['profiles'] = profiles
+        # if request.method == "POST":
+        #     context['step'] = 2
+        #     data = get_info_from_excel(
+        #         path + "/matrices/" + files_dict[request.POST.get("profile")])
+        #     context['data'] = data
+        #     context['profile'] = request.POST.get('profile')
+        #     if request.POST.get('discipline'):
+        #         context['step'] = 3
+        #         discipline = request.POST.get('discipline')
+        #         try:
+        #             context_plane = get_info_from_education_plane(path + "/planes/03-5190 - ВЕБ 2020 (1).xlsx")[
+        #                 discipline]
+        #         except KeyError:
+        #             for error_key in get_info_from_education_plane(path + "/planes/planes/03-5190 - ВЕБ 2020 (1).xlsx"):
+        #                 if SequenceMatcher(None, discipline, error_key).ratio() >= 0.75:
+        #                     context_plane = \
+        #                         get_info_from_education_plane(path + "/planes/planes/03-5190 - ВЕБ 2020 (1).xlsx")[
+        #                             error_key]
+        #                     break
+        #         context_plane['intensity_ZET_check'] = check_number(context_plane['intensity_ZET'])
+        #         context_plane['intensity_hours_check'] = check_number(context_plane['intensity_hours'])
+        #         context_plane['total_homework_hours_check'] = check_number(context_plane['total_homework_hours'])
+        #         for i, _ in enumerate(context_plane['courses']):
+        #             context_plane['courses'][i]['ZET_check'] = check_number(context_plane['courses'][i]['ZET'])
+        #             context_plane['courses'][i]['hours_check'] = check_number(context_plane['courses'][i]['hours'])
+        #             context_plane['courses'][i]['homework_time_check'] = check_number(
+        #                 context_plane['courses'][i]['homework_time'])
+        #         doc = DocxTemplate(
+        #             join(str(BASE_DIR), "excel_to_doc_parser/templates/template.docx"))
+        #         doc.render(dict(data[discipline], **context_plane))
+        #         for i in range(len(doc.tables)):
+        #             table = doc.tables[i]._tbl
+        #             for row in doc.tables[i].rows:
+        #                 if len(row.cells[0].text.strip()) == 0 and len(set(row.cells)) == 1:
+        #                     table.remove(row._tr)
+        #         doc.save(join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files/{}.docx".format(
+        #             data[discipline]['program_name'])))
+        #         context['path'] = "excel_to_doc_parser/media/generated_files/{}.docx".format(
+        #             data[discipline]['program_name'])
+        #         context['name'] = data[discipline]['program_name'] + '.docx'
+    else:
+        return render(request, "login.html")
     return render(request, "index.html", context)
 
 
@@ -102,3 +125,14 @@ def download(request):
         name)
     print(response['Content-Disposition'])
     return response
+
+
+def login_request(request):
+    username = request.POST.get('username')
+    password = request.POST.get('password')
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+        login(request, user)
+    else:
+        print("Error")
+    return render(request, "login.html", )

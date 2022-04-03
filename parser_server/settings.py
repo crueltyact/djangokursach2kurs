@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'excel_to_doc_parser'
+    'excel_to_doc_parser',
+    'crispy_forms'
 ]
 
 MIDDLEWARE = [
@@ -77,8 +78,12 @@ WSGI_APPLICATION = 'parser_server.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'excel_parser',
+        'USER': 'root',
+        'PASSWORD': '200347ATunic@',
+        'HOST': '127.0.0.1',
+        'PORT': '3306'
     }
 }
 
@@ -126,3 +131,5 @@ STATIC_ROOT = join(BASE_DIR, 'excel_to_doc_parser/staticfiles/')
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'profile'
