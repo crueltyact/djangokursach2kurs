@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'parser_server.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'excel_parser',
+        'NAME': 'excel_to_doc_parser',
         'USER': 'root',
         'PASSWORD': '200347ATunic@',
         'HOST': '127.0.0.1',

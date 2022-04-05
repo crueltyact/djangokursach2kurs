@@ -16,7 +16,7 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect
 from docxtpl import DocxTemplate
 
-from excel_to_doc_parser.models import CustomUser, Role
+from excel_to_doc_parser.models import CustomUser, Role, Document, Module
 from excel_to_doc_parser.py.parser import get_info_from_excel
 from excel_to_doc_parser.py.parser_plane import get_info_from_education_plane
 from parser_server.settings import BASE_DIR
@@ -37,16 +37,20 @@ def index(request):
     if request.user.is_authenticated:
         context["custom_user"] = CustomUser.objects.get(user=request.user)
         context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
-        # if request.method == "POST":
-        #     header = request.POST.get('header')
-        #     description = request.POST.get('description')
-        #     classwork_hours = request.POST.get('classwork_hours')
-        #     homework_hours = request.POST.get('homework_hours')
-        #     print(header, description, classwork_hours, homework_hours)
-        #     with open(join(str(BASE_DIR), 'excel_to_doc_parser/media/temporary_text/{}.csv'.format(str(request.user) + '_' + header)), 'w') as f:
-        #         writer = csv.writer(f)
-        #         writer.writerow(['header', 'description', 'classwork_hours', 'homework_hours'])
-        #         writer.writerow([header, description, classwork_hours, homework_hours])
+        context["modules"] = Document.objects.all()
+        context["sections"] = Module.objects.all()
+        if request.method == "POST":
+            pk = request.POST.get('pk')
+            header = request.POST.get('header')
+            description = request.POST.get('description')
+            classwork_hours = request.POST.get('classwork')
+            homework_hours = request.POST.get('homework')
+            document = Document.objects.filter(pk=pk)
+            document.update(header=header, description=description, classwork_hours=classwork_hours, homework_hours=homework_hours)
+            with open(join(str(BASE_DIR), 'excel_to_doc_parser/media/temporary_text/{}.csv'.format(str(request.user) + '_' + header)), 'w') as f:
+                writer = csv.writer(f)
+                writer.writerow(['header', 'description', 'classwork_hours', 'homework_hours'])
+                writer.writerow([header, description, classwork_hours, homework_hours])
         # path = join(str(BASE_DIR), "excel_to_doc_parser/media/excel")
         # files_dict = {}
         # folder = join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files")

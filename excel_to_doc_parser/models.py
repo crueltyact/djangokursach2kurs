@@ -26,13 +26,16 @@ class Status(models.Model):
     status = models.CharField(choices=STATUSES, default=STATUSES[4], max_length=256)
 
 
+class Module(models.Model):
+    module = models.IntegerField()
+    header = models.CharField(max_length=128)
+    classwork_hours = models.IntegerField()
+    homework_hours = models.IntegerField()
+    description = models.TextField()
+
+
 class Document(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     status = models.ForeignKey(Status, on_delete=models.CASCADE)
     link = models.ForeignKey(Link, on_delete=models.CASCADE)
-    module = models.IntegerField()
-    header = models.CharField(max_length=128)
-    semester = models.IntegerField()
-    classwork_hours = models.IntegerField()
-    homework_hours = models.IntegerField()
-    description = models.TextField()
+    module = models.ForeignKey(Module, on_delete=models.CASCADE)

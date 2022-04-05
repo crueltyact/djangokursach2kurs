@@ -41,7 +41,8 @@
                 <div class="menu">
                     <div class="menu-profile">
                         <img width="75" height="75" src="../../static/img/avatar.png" alt="avatar">
-                        <div class="menu-profile__name">{{ custom_user.second_name }} {{ custom_user.first_name }} {{ custom_user.last_name }}
+                        <div class="menu-profile__name">{{ custom_user.second_name }} {{ custom_user.first_name }}
+                            {{ custom_user.last_name }}
                         </div>
                         <div class="menu-profile__position">{{ role.role_type }}</div>
                     </div>
@@ -62,80 +63,42 @@
             </div>
             <div class="col-9 pt-5">
                 <div class="card-inner">
+                    {% for module in modules %}
                     <!--Module-->
                     <div class="card-module">
-                        <p class="card-module__title">Модуль 1</p>
+                        <p class="card-module__title">Модуль {{ module.module.module }}</p>
                         <div class="card-module__content">
                             <div class="card-module__cards">
+                                {% for section in sections %}
+                                {% if section.module == module.module.module %}
                                 <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
+                                    <form method="POST" action="">
+                                        {% csrf_token %}
+                                        <div class="card-body">
+                                            <label>
+                                                <input type="text" name="header" class="card-title" value="{{ section.header }}">
+                                            </label>
+                                            <label>
+                                                <textarea class="card-title" name="description">{{ section.description }}</textarea>
+                                            </label>
+                                            <label>
+                                                <input type="number" name="classwork" class="card-title" value="{{ section.classwork_hours }}">
+                                            </label>
+                                            <label>
+                                                <input type="number" name="homework" class="card-title" value="{{ section.homework_hours }}">
+                                            </label>
+                                            <!--                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>-->
+                                            <!--                                        <p class="card-text">Программа обучения</p>-->
+                                            <button type="submit" class="card-link">Сохранить</button>
+<!--                                            <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>-->
+                                            <label>
+                                                <input type="hidden" name="pk" value="{{ section.id }}">
+                                            </label>
+                                        </div>
+                                    </form>
                                 </div>
-
-                                <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
-                                </div>
-
-                                <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
-                                </div>
-                                <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
-                                </div>
-
-                                <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
-                                </div>
-
-                                <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
-                                </div>
-
-                                <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
-                                </div>
-
+                                {% endif %}
+                                {% endfor %}
                             </div>
                             <div class="card-btn_addchapter">
                                 <button>Добавить раздел +</button>
@@ -143,170 +106,7 @@
                         </div>
                     </div>
                     <!--/Module-->
-
-                    <!--Module-->
-                    <div class="card-module">
-                        <p class="card-module__title">Модуль 2</p>
-                        <div class="card-module__content">
-                            <div class="card-module__cards">
-                                <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
-                                </div>
-
-                                <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
-                                </div>
-
-                                <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
-                                </div>
-                                <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
-                                </div>
-
-                                <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
-                                </div>
-
-                                <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
-                                </div>
-
-                                <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div class="card-btn_addchapter">
-                                <button>Добавить раздел +</button>
-                            </div>
-                        </div>
-                    </div>
-                    <!--/Module-->
-
-                    <!--Module-->
-                    <div class="card-module">
-                        <p class="card-module__title">Модуль 3</p>
-                        <div class="card-module__content">
-                            <div class="card-module__cards">
-                                <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
-                                </div>
-
-                                <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
-                                </div>
-
-                                <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
-                                </div>
-                                <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
-                                </div>
-
-                                <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
-                                </div>
-
-                                <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
-                                </div>
-
-                                <div class="card" style="width: 18rem;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Корпоративные информационные системы</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>
-                                        <p class="card-text">Программа обучения</p>
-                                        <a href="#" class="card-link">Сохранить</a>
-                                        <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div class="card-btn_addchapter">
-                                <button>Добавить раздел +</button>
-                            </div>
-                        </div>
-                    </div>
-                    <!--/Module-->
+                    {% endfor %}
                     <div class="card-btn_addmodule">
                         <button>Добавить модуль +</button>
                     </div>
