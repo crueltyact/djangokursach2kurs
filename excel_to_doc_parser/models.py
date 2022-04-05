@@ -19,8 +19,10 @@ class Link(models.Model):
 
 
 class Status(models.Model):
-    STATUSES = [("В архиве", "archive"), ("Актуальный", "actual"), ("Отправлен на доработку", "revise"), ("Отклонён", "rejected"), ("В процессе составления", "making"),
-    ("В процессе редакции", "redaction"), ("Составлен", "made"), ("Согласован", "conformed"), ("Утверждён", "approved")]
+    STATUSES = [("В архиве", "archive"), ("Актуальный", "actual"), ("Отправлен на доработку", "revise"),
+                ("Отклонён", "rejected"), ("В процессе составления", "making"),
+                ("В процессе редакции", "redaction"), ("Составлен", "made"), ("Согласован", "conformed"),
+                ("Утверждён", "approved")]
     status = models.CharField(choices=STATUSES, default=STATUSES[4], max_length=256)
 
 
@@ -34,6 +36,3 @@ class Document(models.Model):
     classwork_hours = models.IntegerField()
     homework_hours = models.IntegerField()
     description = models.TextField()
-
-
-

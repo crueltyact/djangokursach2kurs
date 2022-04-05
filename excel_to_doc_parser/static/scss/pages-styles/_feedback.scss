@@ -1,0 +1,18 @@
+@import "../scss-vars/vars";
+
+.feedback {
+    &__title {
+        font-size: 20px;
+    }
+
+    &__suptitle {
+        font-size: 16px;
+        color: $main-grey;
+        margin-bottom: 15px;
+    }
+
+    &-cards {
+        display: flex;
+        flex-wrap: wrap;
+    }
+}

@@ -18,11 +18,12 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
-from excel_to_doc_parser.views import index, download, login_request
+from excel_to_doc_parser.views import index, download, login_view, logout_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name="index"),
     path('download/', download, name='download'),
-    path('login/', login_request, name="login"),
+    path('login/', login_view, name="login"),
+    path('logout/', logout_view, name="logout"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

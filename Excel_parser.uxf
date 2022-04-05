@@ -4,8 +4,8 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>390</x>
-      <y>390</y>
+      <x>20</x>
+      <y>320</y>
       <w>210</w>
       <h>200</h>
     </coordinates>
@@ -28,8 +28,8 @@ description: string
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>390</x>
-      <y>160</y>
+      <x>20</x>
+      <y>90</y>
       <w>210</w>
       <h>150</h>
     </coordinates>
@@ -48,8 +48,8 @@ password: string
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>710</x>
-      <y>160</y>
+      <x>340</x>
+      <y>90</y>
       <w>210</w>
       <h>70</h>
     </coordinates>
@@ -64,8 +64,8 @@ role_type: string
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>590</x>
-      <y>190</y>
+      <x>220</x>
+      <y>120</y>
       <w>140</w>
       <h>40</h>
     </coordinates>
@@ -77,8 +77,8 @@ m2=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>480</x>
-      <y>300</y>
+      <x>110</x>
+      <y>230</y>
       <w>50</w>
       <h>110</h>
     </coordinates>
@@ -90,8 +90,8 @@ m2=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>480</x>
-      <y>580</y>
+      <x>110</x>
+      <y>510</y>
       <w>50</w>
       <h>110</h>
     </coordinates>
@@ -103,8 +103,8 @@ m2=1</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>390</x>
-      <y>670</y>
+      <x>20</x>
+      <y>600</y>
       <w>210</w>
       <h>70</h>
     </coordinates>
@@ -119,8 +119,8 @@ status: string
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>740</x>
-      <y>440</y>
+      <x>370</x>
+      <y>370</y>
       <w>210</w>
       <h>70</h>
     </coordinates>
@@ -135,8 +135,8 @@ link: string
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>590</x>
-      <y>470</y>
+      <x>220</x>
+      <y>400</y>
       <w>170</w>
       <h>40</h>
     </coordinates>
