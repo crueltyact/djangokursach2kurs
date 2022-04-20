@@ -49,4 +49,5 @@ class Section(models.Model):
     description = models.TextField()
     module_id = models.ForeignKey(Module, on_delete=models.CASCADE)
     theme_id = models.ForeignKey(Theme, on_delete=models.CASCADE)
-
+    semester = models.IntegerField(default=1)
+    week = models.IntegerField(default=1)
