@@ -1,0 +1,28 @@
+{% load static %}
+<div class="col-3 h-100">
+    <div class="menu">
+        <div class="menu-profile">
+            <img width="75" height="75" src="{% static 'img/avatar.png' %}" alt="avatar">
+            <div class="menu-profile__name">{{ custom_user.second_name }} {{ custom_user.first_name }}
+                {{ custom_user.last_name }}
+            </div>
+            <div class="menu-profile__position">{{ role.role_type }}</div>
+        </div>
+        <div class="menu-list">
+            <ul class="menu-list__ul">
+                <a href="/">
+                    <li>Главная</li>
+                </a>
+                <a href="/documents">
+                    <li>Программы обучения</li>
+                </a>
+                <a href="feedback.html">
+                    <li>Обратная связь</li>
+                </a>
+            </ul>
+        </div>
+        <div class="menu-footer">
+            <p><a href="/logout"><span>Выйти</span></a> из аккаунта</p>
+        </div>
+    </div>
+</div>

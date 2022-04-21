@@ -16,9 +16,10 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.template.defaulttags import url
 from django.urls import path
 
-from excel_to_doc_parser.views import index, download, login_view, logout_view
+from excel_to_doc_parser.views import index, download, login_view, logout_view, themes, documents
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,4 +27,6 @@ urlpatterns = [
     path('download/', download, name='download'),
     path('login/', login_view, name="login"),
     path('logout/', logout_view, name="logout"),
+    path('documents/', documents, name="documents"),
+    path('themes/', themes, name="themes"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

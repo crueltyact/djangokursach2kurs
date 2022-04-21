@@ -1,183 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
+{% include 'base/header.html' %}
 {% load static %}
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'css/index.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <title>Главная страница</title>
-</head>
-
 <body>
-<!--Loader-->
-<div class="mask">
-    <div class="lds-ring">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-    </div>
-</div>
-<!--/Loader-->
-<header class="header">
-    <div class="container">
-        <div class="row d-flex">
-            <div class="col text-start">
-                <div class="header__logo">Curriculum Creator</div>
-            </div>
-            <div class="col text-end">
-                <div class="header__user">Вы авторизированы, как <span>{{ custom_user.user }}</span></div>
-            </div>
-        </div>
-    </div>
-</header>
-<div class="main">
-    <div class="container h-100">
-        <div class="row d-flex h-100">
-            <div class="col-3 h-100">
-                <div class="menu">
-                    <div class="menu-profile">
-                        <img width="75" height="75" src="{% static 'img/avatar.png' %}" alt="avatar">
-                        <div class="menu-profile__name">{{ custom_user.second_name }} {{ custom_user.first_name }}
-                            {{ custom_user.last_name }}
-                        </div>
-                        <div class="menu-profile__position">{{ role.role_type }}</div>
-                    </div>
-                    <div class="menu-list">
-                        <ul class="menu-list__ul">
-                            <a href="./main.html">
-                                <li>Главная</li>
-                            </a>
-                            <a href="feedback.html">
-                                <li>Обратная связь</li>
-                            </a>
-                        </ul>
-                    </div>
-                    <div class="menu-footer">
-                        <p><a href="/logout"><span>Выйти</span></a> из аккаунта</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-9 pt-5">
-                <div class="card-inner">
-                    {% for module in modules %}
-                    <!--Module-->
-                    <div class="card-module">
-                        <p class="card-module__title">Модуль {{ module.module.module }}</p>
-                        <div class="card-module__content">
-                            <div class="card-module__cards">
-                                {% for section in sections %}
-                                {% if section.module == module.module.module %}
-                                <div class="card" style="width: 18rem;">
-                                    <form method="POST" action="">
-                                        {% csrf_token %}
-                                        <div class="card-body">
-                                            <label>
-                                                <input type="text" name="header" class="card-title"
-                                                       value="{{ section.header }}">
-                                            </label>
-                                            <label>
-                                                <textarea class="card-title" name="description">{{ section.description }}</textarea>
-                                            </label>
-                                            <label>
-                                                <input type="number" name="classwork" class="card-title"
-                                                       value="{{ section.classwork_hours }}">
-                                            </label>
-                                            <label>
-                                                <input type="number" name="homework" class="card-title"
-                                                       value="{{ section.homework_hours }}">
-                                            </label>
-                                            <!--                                        <h6 class="card-subtitle mb-2 text-muted">Курс 1</h6>-->
-                                            <!--                                        <p class="card-text">Программа обучения</p>-->
-                                            <button type="submit" class="card-link">Сохранить</button>
-                                            <!--                                            <a href="#" class="card-link card-link__delete"><span>Удалить</span></a>-->
-                                            <label>
-                                                <input type="hidden" name="pk" value="{{ section.id }}">
-                                            </label>
-                                        </div>
-                                    </form>
-                                </div>
-                                {% endif %}
-                                {% endfor %}
-                            </div>
-                            <div class="card-btn_addchapter">
-                                <button type="button" data-bs-toggle="modal" data-bs-target="#addSectionModal-{{ forloop.counter }}">
-                                    Добавить раздел +
-                                </button>
-                                <div class="modal fade" id="addSectionModal-{{ forloop.counter }}" tabindex="-1"
-                                     aria-labelledby="addSectionModalLabel" style="display: none;"
-                                     aria-hidden="true">
-                                    <div class="modal-dialog modal-fullscreen">
-                                        <div class="modal-content">
-                                            <form method="POST" action="">
-                                                <input type="hidden" value="True" name="new_section">
-                                                {% csrf_token %}
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title h4" id="exampleModalFullscreenLabel">
-                                                        Добавление нового раздела</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <label>
-                                                        <input type="text" name="new_header" class="card-title"
-                                                               required>
-                                                    </label>
-                                                    <label>
-                                                        <textarea class="card-title" name="new_description" required></textarea>
-                                                    </label>
-                                                    <label>
-                                                        <input type="number" name="new_classwork" class="card-title"
-                                                               required>
-                                                    </label>
-                                                    <label>
-                                                        <input type="number" name="new_homework" class="card-title"
-                                                               required>
-                                                    </label>
-                                                    <label>
-                                                        <input type="hidden" name="new_module" value="{{ forloop.counter }}">
-                                                    </label>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="submit" class="card-link">
-                                                        Сохранить
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                    <!--/Module-->
-                    {% endfor %}
-                    <div class="card-btn_addmodule">
-                        <button>Добавить модуль +</button>
+    {% include 'base/body.html' %}
+    {% block body %}
+    <div class="main">
+        <div class="container h-100">
+            <div class="row d-flex h-100">
+                {% include 'base/menu.html' %}
+                <div class="col-9 pt-5">
+                    <div class="card-inner">
+                        {{ hello }}
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<!-- <footer class="footer">
-    <p>&copy Лучшая команда КИС 2022</p>
-</footer> -->
-
-<script src="{% static 'js/loader.js' %}"></script>
-<script src="{% static 'js/jQuery.js' %}"></script>
-<script src="{% static 'js/jQuery-datatables.min.js' %}"></script>
-<script src="{% static 'js/jQuery-datatables-bootstrap5.min.js' %}"></script>
-<script src="{% static 'js/datatable.js' %}"></script>
-<script src="{% static 'js/cardTabs.js' %}"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
+    {% endblock %}
+    <!-- <footer class="footer">
+        <p>&copy Лучшая команда КИС 2022</p>
+    </footer> -->
+    {% include 'base/scripts.html' %}
 </body>
-</html>
