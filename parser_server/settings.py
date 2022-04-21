@@ -38,8 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'excel_to_doc_parser',
-    'crispy_forms'
+    'excel_to_doc_parser'
 ]
 
 MIDDLEWARE = [
@@ -79,10 +78,10 @@ WSGI_APPLICATION = 'parser_server.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'excel_to_doc_parser',
-        'USER': 'root',
+        'NAME': 'std_1945_excel_to_doc_parser',
+        'USER': 'std_1945_excel_to_doc_parser',
         'PASSWORD': '200347ATunic@',
-        'HOST': '127.0.0.1',
+        'HOST': 'std-mysql.ist.mospolytech.ru',
         'PORT': '3306'
     }
 }
