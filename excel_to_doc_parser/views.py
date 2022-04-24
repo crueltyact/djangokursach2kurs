@@ -220,6 +220,8 @@ def themes(request):
         context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
         context["theme"] = Theme.objects.get(pk=theme.id)
         context["modules"] = Module.objects.filter(theme_id=Theme.objects.get(pk=theme.id))
+        context["homework_hours"] = TimePlan.objects.get(program_name=Document.objects.get(pk=request.GET.get("document")).program_name).homework_hours
+        context["classwork_hours"] = TimePlan.objects.get(program_name=Document.objects.get(pk=request.GET.get("document")).program_name).classwork_hours - context["homework_hours"]
         if len(context["modules"]) > 0:
             context["last_module"] = context["modules"].order_by('-id')[0].module
             context["sections"] = Section.objects.filter(theme_id=context["theme"])
@@ -312,11 +314,6 @@ def themes(request):
                 module = Section.objects.filter(pk=pk)
                 module.update(header=header, description=description, classwork_hours=classwork_hours,
                               homework_hours=homework_hours, semester=semester, week=week)
-                # with open(join(str(BASE_DIR), 'excel_to_doc_parser/media/temporary_text/{}.csv'.format(
-                #         str(request.user) + '_' + header)), 'w') as f:
-                #     writer = csv.writer(f)
-                #     writer.writerow(['header', 'description', 'classwork_hours', 'homework_hours'])
-                #     writer.writerow([header, description, classwork_hours, homework_hours])
                 return redirect("/themes/?document={}".format(request.GET.get("document")))
     return render(request, "theme.html", context)
 
@@ -349,3 +346,12 @@ def logout_view(request):
     if not request.user.is_authenticated:
         return redirect("/")
     return render(request, "authorization.html")
+
+
+@login_required(login_url='/login/')
+def info(request):
+    context = {}
+    if request.user.is_authenticated:
+        context["custom_user"] = CustomUser.objects.get(user=request.user)
+        context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
+    return render(request, "feedback.html", context)
