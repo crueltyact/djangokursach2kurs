@@ -12,15 +12,17 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
+from django.core.files.storage import FileSystemStorage
 from django.db.models import QuerySet
 from django.http import HttpResponse, HttpResponseForbidden, FileResponse
 from django.shortcuts import render, redirect
 from docxtpl import DocxTemplate
 
-from excel_to_doc_parser.models import CustomUser, Role, Document, Theme, Section, Module
+from excel_to_doc_parser.models import CustomUser, Role, Document, Theme, Section, Module, WorkProgram, ProgramNames, \
+    TimePlan
 from excel_to_doc_parser.py.parser import get_info_from_excel
 from excel_to_doc_parser.py.parser_plane import get_info_from_education_plane
-from parser_server.settings import BASE_DIR
+from parser_server.settings import BASE_DIR, MEDIA_ROOT
 
 
 def check_number(num):
@@ -34,8 +36,51 @@ def check_number(num):
 
 @login_required(login_url='/login/')
 def index(request):
+    context = {}
     if request.user.is_authenticated:
-        context = {"hello": "hello", "custom_user": CustomUser.objects.get(user=request.user)}
+        context["hello"] = "hello"
+        context["custom_user"] = CustomUser.objects.get(user=request.user)
+        context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
+        if context["custom_user"].role_id == 1:
+            if request.method == "POST":
+                fs = FileSystemStorage()
+                program = fs.save(request.FILES['work_program'].name, request.FILES['work_program'])
+                time = fs.save(request.FILES['time_plane'].name, request.FILES['time_plane'])
+                work_program, key_list = get_info_from_excel(join(MEDIA_ROOT, program))
+                new_program, created = WorkProgram.objects.update_or_create(profile_name=work_program['profile_name'],
+                                                                            program_code=work_program["program_code"],
+                                                                            year_start=work_program["year_start"],
+                                                                            year_end=work_program["year_end"])
+                for key in key_list:
+                    try:
+                        time_plane = get_info_from_education_plane(join(MEDIA_ROOT, time))[key]
+                    except KeyError:
+                        for error_key in get_info_from_education_plane(join(MEDIA_ROOT, time)):
+                            if SequenceMatcher(None, key, error_key).ratio() >= 0.75:
+                                time_plane = get_info_from_education_plane(join(MEDIA_ROOT, time))[
+                                    error_key]
+                                break
+                    new_program_name, created = ProgramNames.objects.update_or_create(work_program=new_program,
+                                                                                      program_name=key)
+                    new_time_plan, created = TimePlan.objects.update_or_create(program_name=new_program_name,
+                                                                               classwork_hours=time_plane[
+                                                                                   "intensity_hours"],
+                                                                               homework_hours=time_plane[
+                                                                                   "total_homework_hours"],
+                                                                               intensity_ZET=time_plane[
+                                                                                   "intensity_ZET"])
+                folder = MEDIA_ROOT
+                for filename in os.listdir(folder):
+                    file_path = os.path.join(folder, filename)
+                    if filename == ".gitkeep":
+                        continue
+                    try:
+                        if os.path.isfile(file_path) or os.path.islink(file_path):
+                            os.unlink(file_path)
+                        elif os.path.isdir(file_path):
+                            shutil.rmtree(file_path)
+                    except Exception as e:
+                        print('An error appear ' + str(e))
     #     context["custom_user"] = CustomUser.objects.get(user=request.user)
     #     context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
     #     context["theme"] = Theme.objects.get(theme=1)
@@ -151,13 +196,14 @@ def index(request):
 @login_required(login_url='/login/')
 def documents(request):
     context = {"documents": Document.objects.filter(user_id=request.user.id),
-               "custom_user": CustomUser.objects.get(user=request.user)}
+               "custom_user": CustomUser.objects.get(user=request.user), "disciplines": ProgramNames.objects.all()}
     if request.method == "POST":
-        name = request.POST.get("name")
+        program_name = request.POST.get("program_name")
         link = request.POST.get("link")
         status = request.POST.get("status")
         user = request.user.id
-        new_document = Document(link_id=link, status_id=status, user_id=user, name=name)
+        new_document = Document(link_id=link, status_id=status, user_id=user,
+                                program_name=ProgramNames.objects.get(pk=ProgramNames.objects.get(program_name=program_name).id))
         new_document.save()
         new_theme = Theme(document_id=new_document)
         new_theme.save()

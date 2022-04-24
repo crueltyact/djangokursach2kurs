@@ -16,14 +16,15 @@ def check_number(num):
 
 
 def main():
-    contexts = get_info_from_excel("../templates/09_03_01_Информатика_и_ВТ,_Матрица_ВЕБ_технологии_2020.xlsx")
+    contexts = get_info_from_excel("../../media/09_03_01_Информатика_и_ВТ,_Матрица_ВЕБ_технологии_2020.xlsx")
     for key in contexts:
         try:
-            context_plane = get_info_from_education_plane("../media/excel/planes/03-5190 - ВЕБ 2020 (1).xlsx")[key]
+            context_plane = get_info_from_education_plane("../../media/03-5190 - ВЕБ 2020 (1).xlsx")[key]
         except KeyError:
-            for error_key in get_info_from_education_plane("../media/excel/planes/03-5190 - ВЕБ 2020 (1).xlsx"):
+            for error_key in get_info_from_education_plane("../../media/03-5190 - ВЕБ 2020 (1).xlsx"):
                 if SequenceMatcher(None, key, error_key).ratio() >= 0.75:
-                    context_plane = get_info_from_education_plane("../media/excel/planes/03-5190 - ВЕБ 2020 (1).xlsx")[error_key]
+                    context_plane = get_info_from_education_plane("../../media/03-5190 - ВЕБ 2020 (1).xlsx")[
+                        error_key]
                     break
         context_plane['intensity_ZET_check'] = check_number(context_plane['intensity_ZET'])
         context_plane['intensity_hours_check'] = check_number(context_plane['intensity_hours'])
@@ -34,13 +35,13 @@ def main():
             context_plane['courses'][i]['homework_time_check'] = check_number(
                 context_plane['courses'][i]['homework_time'])
         doc = DocxTemplate("../templates/template.docx")
-        doc.render(contexts[key])
+        doc.render(dict(contexts[key], **context_plane))
         for i in range(len(doc.tables)):
             table = doc.tables[i]._tbl
             for row in doc.tables[i].rows:
                 if len(row.cells[0].text.strip()) == 0 and len(set(row.cells)) == 1:
                     table.remove(row._tr)
-        doc.save("../generated_files/{}.docx".format(key))
+        doc.save("../../generated_files/{}.docx".format(key))
 
 
 if __name__ == '__main__':
