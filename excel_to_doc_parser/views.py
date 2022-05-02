@@ -6,6 +6,7 @@ from os.path import join
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponseForbidden, FileResponse
 from django.shortcuts import render, redirect
 from docxtpl import DocxTemplate
@@ -31,8 +32,6 @@ def index(request):
     context = {}
     if request.user.is_authenticated:
         context = {"hello": "hello", "custom_user": CustomUser.objects.get(user=request.user)}
-        context["hello"] = "hello"
-        context["custom_user"] = CustomUser.objects.get(user=request.user)
         context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
         if context["custom_user"].role_id == 1:
             if request.method == "POST":
