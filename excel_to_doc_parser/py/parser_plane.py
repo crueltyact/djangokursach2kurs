@@ -69,16 +69,11 @@ def get_courses(arr, imp_cols, met='moduls'):
             'ZET': hours_to_zet(hours),
             'homework_time': 0,
         }]
-
-    # преобразуем courses к виду [[курс, часы аудиторной работы]]
     courses = list(map(lambda el: [el[0] + 1, el[1]], enumerate(arr[imp_cols['sems']::])))
     courses = list(filter(lambda el: el[1] != '', courses))
     courses = list(map(lambda el: [el[0], float(el[1])], courses))
-
     courses_count = len(courses)
     all_homework = to_int(arr[imp_cols['homework']])
-
-    # алгоритм расчета часов домашней работы
     homeworks = [[sem, time / 2] for sem, time in courses]
     if sum([el[1] for el in homeworks]) != all_homework:
         homeworks = [[sem, time] for sem, time in courses]
@@ -89,8 +84,6 @@ def get_courses(arr, imp_cols, met='moduls'):
         idx = [el[1] for el in courses].index(max([el[1] for el in courses]))
         homeworks[idx][1] += ost
     homeworks = dict(homeworks)
-
-    # создаем и заполняем массив информации о каждом семестре
     res = []
     for sem, time in courses:
         res += [{}]
@@ -100,14 +93,14 @@ def get_courses(arr, imp_cols, met='moduls'):
         res[-1]['homework_time'] = to_int(homeworks[sem])
         res[-1]['hours'] = to_int(time) + res[-1]['homework_time']
         res[-1]['ZET'] = hours_to_zet(to_int(res[-1]['hours']))
-
     return res
 
 
 def to_int(x):
     try:
         return int(float(x))
-    except:
+    except Exception as exc:
+        print(exc)
         return 0
 
 
@@ -121,18 +114,13 @@ def find_from_matrix(dct, matrix, idx=0):
     return res
 
 
-# главная функция
 def get_info_from_education_plane(filename):
-    # получаем матрицу из файла
     matrix = get_matrix(filename)
-
-    # ищем нужные координаты ячеек от которых будем отталкиваться
     imp_rows = find_from_matrix({
         'subjects': 'Обязательная часть',
         'practice': 'Б.2',
         'elective': 'Факультативные дисциплины',
     }, matrix, 0)
-
     imp_cols = find_from_matrix({
         'credit': 'зачетов',
         'exam': 'экзаменов',
@@ -146,25 +134,17 @@ def get_info_from_education_plane(filename):
         'elective_sem': 'Семестр',
         'elective_hours': 'Ауд. часов',
     }, matrix, 1)
-
-    # преобразуем названия дисциплин к нормальному виду
     for i in range(len(matrix))[imp_rows['subjects']::]:
         matrix[i][imp_cols['subjects']] = matrix[i][imp_cols['subjects']].split('*')[0].strip()
-
-    # создаем и заполняем выходную структуру дисциплинами из блока "Модули"
     data = {}
     for i in range(imp_rows['subjects'], imp_rows['practice']):
         if matrix[i][imp_cols['hours']] != '' and matrix[i][imp_cols['B.1']] == '':
             key = matrix[i][imp_cols['subjects']]
-
             data[key] = {}
-
             data[key]['intensity_hours'] = to_int(matrix[i][imp_cols['hours']])
             data[key]['intensity_ZET'] = hours_to_zet(to_int(data[key]['intensity_hours']))
             data[key]['total_homework_hours'] = to_int(matrix[i][imp_cols['homework']])
             data[key]['courses'] = get_courses(matrix[i], imp_cols, met='moduls')
-
-    # заполняем выходную структуру дисциплинами из блока "Практика" + "ГИА"
     for i in range(imp_rows['practice'], imp_rows['elective']):
         if matrix[i][imp_cols['B.1']] == '':
             key = matrix[i][imp_cols['subjects']]
@@ -173,18 +153,13 @@ def get_info_from_education_plane(filename):
             data[key]['intensity_hours'] = data[key]['intensity_ZET'] * 36
             data[key]['total_homework_hours'] = 0
             data[key]['courses'] = get_courses(matrix[i], imp_cols, met='practice')
-
-    # заполняем выходную структуру дисциплинами из блока "Факультативные дисциплины"
     i = imp_rows['elective'] + 1
     while matrix[i][imp_cols['elective']] != '':
         key = matrix[i][imp_cols['elective']]
-
         data[key] = {}
         data[key]['intensity_hours'] = to_int(matrix[i][imp_cols['elective_hours']])
         data[key]['intensity_ZET'] = hours_to_zet(data[key]['intensity_hours'])
         data[key]['total_homework_hours'] = 0
         data[key]['courses'] = get_courses(matrix[i], imp_cols, met='elective')
-
         i += 1
-
     return data

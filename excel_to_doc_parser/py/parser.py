@@ -4,7 +4,6 @@ import openpyxl
 import xlrd
 
 
-# возвращает код компетенции, индикатор компетенции и текст компетенции
 def get_parents(matrix, r):
     scd = matrix[r][1].replace('\n', '')
     fst = matrix[r][0].replace('\n', '')
@@ -23,19 +22,16 @@ def get_info_for_table(matrix, rng, c):
 
     for r in rng:
         if matrix[r][c] == '+':
-            # ищем, к какому индикатору и коду компетенции относится найденное требование
             f_code, s_code, t_code = get_parents(matrix, r)
             if f_code == '' or s_code == '' or t_code == '':
                 continue
             code, name = [el.strip() for el in list(filter(bool, f_code.split('.')))]
-
             if res[-1]['competency_code'] != code:
                 res.append({
                     'competency_code': code,
                     'competency_name': name,
                     'indicators': [['', set()]]
                 })
-
                 res[-1]['indicators'][0][0] = s_code
                 res[-1]['indicators'][0][1].add(t_code)
             else:
@@ -85,20 +81,14 @@ def parse_title(txt):
 def get_matrix(filename):
     xls = xlrd.open_workbook(filename)
     xls = xls.sheet_by_index(0)
-
     mx_row, mx_column = xls.nrows, xls.ncols
-
     wb = openpyxl.load_workbook(filename)
     sheet = wb.get_sheet_by_name(wb.get_sheet_names()[0])
-
     all_data = []
-
     for row_index in range(1, mx_row + 1):
         row = []
-
         for col_index in range(1, mx_column + 1):
             vals = sheet.cell(row_index, col_index).value
-
             if vals is None:
                 for crange in sheet.merged_cells:
                     clo, rlo, chi, rhi = crange.bounds
@@ -107,45 +97,29 @@ def get_matrix(filename):
                         vals = top_value
                         break
             row.append(vals)
-
         if len(list(filter(bool, row))) > 0:
             all_data.append(row)
-
     for i in range(len(all_data)):
         for j in range(len(all_data[0])):
             if all_data[i][j] is None:
                 all_data[i][j] = ''
             all_data[i][j] = str(all_data[i][j]).strip()
-
     return all_data
 
 
-# главная функция
 def get_info_from_excel(filename):
-    # получаем python матрицу из excel файла
     matrix = get_matrix(filename)
-    # создаем массив диапазонов "Универсальной", "Общепрофессиональной", "Профессиональной" компетенции
     skill_types = get_ranges(matrix)
-    # удаляем пустые строки
     for i in range(len(matrix))[::-1]:
         if len(list(filter(bool, matrix[i]))) == 0:
             del matrix[i]
-
-    # размеры матрицы
     cols = len(matrix[0])
-
-    # парсим title
     title = parse_title(matrix[0][0])
-
-    # Главный выходной словарь
     data = {}
-
-    # заполняем data всеми дисциплинами и их данными
     for c in range(cols)[3::]:
         key = matrix[2][c]
         if key == '':
             continue
-
         data[key] = {}
         data[key]['program_name'] = key
         data[key]['profile_name'] = title['profile_name']
@@ -154,17 +128,13 @@ def get_info_from_excel(filename):
         data[key]['year_end'] = title['year_end']
         data[key]['current_year'] = str(datetime.date.today().year)
         data[key]['part_type'] = str.lower(matrix[1][c])
-
-        # основной алгоритм заполнения данных для docx таблиц
         universal_competences = get_info_for_table(matrix, skill_types[0], c)
         general_professional_competencies = get_info_for_table(matrix, skill_types[1], c)
         professional_competencies = get_info_for_table(matrix, skill_types[2], c)
-
         if len(universal_competences) > 0:
             data[key]['universal_competences'] = universal_competences
         if len(general_professional_competencies) > 0:
             data[key]['general_professional_competencies'] = general_professional_competencies
         if len(professional_competencies) > 0:
             data[key]['professional_competencies'] = professional_competencies
-
     return data
