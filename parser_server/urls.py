@@ -19,7 +19,7 @@ from django.contrib import admin
 from django.template.defaulttags import url
 from django.urls import path
 
-from excel_to_doc_parser.views import index, download, login_view, logout_view, themes, documents
+from excel_to_doc_parser.views import index, download, login_view, logout_view, themes, documents, info
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,4 +29,5 @@ urlpatterns = [
     path('logout/', logout_view, name="logout"),
     path('documents/', documents, name="documents"),
     path('themes/', themes, name="themes"),
+    path('about/', info, name="about"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

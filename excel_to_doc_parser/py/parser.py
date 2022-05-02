@@ -7,7 +7,6 @@ import xlrd
 def get_parents(matrix, r):
     scd = matrix[r][1].replace('\n', '')
     fst = matrix[r][0].replace('\n', '')
-
     return [fst, scd, matrix[r][2]]
 
 
@@ -19,7 +18,6 @@ def get_info_for_table(matrix, rng, c):
             'indicators': [['', set()]]
         }
     ]
-
     for r in rng:
         if matrix[r][c] == '+':
             f_code, s_code, t_code = get_parents(matrix, r)
@@ -116,17 +114,20 @@ def get_info_from_excel(filename):
     cols = len(matrix[0])
     title = parse_title(matrix[0][0])
     data = {}
+    key_data = []
+    # заполняем data всеми дисциплинами и их данными
     for c in range(cols)[3::]:
         key = matrix[2][c]
         if key == '':
             continue
+        key_data.append(key)
         data[key] = {}
-        data[key]['program_name'] = key
-        data[key]['profile_name'] = title['profile_name']
-        data[key]['program_code'] = title['program_code']
-        data[key]['year_start'] = title['year_start']
-        data[key]['year_end'] = title['year_end']
-        data[key]['current_year'] = str(datetime.date.today().year)
+        data['program_name'] = key
+        data['profile_name'] = title['profile_name']
+        data['program_code'] = title['program_code']
+        data['year_start'] = title['year_start']
+        data['year_end'] = title['year_end']
+        data['current_year'] = str(datetime.date.today().year)
         data[key]['part_type'] = str.lower(matrix[1][c])
         universal_competences = get_info_for_table(matrix, skill_types[0], c)
         general_professional_competencies = get_info_for_table(matrix, skill_types[1], c)
@@ -137,4 +138,4 @@ def get_info_from_excel(filename):
             data[key]['general_professional_competencies'] = general_professional_competencies
         if len(professional_competencies) > 0:
             data[key]['professional_competencies'] = professional_competencies
-    return data
+    return data, key_data

@@ -38,8 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'excel_to_doc_parser',
-    'crispy_forms'
+    'excel_to_doc_parser'
 ]
 
 MIDDLEWARE = [

@@ -3,8 +3,8 @@
     <div class="menu">
         <div class="menu-profile">
             <img width="75" height="75" src="{% static 'img/avatar.png' %}" alt="avatar">
-            <div class="menu-profile__name">{{ custom_user.second_name }} {{ custom_user.first_name }}
-                {{ custom_user.last_name }}
+            <div class="menu-profile__name">{{ custom_user.last_name }} {{ custom_user.first_name }}
+                {{ custom_user.second_name }}
             </div>
             <div class="menu-profile__position">{{ role.role_type }}</div>
         </div>
@@ -16,7 +16,7 @@
                 <a href="/documents">
                     <li>Программы обучения</li>
                 </a>
-                <a href="feedback.html">
+                <a href="/about">
                     <li>Обратная связь</li>
                 </a>
             </ul>

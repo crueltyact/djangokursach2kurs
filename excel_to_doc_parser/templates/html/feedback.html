@@ -1,136 +1,78 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../../static/css/index.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
-    <title>Обратная связь</title>
-</head>
-
+{% include 'base/header.html' %}
+{% load static %}
 <body>
-    <!--Loader-->
-    <div class="mask">
-        <div class="lds-ring">
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-        </div>
-    </div>
-    <!--/Loader-->
-    <header class="header">
-        <div class="container">
-            <div class="row d-flex">
-                <div class="col text-start">
-                    <div class="header__logo">Curriculum Creator</div>
-                </div>
-                <div class="col text-end">
-                    <div class="header__user">Вы авторизированы, как <span>ЛОГИН</span></div>
-                </div>
-            </div>
-        </div>
-    </header>
-    <div class="main">
-        <div class="container h-100">
-            <div class="row d-flex h-100">
-                <div class="col-3 h-100">
-                    <div class="menu">
-                        <div class="menu-profile">
-                            <img width="75" height="75" src="../../static/img/avatar.png" alt="avatar">
-                            <div class="menu-profile__name">Иванов Иван Иванович</div>
-                            <div class="menu-profile__position">Должность</div>
+{% include 'base/body.html' %}
+{% block body %}
+<div class="main">
+    <div class="container h-100">
+        <div class="row d-flex h-100">
+            {% include 'base/menu.html' %}
+            <div class="col-9 pt-5">
+                <div class="feedback">
+                    <div class="feedback__title">Спасибо, что пользуетесь нашей программой!</div>
+                    <div class="feedback__suptitle">Контакты нашей команды, которая участвовала в разработке:</div>
+                    <div class="feedback-cards">
+                        <!--card-->
+                        <div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h5 class="card-title">Логачев Максим Сергеевич</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">Руководитель проекта</h6>
+                                <p class="card-phone">Контактный телефон: <br> <span>Заполнить</span></p>
+                                <p class="card-email">Почта: <br> <span>Заполнить</span></p>
+                            </div>
                         </div>
-                        <div class="menu-list">
-                            <ul class="menu-list__ul">
-                                <a href="main.html">
-                                    <li>Главная</li>
-                                </a>
-
-                                <a href="./feedback.html">
-                                    <li>Обратная связь</li>
-                                </a>
-                            </ul>
+                        <!--/card-->
+                        <!--card-->
+                        <div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h5 class="card-title">Шарков Иван Александрович</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">Front-end developer</h6>
+                                <p class="card-phone">Контактный телефон: <br> <a href="tel: +79851413119">+7 (985) 141-31-19</a></p>
+                                <p class="card-email">Почта: <br> <a href="mailto: sharkov.agent@mail.ru">sharkov.agent@mail.ru</a></p>
+                            </div>
                         </div>
-                        <div class="menu-footer">
-                            <p><a href="authorization.html"><span>Выйти</span></a> из аккаунта</p>
+                        <!--/card-->
+                        <!--card-->
+                        <div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h5 class="card-title">Ткачев Андрей Владимирович</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">Fullstack developer</h6>
+                                <p class="card-phone">Контактный телефон: <br> <a href="tel: +798525541989">+7 (985) 255-41-989</a></p>
+                                <p class="card-email">Почта: <br> <a href="mailto: Andrew@Tkacheff.su">Andrew@Tkacheff.su</a></p>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div class="col-9 pt-5">
-                    <div class="feedback">
-                        <div class="feedback__title">Спасибо, что пользуетесь нашей программой!</div>
-                        <div class="feedback__suptitle">Контакты нашей команды, которая участвовала в разработке:</div>
-                        <div class="feedback-cards">
-                            <!--card-->
-                            <div class="card" style="width: 18rem;">
-                                <div class="card-body">
-                                    <h5 class="card-title">Логачев Максим Сергеевич</h5>
-                                    <h6 class="card-subtitle mb-2 text-muted">Руководитель проекта</h6>
-                                    <p class="card-phone">Контактный телефон: <br> <span>Заполнить</span></p>
-                                    <p class="card-email">Почта: <br> <span>Заполнить</span></p>
-                                </div>
+                        <!--/card-->
+                        <!--card-->
+                        <div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h5 class="card-title">Углов Артем Евгеньевич</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">HR-Manager</h6>
+                                <p class="card-phone">Контактный телефон: <br> <a href="tel: +79236139055">+7 (923) 613-90-55</a></p>
+                                <p class="card-email">Почта: <br> <a href="mailto:artiomuglov@yandex.ru">artiomuglov@yandex.ru</a></p>
                             </div>
-                            <!--/card-->
-                            <!--card-->
-                            <div class="card" style="width: 18rem;">
-                                <div class="card-body">
-                                    <h5 class="card-title">Шарков Иван Александрович</h5>
-                                    <h6 class="card-subtitle mb-2 text-muted">Front-end developer</h6>
-                                    <p class="card-phone">Контактный телефон: <br> <span>+7 (985) 141-31-19</span></p>
-                                    <p class="card-email">Почта: <br> <span>sharkov.agent@mail.ru</span></p>
-                                </div>
-                            </div>
-                            <!--/card-->
-                            <!--card-->
-                            <div class="card" style="width: 18rem;">
-                                <div class="card-body">
-                                    <h5 class="card-title">Ткачев Андрей Владимирович</h5>
-                                    <h6 class="card-subtitle mb-2 text-muted">Fullstack developer</h6>
-                                    <p class="card-phone">Контактный телефон: <br> <span>+7 (985) 255-41-989</span></p>
-                                    <p class="card-email">Почта: <br> <span>Andrew@Tkacheff.su</span></p>
-                                </div>
-                            </div>
-                            <!--/card-->
-                            <!--card-->
-                            <div class="card" style="width: 18rem;">
-                                <div class="card-body">
-                                    <h5 class="card-title">Углов Артем Евгеньевич</h5>
-                                    <h6 class="card-subtitle mb-2 text-muted">HR-Manager</h6>
-                                    <p class="card-phone">Контактный телефон: <br> <span>+7 (923) 613-90-55</span></p>
-                                    <p class="card-email">Почта: <br> <span>artiomuglov@yandex.ru</span></p>
-                                </div>
-                            </div>
-                            <!--/card-->
-                            <!--card-->
-                            <div class="card" style="width: 18rem;">
-                                <div class="card-body">
-                                    <h5 class="card-title">Тимашов Петр Валерьевич</h5>
-                                    <h6 class="card-subtitle mb-2 text-muted">Back-end developer</h6>
-                                    <p class="card-phone">Контактный телефон: <br> <span>+7 (968) 548-54-89</span></p>
-                                    <p class="card-email">Почта: <br> <span>kalij2228@gmail.com</span></p>
-                                </div>
-                            </div>
-                            <!--/card-->
                         </div>
+                        <!--/card-->
+                        <!--card-->
+                        <div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h5 class="card-title">Тимашов Петр Валерьевич</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">Back-end developer</h6>
+                                <p class="card-phone">Контактный телефон: <br> <a href="tel: +79685485489">+7 (968) 548-54-89</a></p>
+                                <p class="card-email">Почта: <br> <a href="mailto: kalij2228@gmail.com">kalij2228@gmail.com</a></p>
+                            </div>
+                        </div>
+                        <!--/card-->
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- <footer class="footer">
-        <p>&copy Лучшая команда КИС 2022</p>
-    </footer> -->
-
-    <script src="../../static/js/loader.js"></script>
-    <script src="../../static/js/jQuery.js"></script>
-    <script src="../../static/js/jQuery-datatables.min.js"></script>
-    <script src="../../static/js/jQuery-datatables-bootstrap5.min.js"></script>
-    <script src="../../static/js/datatable.js"></script>
-    <script src="../../static/js/cardTabs.js"></script>
+</div>
+{% endblock %}
+<!-- <footer class="footer">
+    <p>&copy Лучшая команда КИС 2022</p>
+</footer> -->
+{% include 'base/scripts.html' %}
 </body>
 
 </html>

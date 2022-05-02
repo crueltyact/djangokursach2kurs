@@ -10,12 +10,18 @@
             <div class="col-9 pt-5">
                 <div class="card-inner">
                     {% for document in documents %}
-                        <a class="btn" href="/themes?document={{ document.id }}">{{ document.name }}</a>
+                        <a class="btn" href="/themes?document={{ document.id }}">{{ document.program_name.program_name }}</a>
                     {% endfor %}
                     <div class="card-btn_addmodule">
                         <form action="" method="POST">
                             {% csrf_token %}
-                            <input type="text" name="name">
+                            <label>
+                                <select name="program_name">
+                                    {% for discipline in disciplines %}
+                                    <option value="{{ discipline.program_name }}">{{ discipline.program_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </label>
                             <input type="hidden" name="link" value="1">
                             <input type="hidden" name="status" value="1">
                             <input type="hidden" name="new_document" value="True">

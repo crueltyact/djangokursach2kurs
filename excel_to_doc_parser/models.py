@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -26,8 +28,27 @@ class Status(models.Model):
     status = models.CharField(choices=STATUSES, default=STATUSES[4], max_length=256)
 
 
+class WorkProgram(models.Model):
+    profile_name = models.CharField(max_length=128)
+    program_code = models.CharField(max_length=128)
+    year_start = models.IntegerField(default=datetime.date.today().year)
+    year_end = models.IntegerField(default=datetime.date.today().year)
+
+
+class ProgramNames(models.Model):
+    work_program = models.ForeignKey(WorkProgram, on_delete=models.CASCADE)
+    program_name = models.CharField(max_length=512)
+
+
+class TimePlan(models.Model):
+    program_name = models.ForeignKey(ProgramNames, on_delete=models.CASCADE)
+    classwork_hours = models.IntegerField(default=2)
+    homework_hours = models.IntegerField(default=2)
+    intensity_ZET = models.IntegerField(default=2)
+
+
 class Document(models.Model):
-    name = models.TextField()
+    program_name = models.ForeignKey(ProgramNames, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     status = models.ForeignKey(Status, on_delete=models.CASCADE)
     link = models.ForeignKey(Link, on_delete=models.CASCADE)

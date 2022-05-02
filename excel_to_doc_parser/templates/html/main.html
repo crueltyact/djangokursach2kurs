@@ -9,7 +9,18 @@
                 {% include 'base/menu.html' %}
                 <div class="col-9 pt-5">
                     <div class="card-inner">
-                        {{ hello }}
+                        {% if custom_user.role_id != 1 %}
+                            {{ hello }}
+                        {% else %}
+                            <form method="POST" enctype="multipart/form-data" action="/">
+                                {% csrf_token %}
+                                <p>Файл матрицы компетенций</p>
+                                <input type="file" name="work_program">
+                                <p>Файл учебного плана</p>
+                                <input type="file" name="time_plane">
+                                <button type="submit">Загрузить файлы</button>
+                            </form>
+                        {% endif %}
                     </div>
                 </div>
             </div>

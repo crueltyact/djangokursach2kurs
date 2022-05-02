@@ -4,7 +4,6 @@ import xlrd
 def get_matrix(filename):
     xls = xlrd.open_workbook(filename)
     xls = xls.sheet_by_index(0)
-
     return [
         [str(xls.cell_value(i, j)).strip() for j in range(xls.ncols)]
         for i in range(xls.nrows)
@@ -57,7 +56,6 @@ def get_courses(arr, imp_cols, met='moduls'):
             'ZET': to_int(arr[imp_cols['ZET']]),
             'homework_time': 0,
         } for sem in sems]
-
     if met == 'elective':
         sem = to_int(arr[imp_cols['elective_sem']])
         hours = to_int(arr[imp_cols['elective_hours']])

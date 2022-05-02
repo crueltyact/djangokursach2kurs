@@ -29,11 +29,11 @@
                                                 <textarea class="card-title" name="description">{{ section.description }}</textarea>
                                             </label>
                                             <label>
-                                                <input type="number" name="classwork" class="card-title"
+                                                <input type="number" name="classwork" class="card-title classwork"
                                                        value="{{ section.classwork_hours }}">
                                             </label>
                                             <label>
-                                                <input type="number" name="homework" class="card-title"
+                                                <input type="number" name="homework" class="card-title homework"
                                                        value="{{ section.homework_hours }}">
                                             </label>
                                             <label>
@@ -83,11 +83,11 @@
                                                                       required></textarea>
                                                     </label>
                                                     <label>
-                                                        <input type="number" name="new_classwork" class="card-title"
+                                                        <input type="number" name="new_classwork" class="card-title classwork"
                                                                required>
                                                     </label>
                                                     <label>
-                                                        <input type="number" name="new_homework" class="card-title"
+                                                        <input type="number" name="new_homework" class="card-title homework"
                                                                required>
                                                     </label>
                                                     <label>
@@ -155,4 +155,30 @@
     <p>&copy Лучшая команда КИС 2022</p>
 </footer> -->
 {% include 'base/scripts.html' %}
+<script>
+    let classwork_hours = {{ classwork_hours }};
+    let homework_hours = {{ homework_hours }};
+    let classwork = document.querySelectorAll(".classwork");
+    let homework = document.querySelectorAll(".homework");
+    classwork.forEach(el => el.addEventListener('change', event => {
+        let sum = 0;
+        for (let i = 0; i < classwork.length; i++) {
+            sum += classwork[i].value;
+        }
+        if (sum > classwork_hours) {
+            alert("Вы превысили максимальное допустимое число часов: {{ classwork_hours }} ");
+            el.value = 0;
+        }
+    }));
+    homework.forEach(el => el.addEventListener('change', event => {
+        let sum = 0;
+        for (let i = 0; i < classwork.length; i++) {
+            sum += homework[i].value;
+        }
+        if (sum > homework_hours) {
+            alert("Вы превысили максимальное допустимое число часов: {{ homework_hours }} ");
+            el.value = 0;
+        }
+    }));
+</script>
 </body>
