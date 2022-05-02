@@ -242,10 +242,11 @@ def themes(request):
                             shutil.rmtree(file_path)
                     except Exception as e:
                         print('An error appear ' + str(e))
-                data = get_info_from_excel(
+                data, _ = get_info_from_excel(
                     path + "/matrices/" + "09_03_03_Прикладная_информатика,"
                                           "_Матрица_Корпоративные_информационные_системы_2020.xlsx")
                 discipline = "Навыки эффективной презентации"
+                print(data[discipline])
                 try:
                     context_plane = get_info_from_education_plane(path + "/planes/03-5190 - ВЕБ 2020 (1).xlsx")[
                         discipline]
