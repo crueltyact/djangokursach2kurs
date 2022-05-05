@@ -83,11 +83,13 @@
                                                                       required></textarea>
                                                     </label>
                                                     <label>
-                                                        <input type="number" name="new_classwork" class="card-title classwork"
+                                                        <input type="number" name="new_classwork"
+                                                               class="card-title classwork"
                                                                required>
                                                     </label>
                                                     <label>
-                                                        <input type="number" name="new_homework" class="card-title homework"
+                                                        <input type="number" name="new_homework"
+                                                               class="card-title homework"
                                                                required>
                                                     </label>
                                                     <label>
@@ -163,20 +165,35 @@
     classwork.forEach(el => el.addEventListener('change', event => {
         let sum = 0;
         for (let i = 0; i < classwork.length; i++) {
-            sum += classwork[i].value;
+            let tmp = parseInt(classwork[i].value, 10);
+            if (!isNaN(tmp)) {
+                sum += tmp;
+            }
         }
+        // console.log(sum)
         if (sum > classwork_hours) {
-            alert("Вы превысили максимальное допустимое число часов: {{ classwork_hours }} ");
+            alert("Вы превысили максимальное допустимое число часов: {{ classwork_hours }}");
+            el.value = 0;
+        }
+        if (sum % 2 !== 0) {
+            alert('Вы ввели нечётное число');
             el.value = 0;
         }
     }));
     homework.forEach(el => el.addEventListener('change', event => {
         let sum = 0;
-        for (let i = 0; i < classwork.length; i++) {
-            sum += homework[i].value;
+        for (let i = 0; i < homework.length; i++) {
+            let tmp = parseInt(homework[i].value, 10);
+            if (!isNaN(tmp)) {
+                sum += tmp;
+            }
         }
-        if (sum > homework_hours) {
-            alert("Вы превысили максимальное допустимое число часов: {{ homework_hours }} ");
+    if (sum > homework_hours) {
+        alert("Вы превысили максимальное допустимое число часов: {{ homework_hours }} ");
+        el.value = 0;
+    }
+    if (sum % 2 !== 0) {
+            alert('Вы ввели нечётное число');
             el.value = 0;
         }
     }));

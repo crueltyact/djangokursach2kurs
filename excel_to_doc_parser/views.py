@@ -1,6 +1,7 @@
 import os.path
 import os.path
 import shutil
+import datetime
 from difflib import SequenceMatcher
 from os.path import join
 
@@ -130,7 +131,14 @@ def themes(request):
                 data, _ = get_info_from_excel(
                     path + "/matrices/" + "09_03_03_Прикладная_информатика,"
                                           "_Матрица_Корпоративные_информационные_системы_2020.xlsx")
-                discipline = "Навыки эффективной презентации"
+                discipline = Document.objects.get(pk=request.GET['document']).program_name.program_name
+                data["program_name"] = discipline
+                data["program_code"] = Document.objects.get(pk=request.GET['document']).program_name.work_program.program_code
+                data["program_code"] = Document.objects.get(
+                    pk=request.GET['document']).program_name.work_program.profile_name
+                data["program_code"] = Document.objects.get(
+                    pk=request.GET['document']).program_name.work_program.year_start
+                data["current_year"] = datetime.date.today().year
                 print(data[discipline])
                 try:
                     context_plane = get_info_from_education_plane(path + "/planes/03-5190 - ВЕБ 2020 (1).xlsx")[
@@ -162,11 +170,9 @@ def themes(request):
                     for row in doc.tables[i].rows:
                         if len(row.cells[0].text.strip()) == 0 and len(set(row.cells)) == 1:
                             table.remove(row._tr)
-                doc.save(join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files/{}.docx".format(
-                    data[discipline]['program_name'])))
-                context['path'] = "excel_to_doc_parser/media/generated_files/{}.docx".format(
-                    data[discipline]['program_name'])
-                context['name'] = data[discipline]['program_name'] + '.docx'
+                doc.save(join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files/{}.docx".format(discipline)))
+                context['path'] = "excel_to_doc_parser/media/generated_files/{}.docx".format(discipline)
+                context['name'] = discipline + '.docx'
                 return redirect("/download/?file={}&name=".format(context['path'], context["name"]))
             if request.POST.get("new_section"):
                 header = request.POST.get('new_header')
