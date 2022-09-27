@@ -1,7 +1,20 @@
+"""
+Модуль парсинга учебного плана
+"""
+from typing import Union
+
 import xlrd
 
 
-def get_matrix(filename):
+def get_matrix(filename: str) -> list:
+    """
+    Функция получения матрицы предметов из файла
+
+    :param filename: путь к файлу, из которого получается матрица
+    :type filename: str
+    :return: список данных, полученных из файла
+    :rtype: list
+    """
     xls = xlrd.open_workbook(filename)
     xls = xls.sheet_by_index(0)
     return [
@@ -10,7 +23,15 @@ def get_matrix(filename):
     ]
 
 
-def number_to_words(n):
+def number_to_words(n: int) -> str:
+    """
+    Метод преобразования числа в словесное его представление
+
+    :param n: число, по котрому необходимо получить название
+    :type n: int
+    :return: строка с полным названием числа
+    :rtype: str
+    """
     less_than_ten = {1: 'первом', 2: 'втором', 3: 'третьем', 4: 'четвёртом',
                      5: 'пятом', 6: 'шестом', 7: 'седьмом', 8: 'восьмом',
                      9: 'девятом'}
@@ -32,15 +53,35 @@ def number_to_words(n):
         return ten.get(n2) + ' ' + less_than_ten.get(n1)
 
 
-def hours_to_zet(z):
-    h = round(z / 36, 1)
-    if h == int(h):
-        return int(h)
+def hours_to_zet(h: int) -> Union[int, float]:
+    """
+    Метод перевода часов в ZET-единицы
+
+    :param h: количество часов
+    :type h: int
+    :return: количество ZET-единиц от полученных часов
+    :rtype: Union[int, float]
+    """
+    z = round(h / 36, 1)
+    if z == int(z):
+        return int(z)
     else:
-        return h
+        return z
 
 
-def get_courses(arr, imp_cols, met='moduls'):
+def get_courses(arr: list, imp_cols: dict, met: str = 'moduls') -> list:
+    """
+    Функция получения данных о дисциплине (семестр, курс, вид зачётного мероприятия, часы)
+
+    :param arr: список всех данных о дисциплине
+    :type arr: list
+    :param imp_cols: набор параметров, которые необходимо получить
+    :type imp_cols: dict
+    :param met: вид дисциплины (практика, элктивная, основная), defaults to 'moduls'
+    :type met: str
+    :return: список необходимых данных о дисциплине
+    :rtype: list
+    """
     if met == 'practice':
         sems = [
                    to_int(el) for el in arr[imp_cols['exam']].replace(' ', '').split(',')
@@ -94,15 +135,37 @@ def get_courses(arr, imp_cols, met='moduls'):
     return res
 
 
-def to_int(x):
+def to_int(x: str) -> int:
+    """
+    Функция преобразования численных данных из текста в число
+
+    :param x: текст для преобразования
+    :type x: str
+    :raises ValueError: если полученные данные не представлены числом в текстовом формате, то вызывается ошибка,
+    а функция возвращает 0
+    :return: полученное числовое значение
+    :rtype: int
+    """
     try:
         return int(float(x))
-    except Exception as exc:
+    except ValueError as exc:
         # print(exc)
         return 0
 
 
-def find_from_matrix(dct, matrix, idx=0):
+def find_from_matrix(dct: dict, matrix: list, idx: int = 0) -> dict:
+    """
+    Функция поиска данных о дисциплине
+
+    :param dct: список параметров для поиска
+    :type dct: dict
+    :param matrix: матрица, из которой получаются данные
+    :type matrix: list
+    :param idx: переменна для разделения различных типов запросов на поиск, defaults to 0
+    :type idx: int
+    :return: список данных о дисциплине по параметрам
+    :rtype: dict
+    """
     rev = dict([[val, key] for key, val in dct.items()])
     res = {}
     for i in range(len(matrix)):
@@ -112,7 +175,15 @@ def find_from_matrix(dct, matrix, idx=0):
     return res
 
 
-def get_info_from_education_plane(filename):
+def get_info_from_education_plane(filename: str) -> dict:
+    """
+    Функция получения информации из учебного плана
+
+    :param filename: путь к файлу с данными
+    :type filename: str
+    :return: список всей полученной информации
+    :rtype: dict
+    """
     matrix = get_matrix(filename)
     imp_rows = find_from_matrix({
         'subjects': 'Обязательная часть',
