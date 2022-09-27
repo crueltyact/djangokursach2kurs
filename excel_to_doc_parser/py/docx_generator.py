@@ -20,25 +20,31 @@ def check_number(num):
 
 
 gui_win = Tk()
-gui_win.geometry('400x200')
-gui_win.grid_rowconfigure(0, weight=1)
-gui_win.grid_columnconfigure(0, weight=1)
 
 
 def main():
+    gui_win.title('Генератор РПД')
+    gui_win.geometry('400x200')
+    gui_win.grid_rowconfigure(0, weight=1)
+    gui_win.grid_columnconfigure(0, weight=1)
+    dialog_btn = Button(gui_win, text='Выберите директорию для генерации РПД', command=generator)
+    dialog_btn.pack()
+    gui_win.mainloop()
+
+
+def generator():
     filepath = filedialog.askdirectory(initialdir=r"C:/",
                                        title="Dialog box")
-    label_path = Label(gui_win, text=filepath, font='italic 14')
+    label_path = Label(gui_win, text="Генерация выполнена по пути " + filepath, font='italic 14')
     label_path.pack(pady=20)
     try:
         os.mkdir(os.path.join(filepath, "generated_files"))
     except FileExistsError:
         print("Folder already created")
-    contexts = get_info_from_excel("../media/excel/matrices/09_03_01_Информатика_и_ВТ,_Матрица_ВЕБ_технологии_2020.xlsx")
-    for key in contexts.keys():
+    data, key_data = get_info_from_excel(
+        "../media/excel/matrices/09_03_01_Информатика_и_ВТ,_Матрица_ВЕБ_технологии_2020.xlsx")
+    for key in key_data:
         try:
-            print(key)
-            print(get_info_from_education_plane("../media/excel/planes/03-5190 - ВЕБ 2020 (1).xlsx")[key])
             context_plane = get_info_from_education_plane("../media/excel/planes/03-5190 - ВЕБ 2020 (1).xlsx")[key]
         except KeyError:
             for error_key in get_info_from_education_plane("../media/excel/planes/03-5190 - ВЕБ 2020 (1).xlsx"):
@@ -46,6 +52,11 @@ def main():
                     context_plane = get_info_from_education_plane("../media/excel/planes/03-5190 - ВЕБ 2020 (1).xlsx")[
                         error_key]
                     break
+        context_plane["program_name"] = data[key]["program_name"]
+        context_plane["program_code"] = data[key]["program_code"]
+        context_plane["profile_name"] = data[key]["profile_name"]
+        context_plane["year_start"] = data[key]["year_start"]
+        context_plane["current_year"] = data[key]["current_year"]
         context_plane['intensity_ZET_check'] = check_number(context_plane['intensity_ZET'])
         context_plane['intensity_hours_check'] = check_number(context_plane['intensity_hours'])
         context_plane['total_homework_hours_check'] = check_number(context_plane['total_homework_hours'])
@@ -55,7 +66,7 @@ def main():
             context_plane['courses'][i]['homework_time_check'] = check_number(
                 context_plane['courses'][i]['homework_time'])
         doc = DocxTemplate("../templates/template.docx")
-        doc.render(dict(contexts[key], **context_plane))
+        doc.render(dict(data[key], **context_plane))
         for i in range(len(doc.tables)):
             table = doc.tables[i]._tbl
             for row in doc.tables[i].rows:
@@ -63,7 +74,6 @@ def main():
                     table.remove(row._tr)
         doc.save("{}/generated_files/{}.docx".format(filepath, key))
 
-dialog_btn = Button(gui_win, text='select directory', command=main)
-dialog_btn.pack()
 
-gui_win.mainloop()
+if __name__ == '__main__':
+    main()

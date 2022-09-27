@@ -98,7 +98,7 @@ def to_int(x):
     try:
         return int(float(x))
     except Exception as exc:
-        print(exc)
+        # print(exc)
         return 0
 
 

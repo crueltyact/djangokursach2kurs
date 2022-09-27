@@ -122,12 +122,12 @@ def get_info_from_excel(filename):
             continue
         key_data.append(key)
         data[key] = {}
-        data['program_name'] = key
-        data['profile_name'] = title['profile_name']
-        data['program_code'] = title['program_code']
-        data['year_start'] = title['year_start']
-        data['year_end'] = title['year_end']
-        data['current_year'] = str(datetime.date.today().year)
+        data[key]['program_name'] = key
+        data[key]['profile_name'] = title['profile_name']
+        data[key]['program_code'] = title['program_code']
+        data[key]['year_start'] = title['year_start']
+        data[key]['year_end'] = title['year_end']
+        data[key]['current_year'] = str(datetime.date.today().year)
         data[key]['part_type'] = str.lower(matrix[1][c])
         universal_competences = get_info_for_table(matrix, skill_types[0], c)
         general_professional_competencies = get_info_for_table(matrix, skill_types[1], c)
