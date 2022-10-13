@@ -1,0 +1,36 @@
+{% include 'base/header.html' %}
+{% load static %}
+<body>
+{% include 'base/body.html' %}
+{% block body %}
+<div class="main">
+    <div class="container h-100">
+        <div class="row d-flex h-100">
+            {% include 'base/menu.html' %}
+            <fieldset class="col-9 pt-5">
+                <form method="post" action="sections.html">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="targets" class="form-label">Цели изучения</label>
+                        <textarea class="form-control is-invalid" name="targets" id="targets"
+                                  placeholder="Добавьте цели изучения"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tasks" class="form-label">Задачи</label>
+                        <textarea class="form-control is-invalid" name="tasks" id="tasks"
+                                  placeholder="Добавьте задачи"></textarea>
+                    </div>
+<!--                    <button type="submit" name="edit" value="edit" class="btn btn-primary">Назад</button>-->
+                    <button type="submit" name="next" value="next" class="btn btn-primary">Далее</button>
+                </form>
+            </fieldset>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+<!-- <footer class="footer">
+    <p>&copy Лучшая команда КИС 2022</p>
+</footer> -->
+{% include 'base/scripts.html' %}
+</body>

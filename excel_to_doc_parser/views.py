@@ -94,7 +94,7 @@ def documents(request):
         new_theme = Theme(document_id=new_document)
         new_theme.save()
         return redirect('/documents')
-    return render(request, "document.html", context)
+    return render(request, "./docx_creation/document.html", context)
 
 
 @login_required(login_url='/login/')
@@ -188,13 +188,13 @@ def themes(request):
                                      classwork_hours=classwork_hours, homework_hours=homework_hours, semester=semester,
                                      week=week)
                 new_module.save()
-                return redirect("/themes/?document={}".format(request.GET.get("document")))
+                return redirect("./docx_creation/themes/?document={}".format(request.GET.get("document")))
             elif request.POST.get("new_module"):
                 print(request.POST.get("theme"))
                 new_module = Module(module=int(request.POST.get("last_module")) + 1,
                                     theme_id_id=request.POST.get("theme"))
                 new_module.save()
-                return redirect("/themes/?document={}".format(request.GET.get("document")))
+                return redirect("./docx_creation/themes/?document={}".format(request.GET.get("document")))
             else:
                 pk = request.POST.get('pk')
                 header = request.POST.get('header')
@@ -206,8 +206,8 @@ def themes(request):
                 module = Section.objects.filter(pk=pk)
                 module.update(header=header, description=description, classwork_hours=classwork_hours,
                               homework_hours=homework_hours, semester=semester, week=week)
-                return redirect("/themes/?document={}".format(request.GET.get("document")))
-    return render(request, "theme.html", context)
+                return redirect("./docx_creation/themes/?document={}".format(request.GET.get("document")))
+    return render(request, "./docx_creation/theme.html", context)
 
 
 def download(request):

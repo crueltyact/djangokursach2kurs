@@ -16,18 +16,9 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.template.defaulttags import url
-from django.urls import path
-
-from excel_to_doc_parser.views import index, download, login_view, logout_view, themes, documents, info
+from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', index, name="index"),
-    path('download/', download, name='download'),
-    path('login/', login_view, name="login"),
-    path('logout/', logout_view, name="logout"),
-    path('documents/', documents, name="documents"),
-    path('themes/', themes, name="themes"),
-    path('about/', info, name="about"),
+    path('', include("excel_to_doc_parser.urls"))
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

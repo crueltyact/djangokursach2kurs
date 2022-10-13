@@ -9,11 +9,37 @@
             {% include 'base/menu.html' %}
             <div class="col-9 pt-5">
                 <div class="card-inner">
-                    {% for document in documents %}
-                        <a class="btn" href="/themes?document={{ document.id }}">{{ document.program_name.program_name }}</a>
-                    {% endfor %}
-                    <div class="card-btn_addmodule">
-                        <form action="" method="POST">
+                    <table id="startingTable" class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th class="th-sm">Дисциплина
+                            </th>
+                            <th class="th-sm">Профиль
+                            </th>
+                            <th class="th-sm">Курс
+                            </th>
+                            <th class="th-sm">Age
+                            </th>
+                            <th class="th-sm">Статус
+                            </th>
+                            <th class="th-sm">Файл
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for document in documents %}
+                        <tr>
+                            <td><a class="btn" href="/themes?document={{ document.id }}">{{ document.program_name.program_name }}</a></td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <form action="" method="POST">
                             {% csrf_token %}
                             <label>
                                 <select name="program_name">
@@ -29,7 +55,6 @@
                                 Добавить документ +
                             </button>
                         </form>
-                    </div>
                 </div>
             </div>
         </div>
