@@ -8,29 +8,320 @@
         <div class="row d-flex h-100">
             {% include 'base/menu.html' %}
             <fieldset class="col-9 pt-5">
-                <form method="post" action="sections.html">
+                <form method="post" action="/result/">
                     {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="targets" class="form-label">Цели изучения</label>
-                        <textarea class="form-control is-invalid" name="targets" id="targets"
-                                  placeholder="Добавьте цели изучения"></textarea>
+                    <div id="smartwizard">
+                        <ul class="nav">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#step-1">
+                                    <div class="num">1</div>
+                                    <!--                                    Цели и задачи-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#step-2">
+                                    <span class="num">2</span>
+                                    <!--                                    Разделы-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#step-3">
+                                    <span class="num">3</span>
+                                    <!--                                    Связанные дисциплины-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#step-4">
+                                    <span class="num">4</span>
+                                    <!--                                    Дидактическое содержание-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#step-5">
+                                    <span class="num">5</span>
+                                    <!--                                    Оценка результатов-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#step-6">
+                                    <span class="num">6</span>
+                                    <!--                                    Литература-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#step-7">
+                                    <span class="num">7</span>
+                                    <!--                                    Требования к ПО-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#step-8">
+                                    <span class="num">8</span>
+                                    <!--                                    Перечень оценочных средств-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#step-9">
+                                    <span class="num">9</span>
+                                    <!--                                    Задания-->
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div id="step-1" class="tab-pane" role="tabpanel" aria-labelledby="step-1">
+                                <div class="mb-3">
+                                    <label for="targets" class="form-label">Цели изучения</label>
+                                    <textarea class="form-control" name="targets" id="targets"
+                                              placeholder="Добавьте цели изучения"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="tasks" class="form-label">Задачи</label>
+                                    <textarea class="form-control" name="tasks" id="tasks"
+                                              placeholder="Добавьте задачи"></textarea>
+                                </div>
+                            </div>
+                            <div id="step-2" class="tab-pane" role="tabpanel" aria-labelledby="step-2">
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <input type="text" value="Раздел" aria-label="First name" class="form-control"
+                                               readonly>
+                                        <input type="text" value="Часов" aria-label="Last name" class="form-control"
+                                               readonly>
+                                    </div>
+
+                                </div>
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <input type="text" name="section" aria-label="First name" class="form-control">
+                                        <input type="text" name="hours" aria-label="Last name" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <input type="text" name="section" aria-label="First name" class="form-control">
+                                        <input type="text" name="hours" aria-label="Last name" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="step-3" class="tab-pane" role="tabpanel" aria-labelledby="step-3">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div id="modules">
+                                            <p class="drag"><a class="btn btn-default">Text</a></p>
+                                            <p class="drag"><a class="btn btn-default">Textarea</a></p>
+                                            <p class="drag"><a class="btn btn-default">Number</a></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div id="dropzone"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="step-4" class="tab-pane" role="tabpanel" aria-labelledby="step-4">
+                                <div class="input-group mb-3">
+                                    <label class="input-group-text" for="theme">Тема</label>
+                                    <select class="form-select" id="theme">
+                                        <option selected>Выберите тему</option>
+                                        <option value="1">One</option>
+                                        <option value="2">Two</option>
+                                        <option value="3">Three</option>
+                                    </select>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="hours" class="col-sm-2 col-form-label">Часы</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="hours" value="2">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="content" class="form-label">Содержание</label>
+                                    <textarea class="form-control" name="content" id="content"
+                                              placeholder="Содержание раздела"></textarea>
+                                </div>
+                            </div>
+                            <div id="step-5" class="tab-pane" role="tabpanel" aria-labelledby="step-5">
+                                <fieldset class="row mb-3">
+                                    <legend class="col-form-label col-sm-2 pt-0">Оценка результатов</legend>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-5">
+                                            <label for="competentions" class="col-sm-2 col-form-label">По
+                                                компетенциям</label>
+                                        </div>
+                                        <div class="col-sm-5  ms-3">
+                                            <input type="checkbox" name="competentions" value="1"
+                                                   class="form-check-input"
+                                                   id="competentions">
+                                            <input type="checkbox" name="competentions" value="0"
+                                                   class="form-check-input"
+                                                   id="competentions1">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-5">
+                                            <label for="attestation" class="col-sm-2 col-form-label">По промежуточной
+                                                аттестации</label>
+                                        </div>
+                                        <div class="col-sm-5  ms-3">
+                                            <input type="checkbox" name="attestation" value="1" class="form-check-input"
+                                                   id="attestation">
+                                            <input type="checkbox" name="attestation" value="0" class="form-check-input"
+                                                   id="attestation1">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 ml-3">
+                                        <div class="col-sm-5">
+                                            <label for="score_system" class="col-sm-2 col-form-label">Есть бальная
+                                                система</label>
+                                        </div>
+                                        <div class="col-sm-5  ms-3">
+                                            <input type="checkbox" name="score_system" value="1" class="form-check-input"
+                                                   id="score_system">
+                                            <input type="checkbox" name="score_system" value="0" class="form-check-input"
+                                                   id="score_system1">
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <div class="row mb-3 ml-3">
+                                    <div class="col-md-6">
+                                        <div class="col-md-5">
+                                            <label for="competention" class="form-label">Компетенция</label>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <input type="text" name="competention" class="form-control"
+                                                   id="competention">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="col-md-5">
+                                            <label for="intermediate" class="form-label">Промежуточная</label>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <input type="text" name="mark" class="form-control" id="intermediate">
+                                            <input type="text" name="characteristics" class="form-control"
+                                                   id="intermediate1">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="score_system_desc" class="form-label">Описание БРС</label>
+                                    <textarea class="form-control" name="score_system_desc"
+                                              id="score_system_desc"
+                                              placeholder="Описание БРС"></textarea>
+                                </div>
+                            </div>
+                            <div id="step-6" class="tab-pane" role="tabpanel" aria-labelledby="step-6">
+                                <div class="mb-3">
+                                    <label for="main_lit" class="form-label">Основные</label>
+                                    <textarea class="form-control" name="main_lit" id="main_lit"
+                                              placeholder="Основные источники литературы"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="extra_lit" class="form-label">Дополнительные</label>
+                                    <textarea class="form-control" name="extra_lit" id="extra_lit"
+                                              placeholder="Дополнительные источники литературы"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="digital_lit" class="form-label">Электронные</label>
+                                    <textarea class="form-control" name="digital_lit" id="digital_lit"
+                                              placeholder="Цифровые источники литературы"></textarea>
+                                </div>
+                            </div>
+                            <div id="step-7" class="tab-pane" role="tabpanel" aria-labelledby="step-7">
+                                Требования к ПО
+                            </div>
+                            <div id="step-8" class="tab-pane" role="tabpanel" aria-labelledby="step-8">
+                                Перечень оценочных средств
+                            </div>
+                            <div id="step-9" class="tab-pane" role="tabpanel" aria-labelledby="step-9">
+                                Задания
+                            </div>
+                        </div>
+                        <!-- Include optional progressbar HTML -->
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 0" aria-valuenow="0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="tasks" class="form-label">Задачи</label>
-                        <textarea class="form-control is-invalid" name="tasks" id="tasks"
-                                  placeholder="Добавьте задачи"></textarea>
-                    </div>
-<!--                    <button type="submit" name="edit" value="edit" class="btn btn-primary">Назад</button>-->
-                    <button type="submit" name="next" value="next" class="btn btn-primary">Далее</button>
+                    <input type="hidden" name="document" value="{{ document }}">
                 </form>
             </fieldset>
         </div>
     </div>
-</div>
 </div>
 {% endblock %}
 <!-- <footer class="footer">
     <p>&copy Лучшая команда КИС 2022</p>
 </footer> -->
 {% include 'base/scripts.html' %}
+<script>
+    $(function () {
+        $('#smartwizard').smartWizard({
+            selected: 0,
+            theme: 'round',
+            justified: true,
+            autoAdjustHeight: true,
+            backButtonSupport: true,
+            enableUrlHash: true,
+            transition: {
+                animation: 'fade',
+                speed: '400',
+            },
+            toolbar: {
+                position: 'bottom',
+                showNextButton: true,
+                showPreviousButton: true,
+                extraHtml: '<button class="btn btn-success" type="submit">Закончить</button>' // Extra html to show on toolbar
+            },
+            anchor: {
+                enableNavigation: true,
+                enableNavigationAlways: true, // Activates all anchors clickable always
+                enableDoneState: true,
+                markPreviousStepsAsDone: true,
+                unDoneOnBackNavigation: false,
+                enableDoneStateNavigation: true
+            },
+            keyboard: {
+                keyNavigation: true,
+                keyLeft: [37],
+                keyRight: [39]
+            },
+            lang: {
+                next: 'Далее',
+                previous: 'Назад'
+            },
+            disabledSteps: [], // Array Steps disabled
+            errorSteps: [], // Array Steps error
+            warningSteps: [], // Array Steps warning
+            hiddenSteps: [], // Hidden steps
+            getContent: null // Callback function for content loading
+        });
+        $('.drag').draggable({
+            appendTo: 'body',
+            helper: 'clone'
+        });
+
+        $('#dropzone').droppable({
+            activeClass: 'active',
+            hoverClass: 'hover',
+            accept: ":not(.ui-sortable-helper)", // Reject clones generated by sortable
+            drop: function (e, ui) {
+                var $el = $('<div class="drop-item">' + ui.draggable.text() + '</div>');
+                $el.append($('<button type="button" class="btn btn-default btn-xs remove"><i class="fa-solid fa-delete-left"></i></button>').click(function () {
+                    $(this).parent().detach();
+                }));
+                $(this).append($el);
+                $('#smartwizard').smartWizard("fixHeight");
+            }
+        }).sortable({
+            items: '.drop-item',
+            sort: function () {
+                // gets added unintentionally by droppable interacting with sortable
+                // using connectWithSortable fixes this, but doesn't allow you to customize active/hoverClass options
+                $(this).removeClass("active");
+            }
+        });
+    });
+</script>
 </body>

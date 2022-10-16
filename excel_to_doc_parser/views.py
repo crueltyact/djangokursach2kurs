@@ -83,6 +83,7 @@ def index(request):
 def documents(request):
     context = {"documents": Document.objects.filter(user_id=request.user.id),
                "custom_user": CustomUser.objects.get(user=request.user), "disciplines": ProgramNames.objects.all()}
+    context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
     if request.method == "POST":
         program_name = request.POST.get("program_name")
         link = request.POST.get("link")
@@ -100,19 +101,139 @@ def documents(request):
 @login_required(login_url='/login/')
 def themes(request):
     context = {}
-    theme = Theme.objects.get(document_id=Document.objects.get(pk=request.GET.get("document")))
     if request.user.is_authenticated:
         context["custom_user"] = CustomUser.objects.get(user=request.user)
         context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
-        context["theme"] = Theme.objects.get(pk=theme.id)
-        context["modules"] = Module.objects.filter(theme_id=Theme.objects.get(pk=theme.id))
-        context["homework_hours"] = TimePlan.objects.get(program_name=Document.objects.get(pk=request.GET.get("document")).program_name).homework_hours
-        context["classwork_hours"] = TimePlan.objects.get(program_name=Document.objects.get(pk=request.GET.get("document")).program_name).classwork_hours - context["homework_hours"]
-        if len(context["modules"]) > 0:
-            context["last_module"] = context["modules"].order_by('-id')[0].module
-            context["sections"] = Section.objects.filter(theme_id=context["theme"])
-        else:
-            context["last_module"] = 0
+        if request.method == "GET":
+            context["document"] = request.GET.get("document")
+    # theme = Theme.objects.get(document_id=Document.objects.get(pk=request.GET.get("document")))
+    # if request.user.is_authenticated:
+    #     context["custom_user"] = CustomUser.objects.get(user=request.user)
+    #     context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
+    #     context["theme"] = Theme.objects.get(pk=theme.id)
+    #     context["modules"] = Module.objects.filter(theme_id=Theme.objects.get(pk=theme.id))
+    #     context["homework_hours"] = TimePlan.objects.get(program_name=Document.objects.get(pk=request.GET.get("document")).program_name).homework_hours
+    #     context["classwork_hours"] = TimePlan.objects.get(program_name=Document.objects.get(pk=request.GET.get("document")).program_name).classwork_hours - context["homework_hours"]
+    #     if len(context["modules"]) > 0:
+    #         context["last_module"] = context["modules"].order_by('-id')[0].module
+    #         context["sections"] = Section.objects.filter(theme_id=context["theme"])
+    #     else:
+    #         context["last_module"] = 0
+    #     if request.method == "POST":
+    #         if request.POST.get("generate"):
+    #             path = join(str(BASE_DIR), "excel_to_doc_parser/media/excel")
+    #             folder = join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files")
+    #             for filename in os.listdir(folder):
+    #                 file_path = os.path.join(folder, filename)
+    #                 if filename == ".gitkeep":
+    #                     continue
+    #                 try:
+    #                     if os.path.isfile(file_path) or os.path.islink(file_path):
+    #                         os.unlink(file_path)
+    #                     elif os.path.isdir(file_path):
+    #                         shutil.rmtree(file_path)
+    #                 except Exception as e:
+    #                     print('An error appear ' + str(e))
+    #             data, _ = get_info_from_excel(
+    #                 path + "/matrices/" + "09_03_03_Прикладная_информатика,"
+    #                                       "_Матрица_Корпоративные_информационные_системы_2020.xlsx")
+    #             discipline = Document.objects.get(pk=request.GET['document']).program_name.program_name
+    #             data["program_name"] = discipline
+    #             data["program_code"] = Document.objects.get(pk=request.GET['document']).program_name.work_program.program_code
+    #             data["program_code"] = Document.objects.get(
+    #                 pk=request.GET['document']).program_name.work_program.profile_name
+    #             data["program_code"] = Document.objects.get(
+    #                 pk=request.GET['document']).program_name.work_program.year_start
+    #             data["current_year"] = datetime.date.today().year
+    #             print(data[discipline])
+    #             try:
+    #                 context_plane = get_info_from_education_plane(path + "/planes/03-5190 - ВЕБ 2020 (1).xlsx")[
+    #                     discipline]
+    #             except KeyError:
+    #                 for error_key in get_info_from_education_plane(path + "/planes/planes/03-5190 - ВЕБ 2020 ("
+    #                                                                       "1).xlsx"):
+    #                     if SequenceMatcher(None, discipline, error_key).ratio() >= 0.75:
+    #                         context_plane = \
+    #                             get_info_from_education_plane(path + "/planes/planes/03-5190 -"
+    #                                                                  " ВЕБ 2020 (1).xlsx")[error_key]
+    #                         break
+    #             context_plane['intensity_ZET_check'] = check_number(context_plane['intensity_ZET'])
+    #             context_plane['intensity_hours_check'] = check_number(context_plane['intensity_hours'])
+    #             context_plane['total_homework_hours_check'] = check_number(context_plane['total_homework_hours'])
+    #             for i, _ in enumerate(context_plane['courses']):
+    #                 context_plane['courses'][i]['ZET_check'] = check_number(context_plane['courses'][i]['ZET'])
+    #                 context_plane['courses'][i]['hours_check'] = check_number(context_plane['courses'][i]['hours'])
+    #                 context_plane['courses'][i]['homework_time_check'] = check_number(
+    #                     context_plane['courses'][i]['homework_time'])
+    #             context_plane["modules"] = Module.objects.filter(theme_id=Theme.objects.get(pk=theme.id))
+    #             if len(context["modules"]) > 0:
+    #                 context_plane["sections"] = Section.objects.filter(theme_id=context["theme"])
+    #             doc = DocxTemplate(
+    #                 join(str(BASE_DIR), "excel_to_doc_parser/templates/template.docx"))
+    #             doc.render(dict(data[discipline], **context_plane))
+    #             for i in range(len(doc.tables)):
+    #                 table = doc.tables[i]._tbl
+    #                 for row in doc.tables[i].rows:
+    #                     if len(row.cells[0].text.strip()) == 0 and len(set(row.cells)) == 1:
+    #                         table.remove(row._tr)
+    #             doc.save(join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files/{}.docx".format(discipline)))
+    #             context['path'] = "excel_to_doc_parser/media/generated_files/{}.docx".format(discipline)
+    #             context['name'] = discipline + '.docx'
+    #             return redirect("/download/?file={}&name=".format(context['path'], context["name"]))
+    #         if request.POST.get("new_section"):
+    #             header = request.POST.get('new_header')
+    #             description = request.POST.get('new_description')
+    #             classwork_hours = request.POST.get('new_classwork')
+    #             homework_hours = request.POST.get('new_homework')
+    #             semester = request.POST.get('new_semester')
+    #             week = request.POST.get('new_week')
+    #             module = request.POST.get('new_module')
+    #             theme = request.POST.get("new_theme")
+    #             new_module = Section(module_id=Module.objects.get(pk=module), theme_id=Theme.objects.get(pk=theme),
+    #                                  header=header, description=description,
+    #                                  classwork_hours=classwork_hours, homework_hours=homework_hours, semester=semester,
+    #                                  week=week)
+    #             new_module.save()
+    #             return redirect("./docx_creation/themes/?document={}".format(request.GET.get("document")))
+    #         elif request.POST.get("new_module"):
+    #             print(request.POST.get("theme"))
+    #             new_module = Module(module=int(request.POST.get("last_module")) + 1,
+    #                                 theme_id_id=request.POST.get("theme"))
+    #             new_module.save()
+    #             return redirect("./docx_creation/themes/?document={}".format(request.GET.get("document")))
+    #         else:
+    #             pk = request.POST.get('pk')
+    #             header = request.POST.get('header')
+    #             description = request.POST.get('description')
+    #             classwork_hours = request.POST.get('classwork')
+    #             homework_hours = request.POST.get('homework')
+    #             semester = request.POST.get('semester')
+    #             week = request.POST.get('week')
+    #             module = Section.objects.filter(pk=pk)
+    #             module.update(header=header, description=description, classwork_hours=classwork_hours,
+    #                           homework_hours=homework_hours, semester=semester, week=week)
+    #             return redirect("./docx_creation/themes/?document={}".format(request.GET.get("document")))
+    return render(request, "./docx_creation/theme.html", context)
+
+
+@login_required(login_url='/login/')
+def document_information(request):
+    context = {}
+    if request.user.is_authenticated:
+        context["custom_user"] = CustomUser.objects.get(user=request.user)
+        context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
+        if request.method == "POST":
+            context["document"] = request.POST.get("document")
+    return render(request, "./docx_creation/targets.html", context)
+
+
+@login_required(login_url='/login/')
+def result(request):
+    context = {}
+    if request.user.is_authenticated:
+        context["custom_user"] = CustomUser.objects.get(user=request.user)
+        context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
+        theme = Theme.objects.get(document_id=Document.objects.get(pk=request.GET.get("document")))
         if request.method == "POST":
             if request.POST.get("generate"):
                 path = join(str(BASE_DIR), "excel_to_doc_parser/media/excel")
@@ -131,9 +252,9 @@ def themes(request):
                 data, _ = get_info_from_excel(
                     path + "/matrices/" + "09_03_03_Прикладная_информатика,"
                                           "_Матрица_Корпоративные_информационные_системы_2020.xlsx")
-                discipline = Document.objects.get(pk=request.GET['document']).program_name.program_name
+                discipline = Document.objects.get(pk=request.POST.get('document')).program_name.program_name
                 data["program_name"] = discipline
-                data["program_code"] = Document.objects.get(pk=request.GET['document']).program_name.work_program.program_code
+                data["program_code"] = Document.objects.get(pk=request.POST.get('document')).program_name.work_program.program_code
                 data["program_code"] = Document.objects.get(
                     pk=request.GET['document']).program_name.work_program.profile_name
                 data["program_code"] = Document.objects.get(
@@ -174,40 +295,7 @@ def themes(request):
                 context['path'] = "excel_to_doc_parser/media/generated_files/{}.docx".format(discipline)
                 context['name'] = discipline + '.docx'
                 return redirect("/download/?file={}&name=".format(context['path'], context["name"]))
-            if request.POST.get("new_section"):
-                header = request.POST.get('new_header')
-                description = request.POST.get('new_description')
-                classwork_hours = request.POST.get('new_classwork')
-                homework_hours = request.POST.get('new_homework')
-                semester = request.POST.get('new_semester')
-                week = request.POST.get('new_week')
-                module = request.POST.get('new_module')
-                theme = request.POST.get("new_theme")
-                new_module = Section(module_id=Module.objects.get(pk=module), theme_id=Theme.objects.get(pk=theme),
-                                     header=header, description=description,
-                                     classwork_hours=classwork_hours, homework_hours=homework_hours, semester=semester,
-                                     week=week)
-                new_module.save()
-                return redirect("./docx_creation/themes/?document={}".format(request.GET.get("document")))
-            elif request.POST.get("new_module"):
-                print(request.POST.get("theme"))
-                new_module = Module(module=int(request.POST.get("last_module")) + 1,
-                                    theme_id_id=request.POST.get("theme"))
-                new_module.save()
-                return redirect("./docx_creation/themes/?document={}".format(request.GET.get("document")))
-            else:
-                pk = request.POST.get('pk')
-                header = request.POST.get('header')
-                description = request.POST.get('description')
-                classwork_hours = request.POST.get('classwork')
-                homework_hours = request.POST.get('homework')
-                semester = request.POST.get('semester')
-                week = request.POST.get('week')
-                module = Section.objects.filter(pk=pk)
-                module.update(header=header, description=description, classwork_hours=classwork_hours,
-                              homework_hours=homework_hours, semester=semester, week=week)
-                return redirect("./docx_creation/themes/?document={}".format(request.GET.get("document")))
-    return render(request, "./docx_creation/theme.html", context)
+    return render(request, "./docx_creation/result.html", context)
 
 
 def download(request):
