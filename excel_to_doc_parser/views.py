@@ -106,6 +106,8 @@ def themes(request):
         context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
         if request.method == "GET":
             context["document"] = request.GET.get("document")
+        if request.method == "POST":
+            context["document"] = request.POST.get("document")
     # theme = Theme.objects.get(document_id=Document.objects.get(pk=request.GET.get("document")))
     # if request.user.is_authenticated:
     #     context["custom_user"] = CustomUser.objects.get(user=request.user)
@@ -222,8 +224,7 @@ def document_information(request):
     if request.user.is_authenticated:
         context["custom_user"] = CustomUser.objects.get(user=request.user)
         context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
-        if request.method == "POST":
-            context["document"] = request.POST.get("document")
+        context["document"] = request.POST.get("document")
     return render(request, "./docx_creation/targets.html", context)
 
 
@@ -233,7 +234,8 @@ def result(request):
     if request.user.is_authenticated:
         context["custom_user"] = CustomUser.objects.get(user=request.user)
         context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
-        theme = Theme.objects.get(document_id=Document.objects.get(pk=request.GET.get("document")))
+        print(request.POST.get("document"))
+        theme = Theme.objects.get(document_id=Document.objects.get(pk=request.POST.get("document")))
         if request.method == "POST":
             if request.POST.get("generate"):
                 path = join(str(BASE_DIR), "excel_to_doc_parser/media/excel")
