@@ -30,11 +30,11 @@
                         {% for document in documents %}
                         <tr>
                             <td><a class="btn" href="/themes?document={{ document.id }}">{{ document.program_name.program_name }}</a></td>
+                            <td>{{ document.program_name.work_program.profile_name }}</td>
                             <td>-</td>
                             <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
+                            <td>{{ document.status.status }}</td>
+                            <td><a class="btn" href="/themes?document={{ document.id }}">docx</a></td>
                         </tr>
                         {% endfor %}
                         </tbody>
