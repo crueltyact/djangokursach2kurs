@@ -34,27 +34,34 @@
                             <td>-</td>
                             <td>-</td>
                             <td>{{ document.status.status }}</td>
-                            <td><a class="btn" href="/themes?document={{ document.id }}">docx</a></td>
+                            <td>
+                                <form class="main-form" id="generate" action="" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit">Сгенерировать документ</button>
+                                    <input name="generate" type="hidden" value="True">
+                                    <input name="document" type="hidden" value="{{ document.id }}">
+                                </form>
+                            </td>
                         </tr>
                         {% endfor %}
                         </tbody>
                     </table>
                     <form action="" method="POST">
-                            {% csrf_token %}
-                            <label>
-                                <select name="program_name">
-                                    {% for discipline in disciplines %}
-                                    <option value="{{ discipline.program_name }}">{{ discipline.program_name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </label>
-                            <input type="hidden" name="link" value="1">
-                            <input type="hidden" name="status" value="1">
-                            <input type="hidden" name="new_document" value="True">
-                            <button type="submit">
-                                Добавить документ +
-                            </button>
-                        </form>
+                        {% csrf_token %}
+                        <label>
+                            <select name="program_name">
+                                {% for discipline in disciplines %}
+                                <option value="{{ discipline.program_name }}">{{ discipline.program_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <input type="hidden" name="link" value="1">
+                        <input type="hidden" name="status" value="1">
+                        <input type="hidden" name="new_document" value="True">
+                        <button type="submit">
+                            Добавить документ +
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

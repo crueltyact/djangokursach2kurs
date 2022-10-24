@@ -290,3 +290,6 @@ log.txt
 test.py
 
 # End of https://www.toptal.com/developers/gitignore/api/python,pycharm+all,windows,linux
+
+excel_to_doc_parser/media/generated_files/docx/*
+excel_to_doc_parser/media/generated_files/xml/*
