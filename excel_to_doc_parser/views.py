@@ -107,7 +107,8 @@ def documents(request):
                                       "_Матрица_Корпоративные_информационные_системы_2020.xlsx")
             discipline = Document.objects.get(pk=request.POST.get('document')).program_name.program_name
             data["program_name"] = discipline
-            data["program_code"] = Document.objects.get(pk=request.POST.get('document')).program_name.work_program.program_code
+            data["program_code"] = Document.objects.get(
+                pk=request.POST.get('document')).program_name.work_program.program_code
             data["program_code"] = Document.objects.get(
                 pk=request.POST.get('document')).program_name.work_program.profile_name
             data["program_code"] = Document.objects.get(
@@ -134,7 +135,9 @@ def documents(request):
                     context_plane['courses'][i]['homework_time'])
             doc = DocxTemplate(
                 join(str(BASE_DIR), "excel_to_doc_parser/templates/template.docx"))
-            doc.render(dict(data[discipline], **context_plane))
+
+            data = dict(data[discipline], **xml_parser(request))
+            doc.render(dict(data, **context_plane))
             for i in range(len(doc.tables)):
                 table = doc.tables[i]._tbl
                 for row in doc.tables[i].rows:
@@ -149,7 +152,8 @@ def documents(request):
         status = request.POST.get("status")
         user = request.user.id
         new_document = Document(link_id=link, status_id=status, user_id=user,
-                                program_name=ProgramNames.objects.get(pk=ProgramNames.objects.get(program_name=program_name).id))
+                                program_name=ProgramNames.objects.get(
+                                    pk=ProgramNames.objects.get(program_name=program_name).id))
         new_document.save()
         new_theme = Theme(document_id=new_document)
         new_theme.save()
@@ -157,8 +161,109 @@ def documents(request):
     return render(request, "./docx_creation/document.html", context)
 
 
-def xml_parser():
-    pass
+def main_info_parser(part, content):
+    for field in part:
+        content[str(field.tag)] = field.text
+    return content
+
+
+def files_parser(part, content):
+    for field in part:
+        content[str(field.tag)] = field.text
+    return content
+
+
+def targets_parser(part, content):
+    for i, field in enumerate(part):
+        content["{}{}".format(field.tag, i)] = field.text
+    return content
+
+
+def tasks_parser(part, content):
+    for i, field in enumerate(part):
+        content["{}{}".format(field.tag, i)] = field.text
+    return content
+
+
+def sections_parser(part, content):
+    for i, field in enumerate(part):
+        content[str(field[0].text)] = field[1].text
+    return content
+
+
+def disciplines_parser(part, content):
+    for field in part:
+        content[str(field.text)] = field.text
+    return content
+
+
+def sections_content_parser(part, content):
+    for i, field in enumerate(part):
+        content[str(field[0].text)] = [field[1].text, field[2].text]
+    return content
+
+
+def marks_parser(part, content):
+    content[part[0].tag] = part[0].text
+    content[part[1].tag] = part[1].text
+    content[part[2].tag] = part[2].text
+    content[part[3].tag] = part[3].text
+    for i, field in enumerate(part[4]):
+        content["{}{}".format(field.tag, i)] = field.text
+    for i, field in enumerate(part[5]):
+        content[str(field[0].text)] = field[1].text
+    return content
+
+
+def literature_parser(part, content):
+    for j in range(len(part)):
+        for i, field in enumerate(part[j]):
+            content["{}{}".format(field.tag, i)] = field.text
+    return content
+
+
+def software_parser(part, content):
+    for i, field in enumerate(part):
+        content["{}{}".format(field.tag, i)] = field.text
+    return content
+
+
+def evaluation_tools_parser(part, content):
+    for i, field in enumerate(part):
+        content["{}{}".format(field.tag, i)] = field.text
+    return content
+
+
+def tasks_for_students_parser(part, content):
+    for i, field in enumerate(part):
+        content["{}{}".format(field.tag, i)] = field.text
+    return content
+
+
+def xml_parser(request) -> dict:
+    tree = etree.parse(
+        join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files/xml/{}/{}.xml".format(request.user.id,Document.objects.get(pk=request.POST.get('document')).program_name.program_name)))
+    root = tree.getroot()
+    content = {}
+    functions = {
+        "main_info": main_info_parser,
+        "files": files_parser,
+        "targets": targets_parser,
+        "tasks": tasks_parser,
+        "sections": sections_parser,
+        "disciplines": disciplines_parser,
+        "sections_content": sections_content_parser,
+        "marks": marks_parser,
+        "literature": literature_parser,
+        "software": software_parser,
+        "evaluation_tools": evaluation_tools_parser,
+        "tasks_for_students": tasks_for_students_parser,
+    }
+    for part in root:
+        print(part.tag)
+        content = functions.get(part.tag, lambda: "Invalid tag")(part, content)
+        print("It works")
+    return content
 
 
 @login_required(login_url='/login/')
@@ -171,113 +276,6 @@ def themes(request):
             context["document"] = request.GET.get("document")
         if request.method == "POST":
             context["document"] = request.POST.get("document")
-    # theme = Theme.objects.get(document_id=Document.objects.get(pk=request.GET.get("document")))
-    # if request.user.is_authenticated:
-    #     context["custom_user"] = CustomUser.objects.get(user=request.user)
-    #     context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
-    #     context["theme"] = Theme.objects.get(pk=theme.id)
-    #     context["modules"] = Module.objects.filter(theme_id=Theme.objects.get(pk=theme.id))
-    #     context["homework_hours"] = TimePlan.objects.get(program_name=Document.objects.get(pk=request.GET.get("document")).program_name).homework_hours
-    #     context["classwork_hours"] = TimePlan.objects.get(program_name=Document.objects.get(pk=request.GET.get("document")).program_name).classwork_hours - context["homework_hours"]
-    #     if len(context["modules"]) > 0:
-    #         context["last_module"] = context["modules"].order_by('-id')[0].module
-    #         context["sections"] = Section.objects.filter(theme_id=context["theme"])
-    #     else:
-    #         context["last_module"] = 0
-    #     if request.method == "POST":
-    #         if request.POST.get("generate"):
-    #             path = join(str(BASE_DIR), "excel_to_doc_parser/media/excel")
-    #             folder = join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files")
-    #             for filename in os.listdir(folder):
-    #                 file_path = os.path.join(folder, filename)
-    #                 if filename == ".gitkeep":
-    #                     continue
-    #                 try:
-    #                     if os.path.isfile(file_path) or os.path.islink(file_path):
-    #                         os.unlink(file_path)
-    #                     elif os.path.isdir(file_path):
-    #                         shutil.rmtree(file_path)
-    #                 except Exception as e:
-    #                     print('An error appear ' + str(e))
-    #             data, _ = get_info_from_excel(
-    #                 path + "/matrices/" + "09_03_03_Прикладная_информатика,"
-    #                                       "_Матрица_Корпоративные_информационные_системы_2020.xlsx")
-    #             discipline = Document.objects.get(pk=request.GET['document']).program_name.program_name
-    #             data["program_name"] = discipline
-    #             data["program_code"] = Document.objects.get(pk=request.GET['document']).program_name.work_program.program_code
-    #             data["program_code"] = Document.objects.get(
-    #                 pk=request.GET['document']).program_name.work_program.profile_name
-    #             data["program_code"] = Document.objects.get(
-    #                 pk=request.GET['document']).program_name.work_program.year_start
-    #             data["current_year"] = datetime.date.today().year
-    #             print(data[discipline])
-    #             try:
-    #                 context_plane = get_info_from_education_plane(path + "/planes/03-5190 - ВЕБ 2020 (1).xlsx")[
-    #                     discipline]
-    #             except KeyError:
-    #                 for error_key in get_info_from_education_plane(path + "/planes/planes/03-5190 - ВЕБ 2020 ("
-    #                                                                       "1).xlsx"):
-    #                     if SequenceMatcher(None, discipline, error_key).ratio() >= 0.75:
-    #                         context_plane = \
-    #                             get_info_from_education_plane(path + "/planes/planes/03-5190 -"
-    #                                                                  " ВЕБ 2020 (1).xlsx")[error_key]
-    #                         break
-    #             context_plane['intensity_ZET_check'] = check_number(context_plane['intensity_ZET'])
-    #             context_plane['intensity_hours_check'] = check_number(context_plane['intensity_hours'])
-    #             context_plane['total_homework_hours_check'] = check_number(context_plane['total_homework_hours'])
-    #             for i, _ in enumerate(context_plane['courses']):
-    #                 context_plane['courses'][i]['ZET_check'] = check_number(context_plane['courses'][i]['ZET'])
-    #                 context_plane['courses'][i]['hours_check'] = check_number(context_plane['courses'][i]['hours'])
-    #                 context_plane['courses'][i]['homework_time_check'] = check_number(
-    #                     context_plane['courses'][i]['homework_time'])
-    #             context_plane["modules"] = Module.objects.filter(theme_id=Theme.objects.get(pk=theme.id))
-    #             if len(context["modules"]) > 0:
-    #                 context_plane["sections"] = Section.objects.filter(theme_id=context["theme"])
-    #             doc = DocxTemplate(
-    #                 join(str(BASE_DIR), "excel_to_doc_parser/templates/template.docx"))
-    #             doc.render(dict(data[discipline], **context_plane))
-    #             for i in range(len(doc.tables)):
-    #                 table = doc.tables[i]._tbl
-    #                 for row in doc.tables[i].rows:
-    #                     if len(row.cells[0].text.strip()) == 0 and len(set(row.cells)) == 1:
-    #                         table.remove(row._tr)
-    #             doc.save(join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files/{}.docx".format(discipline)))
-    #             context['path'] = "excel_to_doc_parser/media/generated_files/{}.docx".format(discipline)
-    #             context['name'] = discipline + '.docx'
-    #             return redirect("/download/?file={}&name=".format(context['path'], context["name"]))
-    #         if request.POST.get("new_section"):
-    #             header = request.POST.get('new_header')
-    #             description = request.POST.get('new_description')
-    #             classwork_hours = request.POST.get('new_classwork')
-    #             homework_hours = request.POST.get('new_homework')
-    #             semester = request.POST.get('new_semester')
-    #             week = request.POST.get('new_week')
-    #             module = request.POST.get('new_module')
-    #             theme = request.POST.get("new_theme")
-    #             new_module = Section(module_id=Module.objects.get(pk=module), theme_id=Theme.objects.get(pk=theme),
-    #                                  header=header, description=description,
-    #                                  classwork_hours=classwork_hours, homework_hours=homework_hours, semester=semester,
-    #                                  week=week)
-    #             new_module.save()
-    #             return redirect("./docx_creation/themes/?document={}".format(request.GET.get("document")))
-    #         elif request.POST.get("new_module"):
-    #             print(request.POST.get("theme"))
-    #             new_module = Module(module=int(request.POST.get("last_module")) + 1,
-    #                                 theme_id_id=request.POST.get("theme"))
-    #             new_module.save()
-    #             return redirect("./docx_creation/themes/?document={}".format(request.GET.get("document")))
-    #         else:
-    #             pk = request.POST.get('pk')
-    #             header = request.POST.get('header')
-    #             description = request.POST.get('description')
-    #             classwork_hours = request.POST.get('classwork')
-    #             homework_hours = request.POST.get('homework')
-    #             semester = request.POST.get('semester')
-    #             week = request.POST.get('week')
-    #             module = Section.objects.filter(pk=pk)
-    #             module.update(header=header, description=description, classwork_hours=classwork_hours,
-    #                           homework_hours=homework_hours, semester=semester, week=week)
-    #             return redirect("./docx_creation/themes/?document={}".format(request.GET.get("document")))
     return render(request, "./docx_creation/theme.html", context)
 
 
@@ -298,21 +296,23 @@ def document_information(request):
 def generate_xml(request):
     root = etree.Element("root")
     tree = etree.ElementTree(root)
+    main_info = etree.Element("main_info")
     desc = etree.Element("discipline")
     desc.text = Document.objects.get(pk=request.POST.get("document")).program_name.program_name
-    root.append(desc)
+    main_info.append(desc)
     prof = etree.Element("profile")
     prof.text = Document.objects.get(pk=request.POST.get("document")).program_name.work_program.profile_name
-    root.append(prof)
+    main_info.append(prof)
     course = etree.Element("course")
     course.text = "#TODO"
-    root.append(course)
+    main_info.append(course)
     status = etree.Element("status")
     status.text = Document.objects.get(pk=request.POST.get("document")).status.status
-    root.append(status)
+    main_info.append(status)
     elective = etree.Element("elective")
     elective.text = "#TODO"
-    root.append(elective)
+    main_info.append(elective)
+    root.append(main_info)
     files = etree.Element("files")
     files_list = ["rpd", "annotation", "fos", "method", "review", "plan", "matrix", "program"]
     try:
@@ -344,13 +344,23 @@ def generate_xml(request):
     sections = etree.Element("sections")
     try:
         for element in request.POST.get("sections").split(";") or "":
+            section = etree.Element("section")
             section_name = etree.Element("section_name")
             section_name.text = "#TODO"
-            sections.append(section_name)
+            section.append(section_name)
             hours = etree.Element("hours")
             hours.text = "#TODO"
-            sections.append(hours)
+            section.append(hours)
+            sections.append(section)
     except Exception as exc:
+        section = etree.Element("section")
+        section_name = etree.Element("section_name")
+        section_name.text = "#TODO"
+        section.append(section_name)
+        hours = etree.Element("hours")
+        hours.text = "#TODO"
+        section.append(hours)
+        sections.append(section)
         print(exc)
     root.append(sections)
     disciplines = etree.Element("disciplines")
@@ -360,21 +370,37 @@ def generate_xml(request):
             discipline.text = "#TODO"
             disciplines.append(discipline)
     except Exception as exc:
+        discipline = etree.Element("discipline")
+        discipline.text = "#TODO"
+        disciplines.append(discipline)
         print(exc)
     root.append(disciplines)
     sections_content = etree.Element("sections_content")
     try:
         for element in request.POST.get("sections_content").split(";") or "":
+            section_content = etree.Element("section_content")
             theme = etree.Element("theme")
             theme.text = "#TODO"
-            sections_content.append(theme)
+            section_content.append(theme)
             hours = etree.Element("hours")
             hours.text = "#TODO"
-            sections_content.append(hours)
+            section_content.append(hours)
             content = etree.Element("content")
             content.text = "#TODO"
-            sections_content.append(content)
+            section_content.append(content)
+            sections_content.append(section_content)
     except Exception as exc:
+        section_content = etree.Element("section_content")
+        theme = etree.Element("theme")
+        theme.text = "#TODO"
+        section_content.append(theme)
+        hours = etree.Element("hours")
+        hours.text = "#TODO"
+        section_content.append(hours)
+        content = etree.Element("content")
+        content.text = "#TODO"
+        section_content.append(content)
+        sections_content.append(section_content)
         print(exc)
     root.append(sections_content)
     marks = etree.Element("marks")
@@ -397,6 +423,9 @@ def generate_xml(request):
             competency.text = "#TODO"
             competencies.append(competency)
     except Exception as exc:
+        competency = etree.Element("theme")
+        competency.text = "#TODO"
+        competencies.append(competency)
         print(exc)
     marks.append(competencies)
     intermediate = etree.Element("intermediate")
@@ -411,6 +440,14 @@ def generate_xml(request):
             mark.append(characteristics)
             intermediate.append(mark)
     except Exception as exc:
+        mark = etree.Element("mark")
+        value = etree.Element("value")
+        competency.text = "#TODO"
+        mark.append(value)
+        characteristics = etree.Element("characteristics")
+        characteristics.text = "#TODO"
+        mark.append(characteristics)
+        intermediate.append(mark)
         print(exc)
     marks.append(intermediate)
     root.append(marks)
@@ -422,6 +459,9 @@ def generate_xml(request):
             book.text = "#TODO"
             main.append(book)
     except Exception as exc:
+        book = etree.Element("book")
+        book.text = "#TODO"
+        main.append(book)
         print(exc)
     literature.append(main)
     additional = etree.Element("additional")
@@ -431,6 +471,9 @@ def generate_xml(request):
             book.text = "#TODO"
             additional.append(book)
     except Exception as exc:
+        book = etree.Element("book")
+        book.text = "#TODO"
+        additional.append(book)
         print(exc)
     literature.append(additional)
     digital = etree.Element("digital")
@@ -440,6 +483,9 @@ def generate_xml(request):
             resources.text = "#TODO"
             digital.append(resources)
     except Exception as exc:
+        resources = etree.Element("resources")
+        resources.text = "#TODO"
+        digital.append(resources)
         print(exc)
     literature.append(digital)
     root.append(literature)
@@ -450,6 +496,9 @@ def generate_xml(request):
             program.text = "#TODO"
             software.append(program)
     except Exception as exc:
+        program = etree.Element("program")
+        program.text = "#TODO"
+        software.append(program)
         print(exc)
     root.append(software)
     evaluation_tools = etree.Element("evaluation_tools")
@@ -459,21 +508,28 @@ def generate_xml(request):
             tool.text = "#TODO"
             evaluation_tools.append(tool)
     except Exception as exc:
+        tool = etree.Element("tool")
+        tool.text = "#TODO"
+        evaluation_tools.append(tool)
         print(exc)
     root.append(evaluation_tools)
-    tasks = etree.Element("tasks")
+    tasks_for_students = etree.Element("tasks_for_students")
     try:
-        for element in request.POST.get("tasks").split(";") or "":
+        for element in request.POST.get("tasks_for_students").split(";") or "":
             task = etree.Element("task")
             task.text = "#TODO"
-            tasks.append(task)
+            tasks_for_students.append(task)
     except Exception as exc:
+        task = etree.Element("task")
+        task.text = "#TODO"
+        tasks_for_students.append(task)
         print(exc)
-    root.append(tasks)
+    root.append(tasks_for_students)
     path_to_save = join(str(BASE_DIR), "excel_to_doc_parser\\media\\generated_files\\xml\\{}".format(request.user.id))
     Path(path_to_save).mkdir(parents=True, exist_ok=True)
-    filename = "{}-{}.xml".format(Document.objects.get(pk=request.POST.get("document")).program_name.program_name,
-                                  datetime.date.today().strftime("%m.%d.%Y"))
+    # filename = "{}-{}.xml".format(Document.objects.get(pk=request.POST.get("document")).program_name.program_name,
+    #                               datetime.date.today().strftime("%m.%d.%Y"))
+    filename = "{}.xml".format(Document.objects.get(pk=request.POST.get("document")).program_name.program_name)
     tree.write(join(str(BASE_DIR), path_to_save, filename), encoding="UTF-8", xml_declaration=True, pretty_print=True)
 
 
@@ -489,65 +545,6 @@ def result(request):
                 generate_xml(request)
             if request.POST.get("save"):
                 pass
-                # path = join(str(BASE_DIR), "excel_to_doc_parser/media/excel")
-                # folder = join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files")
-                # for filename in os.listdir(folder):
-                #     file_path = os.path.join(folder, filename)
-                #     if filename == ".gitkeep":
-                #         continue
-                #     try:
-                #         if os.path.isfile(file_path) or os.path.islink(file_path):
-                #             os.unlink(file_path)
-                #         elif os.path.isdir(file_path):
-                #             shutil.rmtree(file_path)
-                #     except Exception as e:
-                #         print('An error appear ' + str(e))
-                # data, _ = get_info_from_excel(
-                #     path + "/matrices/" + "09_03_03_Прикладная_информатика,"
-                #                           "_Матрица_Корпоративные_информационные_системы_2020.xlsx")
-                # discipline = Document.objects.get(pk=request.POST.get('document')).program_name.program_name
-                # data["program_name"] = discipline
-                # data["program_code"] = Document.objects.get(pk=request.POST.get('document')).program_name.work_program.program_code
-                # data["program_code"] = Document.objects.get(
-                #     pk=request.GET['document']).program_name.work_program.profile_name
-                # data["program_code"] = Document.objects.get(
-                #     pk=request.GET['document']).program_name.work_program.year_start
-                # data["current_year"] = datetime.date.today().year
-                # print(data[discipline])
-                # try:
-                #     context_plane = get_info_from_education_plane(path + "/planes/03-5190 - ВЕБ 2020 (1).xlsx")[
-                #         discipline]
-                # except KeyError:
-                #     for error_key in get_info_from_education_plane(path + "/planes/planes/03-5190 - ВЕБ 2020 ("
-                #                                                           "1).xlsx"):
-                #         if SequenceMatcher(None, discipline, error_key).ratio() >= 0.75:
-                #             context_plane = \
-                #                 get_info_from_education_plane(path + "/planes/planes/03-5190 -"
-                #                                                      " ВЕБ 2020 (1).xlsx")[error_key]
-                #             break
-                # context_plane['intensity_ZET_check'] = check_number(context_plane['intensity_ZET'])
-                # context_plane['intensity_hours_check'] = check_number(context_plane['intensity_hours'])
-                # context_plane['total_homework_hours_check'] = check_number(context_plane['total_homework_hours'])
-                # for i, _ in enumerate(context_plane['courses']):
-                #     context_plane['courses'][i]['ZET_check'] = check_number(context_plane['courses'][i]['ZET'])
-                #     context_plane['courses'][i]['hours_check'] = check_number(context_plane['courses'][i]['hours'])
-                #     context_plane['courses'][i]['homework_time_check'] = check_number(
-                #         context_plane['courses'][i]['homework_time'])
-                # context_plane["modules"] = Module.objects.filter(theme_id=Theme.objects.get(pk=theme.id))
-                # if len(context["modules"]) > 0:
-                #     context_plane["sections"] = Section.objects.filter(theme_id=context["theme"])
-                # doc = DocxTemplate(
-                #     join(str(BASE_DIR), "excel_to_doc_parser/templates/template.docx"))
-                # doc.render(dict(data[discipline], **context_plane))
-                # for i in range(len(doc.tables)):
-                #     table = doc.tables[i]._tbl
-                #     for row in doc.tables[i].rows:
-                #         if len(row.cells[0].text.strip()) == 0 and len(set(row.cells)) == 1:
-                #             table.remove(row._tr)
-                # doc.save(join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files/{}.docx".format(discipline)))
-                # context['path'] = "excel_to_doc_parser/media/generated_files/{}.docx".format(discipline)
-                # context['name'] = discipline + '.docx'
-                # return redirect("/download/?file={}&name=".format(context['path'], context["name"]))
     return render(request, "./docx_creation/result.html", context)
 
 
