@@ -276,6 +276,9 @@ def themes(request):
             context["document"] = request.GET.get("document")
         if request.method == "POST":
             context["document"] = request.POST.get("document")
+        context["discipline"] = Document.objects.get(pk=context["document"]).program_name.program_name
+        context["profile"] = Document.objects.get(pk=context["document"]).program_name.work_program.profile_name
+        context["status"] = Document.objects.get(pk=context["document"]).status.status
     return render(request, "./docx_creation/theme.html", context)
 
 
