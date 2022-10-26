@@ -86,7 +86,7 @@
                                 </fieldset>
                             </div>
                             <div id="step-2" class="tab-pane" role="tabpanel" aria-labelledby="step-2">
-                                <fieldset class="col-12 pt-5">
+                                <fieldset id="sections" class="col-12 pt-5">
                                     <legend class="col-form-label col-md-12 pt-0"><p class="h2">Выпишите изучаемые
                                         разделы</p>
                                     </legend>
@@ -100,19 +100,15 @@
                                         </div>
                                     </div>
                                     <div class="mb-3">
-                                        <div class="input-group">
+                                        <div class="input-group sections">
                                             <input type="text" name="section" aria-label="First name"
                                                    class="form-control">
                                             <input type="text" name="hours" aria-label="Last name" class="form-control">
                                         </div>
                                     </div>
-                                    <div class="mb-3">
-                                        <div class="input-group">
-                                            <input type="text" name="section" aria-label="First name"
-                                                   class="form-control">
-                                            <input type="text" name="hours" aria-label="Last name" class="form-control">
-                                        </div>
-                                    </div>
+                                    <button id="addInputGroup" type="button" class="btn btn-primary"
+                                            onclick="addInputs()">Добавить раздел
+                                    </button>
                                 </fieldset>
                             </div>
                             <div id="step-3" class="tab-pane" role="tabpanel" aria-labelledby="step-3">
@@ -141,7 +137,7 @@
                                     </legend>
                                     <div class="input-group mb-3">
                                         <label class="input-group-text" for="theme">Тема</label>
-                                        <select class="form-select" id="theme">
+                                        <select class="form-select" id="theme" name="theme">
                                             <option selected>Выберите тему</option>
                                             <option value="1">One</option>
                                             <option value="2">Two</option>
@@ -235,7 +231,8 @@
                             </div>
                             <div id="step-6" class="tab-pane" role="tabpanel" aria-labelledby="step-6">
                                 <fieldset class="col-12 pt-5">
-                                    <legend class="col-form-label col-md-12 pt-0"><p class="h2">Добавление источников</p>
+                                    <legend class="col-form-label col-md-12 pt-0"><p class="h2">Добавление
+                                        источников</p>
                                     </legend>
                                     <div class="mb-3">
                                         <label for="main_lit" class="form-label">Основные</label>
@@ -263,7 +260,8 @@
                             </div>
                             <div id="step-8" class="tab-pane" role="tabpanel" aria-labelledby="step-8">
                                 <div class="mb-3">
-                                    <label for="evaluation_tools" class="form-label"><p class="h2">Перечень оценочных средств</p></label>
+                                    <label for="evaluation_tools" class="form-label"><p class="h2">Перечень оценочных
+                                        средств</p></label>
                                     <textarea class="form-control" name="evaluation_tools" id="evaluation_tools"
                                               placeholder="Основные источники литературы"></textarea>
                                 </div>
@@ -361,5 +359,42 @@
             }
         });
     });
+    $("#smartwizard").on("showStep", function (e, anchorObject, stepIndex, stepDirection, stepPosition) {
+            if (stepIndex === 3) {
+                let section = document.getElementsByClassName("sections");
+                let dict = {};
+                for (let i = 0; i < section.length; i++) {
+                    dict[section[i].children[0].value] = section[i].children[1].value;
+                }
+                console.log(dict)
+            }
+        });
+    function addInputs() {
+        document.getElementById("addInputGroup").remove();
+        var new_div = document.createElement("div");
+        document.getElementById("sections").appendChild(new_div);
+        new_div.setAttribute("class", "mb-3");
+        var new_div_group = document.createElement("div");
+        new_div.appendChild(new_div_group);
+        new_div_group.setAttribute("class", "input-group sections");
+        var section_input = document.createElement("input");
+        new_div_group.appendChild(section_input);
+        section_input.setAttribute("class", "form-control");
+        section_input.setAttribute("type", "text");
+        section_input.setAttribute("name", "section");
+        var hours_input = document.createElement("input");
+        new_div_group.appendChild(hours_input);
+        hours_input.setAttribute("class", "form-control");
+        hours_input.setAttribute("type", "text");
+        hours_input.setAttribute("name", "hours");
+        var new_button = document.createElement("button");
+        document.getElementById("sections").appendChild(new_button);
+        new_button.setAttribute("class", "btn btn-primary");
+        new_button.setAttribute("type", "button");
+        new_button.setAttribute("id", "addInputGroup");
+        new_button.setAttribute("onclick", "addInputs()");
+        new_button.textContent = "Добавить раздел";
+        $('#smartwizard').smartWizard("fixHeight");
+    }
 </script>
 </body>

@@ -8,7 +8,7 @@
         <div class="row d-flex h-100">
             {% include 'base/menu.html' %}
             <fieldset class="col-9 pt-5">
-                <form method="post" action="/document_information/">
+                <form method="post" action="/document_information/?document={{ document }}">
                     {% csrf_token %}
                     <div class="row mb-3">
                         <label for="discipline" class="col-sm-2 col-form-label">Дисциплина</label>
@@ -91,146 +91,7 @@
                     <button type="submit" name="edit" value="edit" class="btn btn-primary">Изменить</button>
                     <button type="submit" name="create" value="create" class="btn btn-primary">Создать</button>
                 </form>
-                <!--                <div class="card-inner">-->
-                <!--                    {% for module in modules %}-->
-                <!--                    &lt;!&ndash;Module&ndash;&gt;-->
-                <!--                    <div class="card-module">-->
-                <!--                        <p class="card-module__title">Модуль {{ module.module }}</p>-->
-                <!--                        <div class="card-module__content">-->
-                <!--                            <div class="card-module__cards">-->
-                <!--                                {% for section in sections %}-->
-                <!--                                {% if section.module_id_id == module.id %}-->
-                <!--                                <div class="card" style="width: 18rem;">-->
-                <!--                                    <form method="POST" action="">-->
-                <!--                                        {% csrf_token %}-->
-                <!--                                        <div class="card-body">-->
-                <!--                                            <label>-->
-                <!--                                                <input type="text" name="header" class="card-title"-->
-                <!--                                                       value="{{ section.header }}">-->
-                <!--                                            </label>-->
-                <!--                                            <label>-->
-                <!--                                                <textarea class="card-title" name="description">{{ section.description }}</textarea>-->
-                <!--                                            </label>-->
-                <!--                                            <label>-->
-                <!--                                                <input type="number" name="classwork" class="card-title classwork"-->
-                <!--                                                       value="{{ section.classwork_hours }}">-->
-                <!--                                            </label>-->
-                <!--                                            <label>-->
-                <!--                                                <input type="number" name="homework" class="card-title homework"-->
-                <!--                                                       value="{{ section.homework_hours }}">-->
-                <!--                                            </label>-->
-                <!--                                            <label>-->
-                <!--                                                <input type="number" name="semester" class="card-title"-->
-                <!--                                                       value="{{ section.semester }}">-->
-                <!--                                            </label>-->
-                <!--                                            <label>-->
-                <!--                                                <input type="number" name="week" class="card-title"-->
-                <!--                                                       value="{{ section.week }}">-->
-                <!--                                            </label>-->
-                <!--                                            <button type="submit" class="card-link">Сохранить</button>-->
-                <!--                                            <label>-->
-                <!--                                                <input type="hidden" name="pk" value="{{ section.id }}">-->
-                <!--                                            </label>-->
-                <!--                                        </div>-->
-                <!--                                    </form>-->
-                <!--                                </div>-->
-                <!--                                {% endif %}-->
-                <!--                                {% endfor %}-->
-                <!--                            </div>-->
-                <!--                            <div class="card-btn_addchapter">-->
-                <!--                                <button type="button" data-bs-toggle="modal"-->
-                <!--                                        data-bs-target="#addSectionModal-{{ forloop.counter }}">-->
-                <!--                                    Добавить раздел +-->
-                <!--                                </button>-->
-                <!--                                <div class="modal fade" id="addSectionModal-{{ forloop.counter }}" tabindex="-1"-->
-                <!--                                     aria-labelledby="addSectionModalLabel" style="display: none;"-->
-                <!--                                     aria-hidden="true">-->
-                <!--                                    <div class="modal-dialog modal-fullscreen">-->
-                <!--                                        <div class="modal-content">-->
-                <!--                                            <form method="POST" action="">-->
-                <!--                                                <input type="hidden" value="True" name="new_section">-->
-                <!--                                                {% csrf_token %}-->
-                <!--                                                <div class="modal-header">-->
-                <!--                                                    <h5 class="modal-title h4" id="exampleModalFullscreenLabel">-->
-                <!--                                                        Добавление нового раздела</h5>-->
-                <!--                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"-->
-                <!--                                                            aria-label="Close"></button>-->
-                <!--                                                </div>-->
-                <!--                                                <div class="modal-body">-->
-                <!--                                                    <label>-->
-                <!--                                                        <input type="text" name="new_header" class="card-title"-->
-                <!--                                                               required>-->
-                <!--                                                    </label>-->
-                <!--                                                    <label>-->
-                <!--                                                            <textarea class="card-title" name="new_description"-->
-                <!--                                                                      required></textarea>-->
-                <!--                                                    </label>-->
-                <!--                                                    <label>-->
-                <!--                                                        <input type="number" name="new_classwork"-->
-                <!--                                                               class="card-title classwork"-->
-                <!--                                                               required>-->
-                <!--                                                    </label>-->
-                <!--                                                    <label>-->
-                <!--                                                        <input type="number" name="new_homework"-->
-                <!--                                                               class="card-title homework"-->
-                <!--                                                               required>-->
-                <!--                                                    </label>-->
-                <!--                                                    <label>-->
-                <!--                                                        <input type="number" name="new_semester" class="card-title"-->
-                <!--                                                               required>-->
-                <!--                                                    </label>-->
-                <!--                                                    <label>-->
-                <!--                                                        <input type="number" name="new_week" class="card-title"-->
-                <!--                                                               required>-->
-                <!--                                                    </label>-->
-                <!--                                                    <label>-->
-                <!--                                                        <input type="hidden" name="new_module"-->
-                <!--                                                               value="{{ module.id }}">-->
-                <!--                                                    </label>-->
-                <!--                                                    <label>-->
-                <!--                                                        <input type="hidden" name="new_theme"-->
-                <!--                                                               value="{{ theme.id }}">-->
-                <!--                                                    </label>-->
-                <!--                                                </div>-->
-                <!--                                                <div class="modal-footer">-->
-                <!--                                                    <button type="submit" class="card-link">-->
-                <!--                                                        Сохранить-->
-                <!--                                                    </button>-->
-                <!--                                                </div>-->
-                <!--                                            </form>-->
-                <!--                                        </div>-->
-                <!--                                    </div>-->
-                <!--                                </div>-->
-                <!--                            </div>-->
-                <!--                        </div>-->
-                <!--                    </div>-->
-                <!--                    &lt;!&ndash;/Module&ndash;&gt;-->
-                <!--                    {% endfor %}-->
-                <!--                    <div class="card-btn_addmodule">-->
-                <!--                        <form action="" method="POST">-->
-                <!--                            {% csrf_token %}-->
-                <!--                            <button type="submit">-->
-                <!--                                Добавить модуль +-->
-                <!--                            </button>-->
-                <!--                            <input type="hidden" name="theme" value="{{ theme.id }}">-->
-                <!--                            <input type="hidden" name="last_module" value="{{ last_module }}">-->
-                <!--                            <input type="hidden" name="new_module" value="True">-->
-                <!--                        </form>-->
-                <!--                        {% if not generated %}-->
-                <!--                        <form class="main-form" id="generate" action="" method="POST">-->
-                <!--                            {% csrf_token %}-->
-                <!--                            <button type="submit">Сгенерировать документ</button>-->
-                <!--                            <input name="generate" type="hidden" value="True">-->
-                <!--                        </form>-->
-                <!--                        {{ generated }}-->
-                <!--                        {% else %}-->
-                <!--                        <form class="main-form" id="download" action="" method="GET">-->
-                <!--                            <input class="main__btn" type="submit" value="Скачать документ"-->
-                <!--                                   onclick="window.open('/download/?file={{ path }}&name={{ name }}')">-->
-                <!--                        </form>-->
-                <!--                        {% endif %}-->
-                <!--                    </div>-->
-                <!--                </div>-->
+            </fieldset>
         </div>
     </div>
 </div>

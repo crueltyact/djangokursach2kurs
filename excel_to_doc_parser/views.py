@@ -5,17 +5,21 @@ import shutil
 from difflib import SequenceMatcher
 from os.path import join
 from pathlib import Path
+import requests
 
+import boto3 as boto3
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponseForbidden, FileResponse
 from django.shortcuts import render, redirect
 from docxtpl import DocxTemplate
+from dotenv import load_dotenv
 from lxml import etree
+from transliterate import translit
 
 from excel_to_doc_parser.models import CustomUser, Role, Document, Theme, WorkProgram, ProgramNames, \
-    TimePlan, Module, Section
+    TimePlan
 from excel_to_doc_parser.py.parser import get_info_from_excel
 from excel_to_doc_parser.py.parser_plane import get_info_from_education_plane
 from parser_server.settings import BASE_DIR, MEDIA_ROOT
@@ -241,9 +245,15 @@ def tasks_for_students_parser(part, content):
 
 
 def xml_parser(request) -> dict:
-    tree = etree.parse(
-        join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files/xml/{}/{}.xml".format(request.user.id,Document.objects.get(pk=request.POST.get('document')).program_name.program_name)))
-    root = tree.getroot()
+    root = etree.fromstring(
+        requests.get(download_xml_from_s3(
+            request,
+            translit("{}.xml".format(
+                Document.objects.get(
+                    pk=request.POST.get("document")
+                ).program_name.program_name).replace(" ", "_"), "ru", reversed=True))
+        ).content
+    )
     content = {}
     functions = {
         "main_info": main_info_parser,
@@ -288,10 +298,12 @@ def document_information(request):
     if request.user.is_authenticated:
         context["custom_user"] = CustomUser.objects.get(user=request.user)
         context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
-        context["document"] = request.POST.get("document")
-        context["theme"] = Document.objects.get(pk=request.POST.get("document")).program_name.program_name
+        if request.method == "GET":
+            context["document"] = request.GET.get("document")
+            context["theme"] = Document.objects.get(pk=request.GET.get("document")).program_name.program_name
         if request.method == "POST":
-            pass
+            context["document"] = request.POST.get("document")
+            context["theme"] = Document.objects.get(pk=request.POST.get("document")).program_name.program_name
     return render(request, "./docx_creation/targets.html", context)
 
 
@@ -532,8 +544,42 @@ def generate_xml(request):
     Path(path_to_save).mkdir(parents=True, exist_ok=True)
     # filename = "{}-{}.xml".format(Document.objects.get(pk=request.POST.get("document")).program_name.program_name,
     #                               datetime.date.today().strftime("%m.%d.%Y"))
-    filename = "{}.xml".format(Document.objects.get(pk=request.POST.get("document")).program_name.program_name)
+    filename = translit(
+        "{}.xml".format(Document.objects.get(pk=request.POST.get("document")).program_name.program_name).replace(" ",
+                                                                                                                 "_"),
+        "ru", reversed=True)
     tree.write(join(str(BASE_DIR), path_to_save, filename), encoding="UTF-8", xml_declaration=True, pretty_print=True)
+    upload_xml_to_s3(request, filename, path_to_save)
+    os.remove(join(str(BASE_DIR), path_to_save, filename))
+
+
+def upload_xml_to_s3(request, filename, filepath):
+    load_dotenv()
+    session = boto3.session.Session()
+    s3 = session.client(
+        service_name='s3',
+        endpoint_url='https://storage.yandexcloud.net',
+        aws_access_key_id=os.environ.get('S3_ACCESS_KEY'),
+        aws_secret_access_key=os.environ.get('S3_SECRET_KEY'),
+    )
+    with open(join(str(BASE_DIR), filepath, filename), "rb") as xml:
+        s3.put_object(Bucket=os.environ.get('BUCKET_NAME'), Key='xml/{}/{}'.format(request.user.id, filename),
+                      Body=xml.read().decode("UTF-8"))
+
+
+def download_xml_from_s3(request, filename):
+    load_dotenv()
+    session = boto3.session.Session()
+    s3 = session.client(
+        service_name='s3',
+        endpoint_url='https://storage.yandexcloud.net',
+        aws_access_key_id=os.environ.get('S3_ACCESS_KEY'),
+        aws_secret_access_key=os.environ.get('S3_SECRET_KEY'),
+    )
+    return s3.generate_presigned_url('get_object', Params={
+        'Bucket': os.environ.get('BUCKET_NAME'),
+        'Key': 'xml/{}/{}'.format(request.user.id, filename)},
+                                     ExpiresIn=60)
 
 
 @login_required(login_url='/login/')
