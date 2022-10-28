@@ -304,6 +304,7 @@ def document_information(request):
         if request.method == "POST":
             context["document"] = request.POST.get("document")
             context["theme"] = Document.objects.get(pk=request.POST.get("document")).program_name.program_name
+        context["all_themes"] = ProgramNames.objects.all()
     return render(request, "./docx_creation/targets.html", context)
 
 
