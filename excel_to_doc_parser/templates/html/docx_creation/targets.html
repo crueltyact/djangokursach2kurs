@@ -95,15 +95,15 @@
                                             <input type="text" value="Раздел" aria-label="First name"
                                                    class="form-control"
                                                    readonly>
-                                            <input type="text" value="Часов" aria-label="Last name" class="form-control"
+                                            <input type="Text" value="Часов" aria-label="Last name" class="form-control"
                                                    readonly>
                                         </div>
                                     </div>
                                     <div class="mb-3">
                                         <div class="input-group sections">
                                             <input type="text" name="section" aria-label="First name"
-                                                   class="form-control">
-                                            <input type="text" name="hours" aria-label="Last name" class="form-control">
+                                                   class="form-control section">
+                                            <input type="text" name="hours" aria-label="Last name" class="form-control hour">
                                         </div>
                                     </div>
                                     <button id="addInputGroup" type="button" class="btn btn-primary"
@@ -142,12 +142,10 @@
                                         <select class="form-select" id="theme" name="theme">
                                             <option selected value="choose_theme" id="choose_theme">Выберите тему
                                             </option>
-
                                         </select>
                                     </div>
-                                    <div id="hours">
-                                    </div>
-                                    <div id="contents">
+                                    <div id="section">
+
                                     </div>
                                 </fieldset>
                             </div>
@@ -185,7 +183,7 @@
                                             <label for="score_system" class="col-sm-2 col-form-label">Есть бальная
                                                 система</label>
                                         </div>
-                                        <div class="col-sm-5  ms-3">
+                                        <div class="col-sm-5 ms-3">
                                             <input type="checkbox" name="score_system" value="1"
                                                    class="form-check-input"
                                                    id="score_system">
@@ -195,26 +193,35 @@
                                         </div>
                                     </div>
                                 </fieldset>
-                                <div class="row mb-3 ml-3">
-                                    <div class="col-md-6">
-                                        <div class="col-md-5">
-                                            <label for="competention" class="form-label">Компетенция</label>
-                                        </div>
-                                        <div class="col-sm-5">
-                                            <input type="text" name="competention" class="form-control"
-                                                   id="competention">
+                                <div class="row mb-3 ml-3" id="marks">
+<!--                                    <div class="col-md-6">-->
+<!--                                        <div class="col-md-5">-->
+<!--                                            <label for="competention" class="form-label">Компетенция</label>-->
+<!--                                        </div>-->
+<!--                                        <div class="col-sm-5">-->
+<!--                                            <input type="text" name="competention" class="form-control"-->
+<!--                                                   id="competention">-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <input type="text" value="Оценка" aria-label="First name"
+                                                   class="form-control"
+                                                   readonly>
+                                            <input type="Text" value="Описание" aria-label="Last name" class="form-control"
+                                                   readonly>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="col-md-5">
-                                            <label for="intermediate" class="form-label">Промежуточная</label>
-                                        </div>
-                                        <div class="col-sm-5">
-                                            <input type="text" name="mark" class="form-control" id="intermediate">
-                                            <input type="text" name="characteristics" class="form-control"
-                                                   id="intermediate1">
+                                    <div class="mb-3">
+                                        <div class="input-group marks">
+                                            <input type="number" name="mark" aria-label="First name"
+                                                   class="form-control mark">
+                                            <input type="text" name="description" aria-label="Last name" class="form-control description">
                                         </div>
                                     </div>
+                                    <button id="addInputGroupMarks" type="button" class="btn btn-primary"
+                                            onclick="addInputsMarks()">Добавить оценку
+                                    </button>
                                 </div>
                                 <div id="brs" class="mb-3 d-none">
                                     <label for="score_system_desc" class="form-label">Описание БРС</label>
@@ -249,7 +256,7 @@
                                 <div class="mb-3">
                                     <label for="software" class="form-label"><p class="h2">Требования к ПО</p></label>
                                     <textarea class="form-control" name="software" id="software"
-                                              placeholder="Основные источники литературы"></textarea>
+                                              placeholder="Требования к ПО"></textarea>
                                 </div>
                             </div>
                             <div id="step-8" class="tab-pane" role="tabpanel" aria-labelledby="step-8">
@@ -257,14 +264,14 @@
                                     <label for="evaluation_tools" class="form-label"><p class="h2">Перечень оценочных
                                         средств</p></label>
                                     <textarea class="form-control" name="evaluation_tools" id="evaluation_tools"
-                                              placeholder="Основные источники литературы"></textarea>
+                                              placeholder="Переченб оценочных средств"></textarea>
                                 </div>
                             </div>
                             <div id="step-9" class="tab-pane" role="tabpanel" aria-labelledby="step-9">
                                 <div class="mb-3">
                                     <label for="tasks_from_file" class="form-label"><p class="h2">Задания</p></label>
                                     <textarea class="form-control" name="tasks_from_file" id="tasks_from_file"
-                                              placeholder="Основные источники литературы"></textarea>
+                                              placeholder="Задания"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -379,13 +386,12 @@
     $("#smartwizard").on("showStep", function (e, anchorObject, stepIndex, stepDirection, stepPosition) {
         if (stepIndex === 3) {
             let section = document.getElementsByClassName("sections");
+            let output_div = document.getElementById("section");
             let dict = {};
             for (let i = 0; i < section.length; i++) {
                 dict[section[i].children[0].value] = section[i].children[1].value;
             }
             let sections = document.getElementById("theme");
-            let hours = document.getElementById("hours")
-            let contents = document.getElementById("contents")
             for (let [key, value] of Object.entries(dict)) {
                 if (key && added_sections.indexOf(key) === -1) {
                     added_sections.push(key);
@@ -394,9 +400,13 @@
                     section_content.textContent = key;
                     section_content.setAttribute("value", iuliia.translate(key, iuliia.WIKIPEDIA));
                     sections.appendChild(section_content);
+                    //Create div for all themes
+                    let theme = document.createElement("div");
+                    theme.setAttribute("id", iuliia.translate(key, iuliia.WIKIPEDIA))
+                    theme.setAttribute("class", "d-none");
                     //Create hours input field
                     let hour = document.createElement("div");
-                    hour.setAttribute("class", "row mb-3 d-none " + iuliia.translate(key, iuliia.WIKIPEDIA));
+                    hour.setAttribute("class", "row mb-3 " + iuliia.translate(key, iuliia.WIKIPEDIA));
                     let hour_label = document.createElement("label");
                     hour_label.textContent = "Часы";
                     hour_label.setAttribute("for", "hour");
@@ -408,13 +418,14 @@
                     hour_input.setAttribute("value", value.toString());
                     hour_input.setAttribute("class", "form-control");
                     hour_input.setAttribute("type", "number");
+                    hour_input.setAttribute("readonly","");
                     hour_input.setAttribute("id", "hour");
                     hour_input_div.appendChild(hour_input);
                     hour.appendChild(hour_input_div);
-                    hours.appendChild(hour);
+                    theme.appendChild(hour);
                     //Create content input field
                     let content = document.createElement("div");
-                    content.setAttribute("class", "mb-3 d-none " + iuliia.translate(key, iuliia.WIKIPEDIA));
+                    content.setAttribute("class", "mb-3 " + iuliia.translate(key, iuliia.WIKIPEDIA));
                     let content_label = document.createElement("label");
                     content_label.textContent = "Содержание";
                     content_label.setAttribute("for", "content");
@@ -426,21 +437,27 @@
                     content_textarea.setAttribute("name", "content");
                     content_textarea.setAttribute("id", "content");
                     content.appendChild(content_textarea);
-                    contents.appendChild(content);
+                    theme.appendChild(content);
+                    output_div.appendChild(theme);
                 }
             }
-            document.getElementById("theme").addEventListener("change", function () {
-                let vis = document.getElementsByClassName('vis'), target = document.getElementsByClassName(this.value);
-                console.log(vis);
+            document.getElementById("theme").addEventListener("input", function () {
+                let vis = document.getElementsByClassName('vis')
+                let target = document.getElementById(this.value);
+                // console.log("vis", vis, "target", target);
                 if (vis !== null) {
                     for (const visElement of vis) {
                         visElement.className = visElement.className.replace("vis", "d-none");
+                        // console.log(visElement.className);
                     }
                 }
                 if (target !== null && target.value !== "choose_theme") {
-                    for (const targetElement of target) {
-                        targetElement.className = targetElement.className.replace("d-none", "vis");
-                        console.log(targetElement.className);
+                    target.className = target.className.replace("d-none", "vis");
+                }
+                if (target.value === "choose_theme") {
+                    for (const visElement of vis) {
+                        visElement.className = visElement.className.replace("vis", "d-none");
+                        // console.log(visElement.className);
                     }
                 }
                 $('#smartwizard').smartWizard("fixHeight");
@@ -450,23 +467,23 @@
 
     function addInputs() {
         document.getElementById("addInputGroup").remove();
-        var new_div = document.createElement("div");
+        let new_div = document.createElement("div");
         document.getElementById("sections").appendChild(new_div);
         new_div.setAttribute("class", "mb-3");
-        var new_div_group = document.createElement("div");
+        let new_div_group = document.createElement("div");
         new_div.appendChild(new_div_group);
         new_div_group.setAttribute("class", "input-group sections");
-        var section_input = document.createElement("input");
+        let section_input = document.createElement("input");
         new_div_group.appendChild(section_input);
-        section_input.setAttribute("class", "form-control");
+        section_input.setAttribute("class", "form-control section");
         section_input.setAttribute("type", "text");
         section_input.setAttribute("name", "section");
-        var hours_input = document.createElement("input");
+        let hours_input = document.createElement("input");
         new_div_group.appendChild(hours_input);
-        hours_input.setAttribute("class", "form-control");
-        hours_input.setAttribute("type", "text");
+        hours_input.setAttribute("class", "form-control hour");
+        hours_input.setAttribute("type", "number");
         hours_input.setAttribute("name", "hours");
-        var new_button = document.createElement("button");
+        let new_button = document.createElement("button");
         document.getElementById("sections").appendChild(new_button);
         new_button.setAttribute("class", "btn btn-primary");
         new_button.setAttribute("type", "button");
@@ -476,8 +493,79 @@
         $('#smartwizard').smartWizard("fixHeight");
     }
 
-    function generate_output() {
+    function addInputsMarks() {
+        document.getElementById("addInputGroupMarks").remove();
+        let new_div = document.createElement("div");
+        document.getElementById("marks").appendChild(new_div);
+        new_div.setAttribute("class", "mb-3");
+        let new_div_group = document.createElement("div");
+        new_div.appendChild(new_div_group);
+        new_div_group.setAttribute("class", "input-group marks");
+        let section_input = document.createElement("input");
+        new_div_group.appendChild(section_input);
+        section_input.setAttribute("class", "form-control mark");
+        section_input.setAttribute("type", "text");
+        section_input.setAttribute("name", "mark");
+        let hours_input = document.createElement("input");
+        new_div_group.appendChild(hours_input);
+        hours_input.setAttribute("class", "form-control description");
+        hours_input.setAttribute("type", "text");
+        hours_input.setAttribute("name", "description");
+        let new_button = document.createElement("button");
+        document.getElementById("marks").appendChild(new_button);
+        new_button.setAttribute("class", "btn btn-primary");
+        new_button.setAttribute("type", "button");
+        new_button.setAttribute("id", "addInputGroupMarks");
+        new_button.setAttribute("onclick", "addInputsMarks()");
+        new_button.textContent = "Добавить оценку";
+        $('#smartwizard').smartWizard("fixHeight");
+    }
 
+    function generate_output() {
+        //generate input with all sections
+        let sections = document.getElementsByClassName("section");
+        let hours = document.getElementsByClassName("hour");
+        let contents = document.getElementById("section");
+        let sections_str = "";
+        if (sections.length === hours.length && sections.length === contents.children.length) {
+            for (let i = 0; i < sections.length; i++) {
+                sections_str += sections[i].value + ":" + hours[i].value + ":" + contents.children[i].children[1].children[1].value + ";";
+            }
+            let all_sections = document.createElement("input");
+            all_sections.value = sections_str;
+            all_sections.setAttribute("type", "hidden");
+            all_sections.setAttribute("name", "all_sections");
+            document.getElementById("sections").appendChild(all_sections);
+        } else {
+            let error_input = document.createElement("input");
+            error_input.value = "error:sections-hour-mismatch";
+            error_input.setAttribute("type", "hidden");
+            error_input.setAttribute("name", "all_sections");
+            document.getElementById("sections").appendChild(error_input);
+        }
+        //generate input with all modules
+        let modules = document.getElementById("dropzone");
+        let modules_str = "";
+        for (let module of modules.children) {
+            modules_str += module.textContent + ";";
+        }
+        let all_module = document.createElement("input");
+        all_module.value = modules_str;
+        all_module.setAttribute("type", "hidden");
+        all_module.setAttribute("name", "all_modules");
+        document.getElementById("dropzone").appendChild(all_module);
+        //generate input with all marks
+        let marks = document.getElementsByClassName("marks");
+        let description = document.getElementsByClassName("description");
+        let marks_str = "";
+        for (let i = 0; i < marks.length; i++) {
+            marks_str += marks[i].children[0].value + ":" + description[i].value + ";";
+        }
+        let all_marks = document.createElement("input");
+        all_marks.value = marks_str;
+        all_marks.setAttribute("type", "hidden");
+        all_marks.setAttribute("name", "all_marks");
+        document.getElementById("marks").appendChild(all_marks);
     }
 
     window.onload = function () {

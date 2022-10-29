@@ -166,81 +166,111 @@ def documents(request):
 
 
 def main_info_parser(part, content):
+    data = {}
     for field in part:
-        content[str(field.tag)] = field.text
+        data[str(field.tag)] = field.text
+    content["main_info"] = data
     return content
 
 
 def files_parser(part, content):
+    data = {}
     for field in part:
-        content[str(field.tag)] = field.text
+        data[str(field.tag)] = field.text
+    content["files"] = data
     return content
 
 
 def targets_parser(part, content):
+    data = []
     for i, field in enumerate(part):
-        content["{}{}".format(field.tag, i)] = field.text
+        data.append(field.text.strip() + (";" if i < len(part) - 1 else ""))
+    content["targets"] = data
     return content
 
 
 def tasks_parser(part, content):
+    data = []
     for i, field in enumerate(part):
-        content["{}{}".format(field.tag, i)] = field.text
+        data.append(field.text.strip() + (";" if i < len(part) - 1 else ""))
+    content["tasks"] = data
     return content
 
 
 def sections_parser(part, content):
     for i, field in enumerate(part):
         content[str(field[0].text)] = field[1].text
+    content["section"] = content
     return content
 
 
 def disciplines_parser(part, content):
+    data = []
     for field in part:
-        content[str(field.text)] = field.text
+        if not field.text:
+            part.remove(field)
+    for i, field in enumerate(part):
+        if field.text:
+            data.append(field.text.strip() + (";" if field != part[-1] else "."))
+    content["disciplines"] = data
     return content
 
 
 def sections_content_parser(part, content):
+    data = []
     for i, field in enumerate(part):
-        content[str(field[0].text)] = [field[1].text, field[2].text]
+        if field[0].text != "#TODO":
+            data.append([field[0].text, field[1].text, field[2].text])
+    content["sections"] = data
     return content
 
 
 def marks_parser(part, content):
+    data = []
     content[part[0].tag] = part[0].text
     content[part[1].tag] = part[1].text
     content[part[2].tag] = part[2].text
     content[part[3].tag] = part[3].text
+    # for i, field in enumerate(part[4]):
+    #     content["{}{}".format(field.tag, i)] = field.text
     for i, field in enumerate(part[4]):
-        content["{}{}".format(field.tag, i)] = field.text
-    for i, field in enumerate(part[5]):
-        content[str(field[0].text)] = field[1].text
+        if field[0].text:
+            data.append([field[0].text, field[1].text])
+    content["marks"] = data
     return content
 
 
 def literature_parser(part, content):
+    data = {}
     for j in range(len(part)):
+        books = []
         for i, field in enumerate(part[j]):
-            content["{}{}".format(field.tag, i)] = field.text
+            books.append(field.text.strip())
+        data[part[j].tag] = books
+    content["literature"] = data
     return content
 
 
 def software_parser(part, content):
+    data = []
     for i, field in enumerate(part):
-        content["{}{}".format(field.tag, i)] = field.text
+        data.append(field.text.strip())
+    content["software"] = data
+    print(data)
     return content
 
 
 def evaluation_tools_parser(part, content):
     for i, field in enumerate(part):
         content["{}{}".format(field.tag, i)] = field.text
+    content["evaluation_tool"] = content
     return content
 
 
 def tasks_for_students_parser(part, content):
     for i, field in enumerate(part):
         content["{}{}".format(field.tag, i)] = field.text
+    content["tasks_for_students"] = content
     return content
 
 
@@ -270,9 +300,7 @@ def xml_parser(request) -> dict:
         "tasks_for_students": tasks_for_students_parser,
     }
     for part in root:
-        print(part.tag)
         content = functions.get(part.tag, lambda: "Invalid tag")(part, content)
-        print("It works")
     return content
 
 
@@ -341,7 +369,7 @@ def generate_xml(request):
     root.append(files)
     targets = etree.Element("targets")
     try:
-        for element in request.POST.get("targets").split(";") or "":
+        for element in request.POST.get("targets").split(";"):
             target = etree.Element("target")
             target.text = element
             targets.append(target)
@@ -350,7 +378,7 @@ def generate_xml(request):
     root.append(targets)
     tasks = etree.Element("tasks")
     try:
-        for element in request.POST.get("tasks").split(";") or "":
+        for element in request.POST.get("tasks").split(";"):
             task = etree.Element("task")
             task.text = element
             tasks.append(task)
@@ -359,13 +387,14 @@ def generate_xml(request):
     root.append(tasks)
     sections = etree.Element("sections")
     try:
-        for element in request.POST.get("sections").split(";") or "":
+        for element in request.POST.get("all_sections").split(";"):
+            data = element.split(":")
             section = etree.Element("section")
             section_name = etree.Element("section_name")
-            section_name.text = "#TODO"
+            section_name.text = data[0]
             section.append(section_name)
             hours = etree.Element("hours")
-            hours.text = "#TODO"
+            hours.text = data[1]
             section.append(hours)
             sections.append(section)
     except Exception as exc:
@@ -381,9 +410,9 @@ def generate_xml(request):
     root.append(sections)
     disciplines = etree.Element("disciplines")
     try:
-        for element in request.POST.get("disciplines").split(";") or "":
+        for element in request.POST.get("all_modules").split(";"):
             discipline = etree.Element("discipline")
-            discipline.text = "#TODO"
+            discipline.text = element
             disciplines.append(discipline)
     except Exception as exc:
         discipline = etree.Element("discipline")
@@ -393,16 +422,17 @@ def generate_xml(request):
     root.append(disciplines)
     sections_content = etree.Element("sections_content")
     try:
-        for element in request.POST.get("sections_content").split(";") or "":
+        for element in request.POST.get("all_sections").split(";"):
+            data = element.split(":")
             section_content = etree.Element("section_content")
             theme = etree.Element("theme")
-            theme.text = "#TODO"
+            theme.text = data[0]
             section_content.append(theme)
             hours = etree.Element("hours")
-            hours.text = "#TODO"
+            hours.text = data[1]
             section_content.append(hours)
             content = etree.Element("content")
-            content.text = "#TODO"
+            content.text = data[2]
             section_content.append(content)
             sections_content.append(section_content)
     except Exception as exc:
@@ -421,38 +451,39 @@ def generate_xml(request):
     root.append(sections_content)
     marks = etree.Element("marks")
     competency = etree.Element("competency")
-    competency.text = "#TODO"
+    competency.text = request.POST.get("competentions")
     marks.append(competency)
     attestation = etree.Element("attestation")
-    attestation.text = "#TODO"
+    attestation.text = request.POST.get("attestation")
     marks.append(attestation)
     brs = etree.Element("brs")
-    brs.text = "#TODO"
+    brs.text = request.POST.get("score_system")
     marks.append(brs)
     brs_description = etree.Element("brs_description")
-    brs_description.text = "#TODO"
+    brs_description.text = request.POST.get("score_system_desc")
     marks.append(brs_description)
-    competencies = etree.Element("competencies")
-    try:
-        for element in request.POST.get("competencies").split(";") or "":
-            competency = etree.Element("theme")
-            competency.text = "#TODO"
-            competencies.append(competency)
-    except Exception as exc:
-        competency = etree.Element("theme")
-        competency.text = "#TODO"
-        competencies.append(competency)
-        print(exc)
-    marks.append(competencies)
+    # competencies = etree.Element("competencies")
+    # try:
+    #     for element in request.POST.get("competencies").split(";") or "":
+    #         competency = etree.Element("theme")
+    #         competency.text = "#TODO"
+    #         competencies.append(competency)
+    # except Exception as exc:
+    #     competency = etree.Element("theme")
+    #     competency.text = "#TODO"
+    #     competencies.append(competency)
+    #     print(exc)
+    # marks.append(competencies)
     intermediate = etree.Element("intermediate")
     try:
-        for element in request.POST.get("intermediate").split(";") or "":
+        for element in request.POST.get("all_marks").split(";"):
+            data = element.split(":")
             mark = etree.Element("mark")
             value = etree.Element("value")
-            competency.text = "#TODO"
+            value.text = data[0]
             mark.append(value)
             characteristics = etree.Element("characteristics")
-            characteristics.text = "#TODO"
+            characteristics.text = data[1]
             mark.append(characteristics)
             intermediate.append(mark)
     except Exception as exc:
@@ -470,9 +501,9 @@ def generate_xml(request):
     literature = etree.Element("literature")
     main = etree.Element("main")
     try:
-        for element in request.POST.get("main").split(";") or "":
+        for element in request.POST.get("main_lit").split(";"):
             book = etree.Element("book")
-            book.text = "#TODO"
+            book.text = element
             main.append(book)
     except Exception as exc:
         book = etree.Element("book")
@@ -482,9 +513,9 @@ def generate_xml(request):
     literature.append(main)
     additional = etree.Element("additional")
     try:
-        for element in request.POST.get("additional").split(";") or "":
+        for element in request.POST.get("extra_lit").split(";"):
             book = etree.Element("book")
-            book.text = "#TODO"
+            book.text = element
             additional.append(book)
     except Exception as exc:
         book = etree.Element("book")
@@ -494,9 +525,9 @@ def generate_xml(request):
     literature.append(additional)
     digital = etree.Element("digital")
     try:
-        for element in request.POST.get("digital").split(";") or "":
+        for element in request.POST.get("digital_lit").split(";") or "":
             resources = etree.Element("resources")
-            resources.text = "#TODO"
+            resources.text = element
             digital.append(resources)
     except Exception as exc:
         resources = etree.Element("resources")
@@ -507,9 +538,9 @@ def generate_xml(request):
     root.append(literature)
     software = etree.Element("software")
     try:
-        for element in request.POST.get("software").split(";") or "":
+        for element in request.POST.get("software").split(";"):
             program = etree.Element("program")
-            program.text = "#TODO"
+            program.text = element
             software.append(program)
     except Exception as exc:
         program = etree.Element("program")
@@ -519,9 +550,9 @@ def generate_xml(request):
     root.append(software)
     evaluation_tools = etree.Element("evaluation_tools")
     try:
-        for element in request.POST.get("evaluation_tools").split(";") or "":
+        for element in request.POST.get("evaluation_tools").split(";"):
             tool = etree.Element("tool")
-            tool.text = "#TODO"
+            tool.text = element
             evaluation_tools.append(tool)
     except Exception as exc:
         tool = etree.Element("tool")
@@ -531,9 +562,9 @@ def generate_xml(request):
     root.append(evaluation_tools)
     tasks_for_students = etree.Element("tasks_for_students")
     try:
-        for element in request.POST.get("tasks_for_students").split(";") or "":
+        for element in request.POST.get("tasks_from_file").split(";") or "":
             task = etree.Element("task")
-            task.text = "#TODO"
+            task.text = element
             tasks_for_students.append(task)
     except Exception as exc:
         task = etree.Element("task")

@@ -846,7 +846,7 @@ template {
 }
 
 .hide {
-  opacity: 0;
+  display: none;
 }
 
 .mask {
@@ -919,7 +919,7 @@ template {
 }
 
 .hide {
-  opacity: 0;
+  display: none;
 }
 
 .canvas {
@@ -12989,5 +12989,9 @@ fieldset:disabled .btn {
 
 body {
   font-family: "Roboto-Regular" !important;
+}
+
+.hidden {
+  display: none !important;
 }
 /*# sourceMappingURL=index.css.map */
