@@ -139,7 +139,6 @@ def documents(request):
                     context_plane['courses'][i]['homework_time'])
             doc = DocxTemplate(
                 join(str(BASE_DIR), "excel_to_doc_parser/templates/template.docx"))
-
             data = dict(data[discipline], **xml_parser(request))
             doc.render(dict(data, **context_plane))
             for i in range(len(doc.tables)):
@@ -220,7 +219,7 @@ def sections_content_parser(part, content):
     data = []
     for i, field in enumerate(part):
         if field[0].text != "#TODO":
-            data.append([field[0].text, field[1].text, field[2].text])
+            data.append([field[0].text, int(field[1].text), field[2].text])
     content["sections"] = data
     return content
 
@@ -329,7 +328,12 @@ def document_information(request):
         if request.method == "GET":
             context["document"] = request.GET.get("document")
             context["theme"] = Document.objects.get(pk=request.GET.get("document")).program_name.program_name
+            context["hours"] = TimePlan.objects.get(
+                program_name=Document.objects.get(pk=request.GET.get("document")).program_name).classwork_hours
         if request.method == "POST":
+            context["hours"] = TimePlan.objects.get(
+                program_name=Document.objects.get(pk=request.POST.get("document")).program_name).classwork_hours
+            print(context["hours"])
             context["document"] = request.POST.get("document")
             context["theme"] = Document.objects.get(pk=request.POST.get("document")).program_name.program_name
         context["all_themes"] = ProgramNames.objects.all()
@@ -639,14 +643,14 @@ def download(request):
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect("/")
+        return redirect("/documents/")
     if request.method == "POST":
         username = request.POST.get('login')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect("/")
+            return redirect("/documents/")
         else:
             print("Error")
     return render(request, "authorization.html")
