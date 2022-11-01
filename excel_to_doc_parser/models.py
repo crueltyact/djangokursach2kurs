@@ -5,7 +5,19 @@ from django.db import models
 
 
 class Role(models.Model):
-    role_type = models.CharField(max_length=128)
+    ADMIN = 1
+    DEAN = 2
+    HOD = 3
+    HEP = 4
+    TEACHER = 5
+    ROLE_CHOICES = (
+        (ADMIN, 'Admin'),
+        (DEAN, 'Dean'),
+        (HOD, 'HOD'),
+        (HEP, 'HEP'),
+        (TEACHER, 'Teacher')
+    )
+    role_type = models.CharField(choices=ROLE_CHOICES, max_length=128)
 
 
 class CustomUser(models.Model):
