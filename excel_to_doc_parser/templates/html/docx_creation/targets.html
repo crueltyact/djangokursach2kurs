@@ -66,6 +66,18 @@
                                     <!--                                    Задания-->
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#step-10">
+                                    <span class="num">10</span>
+                                    <!--                                    Образовательные технологии-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#step-11">
+                                    <span class="num">11</span>
+                                    <!--                                    Образовательные технологии-->
+                                </a>
+                            </li>
                         </ul>
 
                         <div class="tab-content">
@@ -281,6 +293,83 @@
                                     <label for="tasks_from_file" class="form-label"><p class="h2">Задания</p></label>
                                     <textarea class="form-control" name="tasks_from_file" id="tasks_from_file"
                                               placeholder="Задания"></textarea>
+                                </div>
+                            </div>
+                            <div id="step-10" class="tab-pane" role="tabpanel" aria-labelledby="step-10">
+                                <div class="mb-3">
+                                    <label for="tasks_from_file" class="form-label"><p class="h2">Образовательные технологии</p></label>
+                                    <div class="row">
+                                        <fieldset class="col">
+                                            <div><p class="h3">Предопределённые технологии на занятиях</p>
+                                                {% for tech in predefined_techs_in_class.default %}
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" name="default_tech_in_class" type="checkbox" id="default_tech_in_class{{ forloop.counter }}" value="{{ tech }}" checked onclick="return false;">
+                                                    <label class="form-check-label" for="default_tech_in_class{{ forloop.counter }}">{{ tech }}</label>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                            <div><p class="h3">Технологии на выбор на занятиях</p>
+                                                {% for tech in predefined_techs_in_class.optional %}
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" name="optional_tech_in_class" type="checkbox" id="optional_tech_in_class{{ forloop.counter }}" value="{{ tech }}">
+                                                    <label class="form-check-label" for="optional_tech_in_class{{ forloop.counter }}">{{ tech }}</label>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        </fieldset>
+                                        <fieldset class="col">
+                                            <div><p class="h3">Предопределённые технологии вне занятий</p>
+                                                {% for tech in predefined_techs_out_class.default %}
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" name="default_tech_out_class" type="checkbox" id="default_tech_out_class{{ forloop.counter }}" value="{{ tech }}" checked onclick="return false;">
+                                                    <label class="form-check-label" for="default_tech_out_class{{ forloop.counter }}">{{ tech }}</label>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                            <div><p class="h3">Технологии на выбор вне занятий</p>
+                                                {% for tech in predefined_techs_out_class.optional %}
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" name="optional_tech_out_class" type="checkbox" id="optional_tech_out_class{{ forloop.counter }}" value="{{ tech }}">
+                                                    <label class="form-check-label" for="optional_tech_out_class{{ forloop.counter }}">{{ tech }}</label>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="step-11" class="tab-pane" role="tabpanel" aria-labelledby="step-11">
+                                <div class="mb-3">
+                                    <label for="tasks_from_file" class="form-label"><p class="h2">Методические рекомендации для самостоятельной работы студентов</p></label>
+                                    <div class="row">
+                                        <fieldset class="col">
+                                            <div><p class="h3">Предопределённые критерии оценки самостоятельной работы студента</p>
+                                                {% for tech in predefined_criteries_in_methods_for_students.default %}
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" name="default_criteries" type="checkbox" id="default_criteries{{ forloop.counter }}" value="{{ tech }}" checked onclick="return false;">
+                                                    <label class="form-check-label" for="default_criteries{{ forloop.counter }}">{{ tech }}</label>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+<!--                                            <label><p class="h3">Критерии оценки самостоятельной работы студента на выбор</p>-->
+<!--                                                {% for tech in predefined_criteries_in_methods_for_students.optional %}-->
+<!--                                                    <label><input type="checkbox" name="optional_tech_in_class" value="{{tech}}">{{ tech }}</label>-->
+<!--                                                {% endfor %}-->
+<!--                                            </label>-->
+                                        </fieldset>
+<!--                                        <fieldset class="col">-->
+<!--                                            <label><p class="h3">Предопределённые технологии вне занятий</p>-->
+<!--                                                {% for tech in predefined_techs_out_class.default %}-->
+<!--                                                    <input type="checkbox" name="default_tech_out_class" value="{{tech}}" readonly>-->
+<!--                                                {% endfor %}-->
+<!--                                            </label>-->
+<!--                                            <label><p class="h3">Технологии на выбор вне занятий</p>-->
+<!--                                                {% for tech in predefined_techs_out_class.optional %}-->
+<!--                                                    <input type="checkbox" name="optional_tech_out_class" value="{{tech}}">-->
+<!--                                                {% endfor %}-->
+<!--                                            </label>-->
+<!--                                        </fieldset>-->
+                                    </div>
                                 </div>
                             </div>
                         </div>

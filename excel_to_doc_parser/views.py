@@ -182,6 +182,9 @@ def files_parser(part, content):
 
 def targets_parser(part, content):
     data = []
+    for field in part:
+        if not field.text:
+            part.remove(field)
     for i, field in enumerate(part):
         data.append(field.text.strip() + (";" if i < len(part) - 1 else ""))
     content["targets"] = data
@@ -190,6 +193,9 @@ def targets_parser(part, content):
 
 def tasks_parser(part, content):
     data = []
+    for field in part:
+        if not field.text:
+            part.remove(field)
     for i, field in enumerate(part):
         data.append(field.text.strip() + (";" if i < len(part) - 1 else ""))
     content["tasks"] = data
@@ -244,7 +250,8 @@ def literature_parser(part, content):
     for j in range(len(part)):
         books = []
         for i, field in enumerate(part[j]):
-            books.append(field.text.strip())
+            if field.text:
+                books.append(field.text.strip())
         data[part[j].tag] = books
     content["literature"] = data
     return content
@@ -252,10 +259,12 @@ def literature_parser(part, content):
 
 def software_parser(part, content):
     data = []
+    for field in part:
+        if not field.text:
+            part.remove(field)
     for i, field in enumerate(part):
         data.append(field.text.strip())
     content["software"] = data
-    print(data)
     return content
 
 
@@ -270,6 +279,37 @@ def tasks_for_students_parser(part, content):
     for i, field in enumerate(part):
         content["{}{}".format(field.tag, i)] = field.text
     content["tasks_for_students"] = content
+    return content
+
+
+def education_technologies_parser(part, content):
+    data = {}
+    education_technologies_in = []
+    education_technologies_out = []
+    for field in part[0]:
+        if not field.text:
+            part[0].remove(field)
+    for field in part[1]:
+        if not field.text:
+            part[1].remove(field)
+    for i, field in enumerate(part[0]):
+        education_technologies_in.append(field.text.strip() + (";" if field != part[-1] else "."))
+    data["education_technologies_in"] = education_technologies_in
+    for i, field in enumerate(part[1]):
+        education_technologies_out.append(field.text.strip() + (";" if field != part[-1] else "."))
+    data["education_technologies_out"] = education_technologies_out
+    content["education_technologies"] = data
+    return content
+
+
+def mark_criteries_parser(part, content):
+    data = []
+    for field in part:
+        if not field.text:
+            part.remove(field)
+    for i, field in enumerate(part):
+        data.append(field.text.strip() + (";" if field != part[-1] else "."))
+    content["mark_criteries"] = data
     return content
 
 
@@ -297,6 +337,8 @@ def xml_parser(request) -> dict:
         "software": software_parser,
         "evaluation_tools": evaluation_tools_parser,
         "tasks_for_students": tasks_for_students_parser,
+        "education_technologies": education_technologies_parser,
+        "mark_criteries": mark_criteries_parser
     }
     for part in root:
         content = functions.get(part.tag, lambda: "Invalid tag")(part, content)
@@ -325,15 +367,30 @@ def document_information(request):
     if request.user.is_authenticated:
         context["custom_user"] = CustomUser.objects.get(user=request.user)
         context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
+        context["predefined_techs_in_class"] = {"default": ["выполнение лабораторных работ в лабораториях вуза",
+                                                            "индивидуальные и групповые консультации студентов преподавателем, в том числе в виде защиты выполненных заданий в рамках самостоятельной работы"],
+                                                "optional": [
+                                                    "посещение профильных конференций и работа на мастер-классах экспертов и специалистов индустрии"]}
+        context["predefined_techs_out_class"] = {
+            "default": ["подготовки к выполнению и подготовки к защите лабораторных работ",
+                        "подготовки к текущей аттестации",
+                        "подготовки к промежуточной аттестации"],
+            "optional": ["чтения литературы и освоения дополнительного материала в рамках тематики дисциплины"]}
+        context["predefined_criteries_in_methods_for_students"] = {
+            "default": ["уровень освоения студентом учебного материала",
+                        "умения студента использовать теоретические знания при выполнении практических задач",
+                        "сформированность компетенций",
+                        "оформление материала в соответствии с требованиями"],
+            "optional": []}
         if request.method == "GET":
             context["document"] = request.GET.get("document")
             context["theme"] = Document.objects.get(pk=request.GET.get("document")).program_name.program_name
             context["hours"] = TimePlan.objects.get(
                 program_name=Document.objects.get(pk=request.GET.get("document")).program_name).classwork_hours
         if request.method == "POST":
+            # context["last_values"] = xml_parser(request)
             context["hours"] = TimePlan.objects.get(
                 program_name=Document.objects.get(pk=request.POST.get("document")).program_name).classwork_hours
-            print(context["hours"])
             context["document"] = request.POST.get("document")
             context["theme"] = Document.objects.get(pk=request.POST.get("document")).program_name.program_name
         context["all_themes"] = ProgramNames.objects.all()
@@ -576,6 +633,41 @@ def generate_xml(request):
         tasks_for_students.append(task)
         print(exc)
     root.append(tasks_for_students)
+    education_technologies = etree.Element("education_technologies")
+    education_technologies_in = etree.Element("education_technologies_in")
+    education_technologies_out = etree.Element("education_technologies_out")
+    print(request.POST.getlist("default_tech_in_class"))
+    try:
+        for element in request.POST.getlist("default_tech_in_class"):
+            tech = etree.Element("tech")
+            tech.text = element
+            education_technologies_in.append(tech)
+        for element in request.POST.getlist("optional_tech_in_class"):
+            tech = etree.Element("tech")
+            tech.text = element
+            education_technologies_in.append(tech)
+        for element in request.POST.getlist("default_tech_out_class"):
+            tech = etree.Element("tech")
+            tech.text = element
+            education_technologies_out.append(tech)
+        for element in request.POST.getlist("optional_tech_out_class"):
+            tech = etree.Element("tech")
+            tech.text = element
+            education_technologies_out.append(tech)
+    except Exception as exc:
+        print(exc)
+    education_technologies.append(education_technologies_in)
+    education_technologies.append(education_technologies_out)
+    root.append(education_technologies)
+    mark_criteries = etree.Element("mark_criteries")
+    try:
+        for element in request.POST.getlist("default_tech_in_class"):
+            tech = etree.Element("tech")
+            tech.text = element
+            mark_criteries.append(tech)
+    except Exception as exc:
+        print(exc)
+    root.append(mark_criteries)
     path_to_save = join(str(BASE_DIR), "excel_to_doc_parser\\media\\generated_files\\xml\\{}".format(request.user.id))
     Path(path_to_save).mkdir(parents=True, exist_ok=True)
     # filename = "{}-{}.xml".format(Document.objects.get(pk=request.POST.get("document")).program_name.program_name,
