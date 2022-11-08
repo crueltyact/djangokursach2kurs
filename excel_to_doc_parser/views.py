@@ -107,8 +107,7 @@ def documents(request):
                 except Exception as e:
                     print('An error appear ' + str(e))
             data, _ = get_info_from_excel(
-                path + "/matrices/" + "09_03_03_Прикладная_информатика,"
-                                      "_Матрица_Корпоративные_информационные_системы_2020.xlsx")
+                path + "/matrices/" + "09_03_01_Информатика_и_ВТ,_Матрица_ВЕБ_технологии_2020.xlsx")
             discipline = Document.objects.get(pk=request.POST.get('document')).program_name.program_name
             data["program_name"] = discipline
             data["program_code"] = Document.objects.get(
