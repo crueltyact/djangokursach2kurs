@@ -120,11 +120,11 @@ def get_info_from_education_plane(filename):
         'elective': 'Факультативные дисциплины',
     }, matrix, 0)
     imp_cols = find_from_matrix({
-        'credit': 'зачетов',
-        'exam': 'экзаменов',
+        'credit': 'Зачёты',
+        'exam': 'Экзамены',
         'hours': 'ВСЕГО по структуре',
         'ZET': 'Всего, ЗЕТ',
-        'homework': 'Самостоятельная работа',
+        'homework': 'СРС',
         'sems': 'Распределение по курсам и семестрам, ауд. час.',
         'subjects': 'Обязательная часть',
         'B.1': 'Б.1',
