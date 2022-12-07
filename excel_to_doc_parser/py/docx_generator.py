@@ -36,13 +36,20 @@ def main():
     #             count += 1
 
     # generator()
-    data = parse_plane("../media/excel/planes/17921 09.03.03 ИТУБ ОФО 2022 (3).xlsx")["Основные дисциплины"]
-    header = get_header("../media/excel/planes/03-5190 - ВЕБ 2020 (1).xlsx")
-    disciplines_with_course_project = []
-    for index, row in data[header["Экзамены"]].items():
-        if not pd.isna(row):
-            disciplines_with_course_project.append(data.iloc[index - 1].iloc[header["Название дисциплины"] - 1])
-    print(disciplines_with_course_project)
+    data = parse_plane("../media/excel/planes/17921 09.03.03 ИТУБ ОФО 2022.xlsx")["Основные дисциплины"]
+    header = get_header("../media/excel/planes/17921 09.03.03 ИТУБ ОФО 2022.xlsx")
+    print(header)
+    disciplines_semester = {"Экзамены": [], "Зачёты": [], "Дифференцированные зачёты": [], "Курсовые работы": [],
+                            "Курсовые проекты": []}
+    print(get_disciplines_hours(data, header, disciplines_semester))
+    disciplines_hours = {"Всего, ЗЕТ": [], "ВСЕГО по структуре": [], "Аудиторные занятия": [], "Лекции": [],
+                         "Семинары и практические занятия": [], "Лабораторные работы": [], "СРС": []}
+    print(get_disciplines_hours(data, header, disciplines_hours))
+    disciplines_semester_hours_distribution = {}
+    for key in header:
+        if "семестр" in key:
+            disciplines_semester_hours_distribution[key] = []
+    print(get_disciplines_hours(data, header, disciplines_semester_hours_distribution))
     # gui_win.title('Генератор РПД')
     # gui_win.geometry('400x200')
     # gui_win.grid_rowconfigure(0, weight=1)
@@ -51,6 +58,15 @@ def main():
     # dialog_btn.pack()
     # gui_win.mainloop()
 
+
+def get_disciplines_hours(data, header, keys):
+    for key in keys:
+        for index, row in data[header[key]].items():
+            if not pd.isna(row):
+                keys[key].append((
+                    data.iloc[index - 1].iloc[header["Название дисциплины"] - 1],
+                    data.iloc[index - 1].iloc[header[key] - 1]))
+    return keys
 
 def get_sem(data, index):
     context = {}
