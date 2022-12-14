@@ -36,20 +36,80 @@ def main():
     #             count += 1
 
     # generator()
-    data = parse_plane("../media/excel/planes/17921 09.03.03 ИТУБ ОФО 2022.xlsx")["Основные дисциплины"]
-    header = get_header("../media/excel/planes/17921 09.03.03 ИТУБ ОФО 2022.xlsx")
+    data = parse_plane("../media/excel/planes/03-5190 - ВЕБ 2020 (1).xlsx")["Основные дисциплины"]
+    header = get_header("../media/excel/planes/03-5190 - ВЕБ 2020 (1).xlsx")
     print(header)
-    disciplines_semester = {"Экзамены": [], "Зачёты": [], "Дифференцированные зачёты": [], "Курсовые работы": [],
-                            "Курсовые проекты": []}
+    disciplines_semester = {"Экзамены": [], "Зачёты": []}
     print(get_disciplines_hours(data, header, disciplines_semester))
     disciplines_hours = {"Всего, ЗЕТ": [], "ВСЕГО по структуре": [], "Аудиторные занятия": [], "Лекции": [],
-                         "Семинары и практические занятия": [], "Лабораторные работы": [], "СРС": []}
+                         "Семинары и практические занятия": [], "Лаборатоные занятия": [], "СРС": []}
     print(get_disciplines_hours(data, header, disciplines_hours))
     disciplines_semester_hours_distribution = {}
     for key in header:
         if "семестр" in key:
             disciplines_semester_hours_distribution[key] = []
     print(get_disciplines_hours(data, header, disciplines_semester_hours_distribution))
+    context = {}
+    for index, row in data[header['Название дисциплины']].items():
+        if "*" in row:
+            row = row[:row.find("*")].strip()
+        context[row] = {}
+        context[row]["lections"] = []
+        context[row]["seminars"] = []
+        context[row]["labs"] = []
+        context[row]["srs"] = []
+        if not pd.isna(data.iloc[index - 1][header["Лекции"]]):
+            context[row]["lections"].append(data.iloc[index - 1][header["Лекции"]])
+        if not pd.isna(data.iloc[index - 1][header["Семинары и практические занятия"]]):
+            context[row]["seminars"].append(data.iloc[index - 1][header["Семинары и практические занятия"]])
+        if not pd.isna(data.iloc[index - 1][header["Лаборатоные занятия"]]):
+            context[row]["labs"].append(data.iloc[index - 1][header["Лаборатоные занятия"]])
+        if not pd.isna(data.iloc[index - 1][header["СРС"]]):
+            context[row]["srs"].append(data.iloc[index - 1][header["СРС"]])
+    print(context)
+    data, key_data = get_info_from_excel("../media/excel/matrices/09_03_01_Информатика_и_ВТ,_Матрица_ВЕБ_технологии_2020.xlsx")
+    context_plane = {}
+    for key in key_data:
+        if key == "Современные тенденции ИТ-индустрии" or key == "Коммерциализация ИТ-проектов" or key == "Проектирование информационных ресурсов":
+            continue
+        try:
+            context_plane = get_info_from_education_plane("../media/excel/planes/03-5190 - ВЕБ 2020 (1).xlsx")[key]
+        except KeyError:
+            for error_key in get_info_from_education_plane("../media/excel/planes/03-5190 - ВЕБ 2020 (1).xlsx"):
+                if SequenceMatcher(None, key, error_key).ratio() >= 0.75:
+                    context_plane = get_info_from_education_plane("../media/excel/planes/03-5190 - ВЕБ 2020 (1).xlsx")[
+                        error_key]
+                    break
+        context_plane["program_name"] = data[key]["program_name"]
+        context_plane["program_code"] = data[key]["program_code"]
+        context_plane["profile_name"] = data[key]["profile_name"]
+        context_plane["year_start"] = data[key]["year_start"]
+        context_plane["current_year"] = data[key]["current_year"]
+        context_plane['intensity_ZET_check'] = check_number(context_plane['intensity_ZET'])
+        context_plane['intensity_hours_check'] = check_number(context_plane['intensity_hours'])
+        context_plane['total_homework_hours_check'] = check_number(context_plane['total_homework_hours'])
+        context_plane["education_technologies"] = ""
+        for i, _ in enumerate(context_plane['courses']):
+            context_plane['courses'][i]['ZET_check'] = check_number(context_plane['courses'][i]['ZET'])
+            context_plane['courses'][i]['hours_check'] = check_number(context_plane['courses'][i]['hours'])
+            context_plane['courses'][i]['homework_time_check'] = check_number(
+                context_plane['courses'][i]['homework_time'])
+        try:
+            context_plane["hours"] = context[key]
+        except KeyError:
+            for error_key in get_info_from_education_plane("../media/excel/planes/03-5190 - ВЕБ 2020 (1).xlsx"):
+                if SequenceMatcher(None, key, error_key).ratio() >= 0.75:
+                    context_plane["hours"] = context[error_key]
+                    break
+        print(key, context_plane["hours"])
+        doc = DocxTemplate("./template.docx")
+        doc.render(dict(data[key], **context_plane))
+        for i in range(len(doc.tables)):
+            table = doc.tables[i]._tbl
+            for row in doc.tables[i].rows:
+                if len(row.cells[0].text.strip()) == 0 and len(set(row.cells)) == 1:
+                    table.remove(row._tr)
+        doc.save("../media/generated_files/docx/{}.docx".format(key.strip()))
     # gui_win.title('Генератор РПД')
     # gui_win.geometry('400x200')
     # gui_win.grid_rowconfigure(0, weight=1)
@@ -148,7 +208,7 @@ def parse_plane(filename):
     return context
 
 
-def generator():
+def generator(context):
     # filepath = filedialog.askdirectory(initialdir=r"C:/",
     #                                    title="Dialog box")
     # label_path = Label(gui_win, text="Генерация выполнена по пути " + filepath, font='italic 14')
