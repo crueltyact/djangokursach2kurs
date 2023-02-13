@@ -5,6 +5,9 @@ import shutil
 from difflib import SequenceMatcher
 from os.path import join
 from pathlib import Path
+
+import numpy
+import pandas as pd
 import requests
 
 import boto3 as boto3
@@ -18,8 +21,7 @@ from dotenv import load_dotenv
 from lxml import etree
 from transliterate import translit
 
-from excel_to_doc_parser.models import CustomUser, Role, Document, Theme, WorkProgram, ProgramNames, \
-    TimePlan
+from excel_to_doc_parser.models import CustomUser, Role, Document, Theme, WorkProgram, ProgramNames, TimePlan
 from excel_to_doc_parser.py.parser import get_info_from_excel
 from excel_to_doc_parser.py.parser_plane import get_info_from_education_plane
 from parser_server.settings import BASE_DIR, MEDIA_ROOT
@@ -87,14 +89,42 @@ def index(request):
 
 @login_required(login_url='/login/')
 def documents(request):
+    data = parse_plane(join(str(BASE_DIR), "excel_to_doc_parser/media/excel/planes/18048 09.03.01 ВЕБ ОФО 2022.xlsx"))["Основные дисциплины"]
+    header = get_header(join(str(BASE_DIR), "excel_to_doc_parser/media/excel/planes/18048 09.03.01 ВЕБ ОФО 2022.xlsx"))
+    # disciplines = []
+    # for i, row in data[header["Название дисциплины"]].iteritems():
+    #     if not ("блок" in row.lower() or "часть" in row.lower() or "дисциплины" in row.lower() or "модуль" in row.lower()):
+    #         disciplines.append(row)
+    # print(disciplines)
     context = {"documents": Document.objects.filter(user_id=request.user.id),
                "custom_user": CustomUser.objects.get(user=request.user), "disciplines": ProgramNames.objects.all()}
+    print(Document.objects.filter(user_id=request.user.id).values())
     context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
     if request.method == "POST":
         if request.POST.get("generate"):
             theme = Theme.objects.get(document_id=Document.objects.get(pk=request.POST.get("document")))
             path = join(str(BASE_DIR), "excel_to_doc_parser/media/excel")
             folder = join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files/docx")
+            data = parse_plane(path + "/planes/03-5190 - ВЕБ 2020 (1).xlsx")["Основные дисциплины"]
+            header = get_header(path + "/planes/03-5190 - ВЕБ 2020 (1).xlsx")
+            hours = {}
+            for i, row in data[header['Название дисциплины']].items():
+                if not ("блок" in row.lower() or "часть" in row.lower() or "дисциплины" in row.lower()):
+                    if "*" in row:
+                        row = row[:row.find("*")].strip()
+                    hours[row] = {}
+                    hours[row]["lections"] = []
+                    hours[row]["seminars"] = []
+                    hours[row]["labs"] = []
+                    hours[row]["srs"] = []
+                    if not pd.isna(data.iloc[i - 1][header["Лекции"]]):
+                        hours[row]["lections"].append(data.iloc[i - 1][header["Лекции"]])
+                    if not pd.isna(data.iloc[i - 1][header["Семинары и практические занятия"]]):
+                        hours[row]["seminars"].append(data.iloc[i - 1][header["Семинары и практические занятия"]])
+                    if not pd.isna(data.iloc[i - 1][header["Лаборатоные занятия"]]):
+                        hours[row]["labs"].append(data.iloc[i - 1][header["Лаборатоные занятия"]])
+                    if not pd.isna(data.iloc[i - 1][header["СРС"]]):
+                        hours[row]["srs"].append(data.iloc[i - 1][header["СРС"]])
             for filename in os.listdir(folder):
                 file_path = os.path.join(folder, filename)
                 if filename == ".gitkeep":
@@ -106,8 +136,9 @@ def documents(request):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     print('An error appear ' + str(e))
+
             data, _ = get_info_from_excel(
-                path + "/matrices/" + "09_03_01_Информатика_и_ВТ,_Матрица_ВЕБ_технологии_2020.xlsx")
+                path + "/matrices/09_03_01_Информатика_и_ВТ,_Матрица_ВЕБ_технологии_2020.xlsx")
             discipline = Document.objects.get(pk=request.POST.get('document')).program_name.program_name
             data["program_name"] = discipline
             data["program_code"] = Document.objects.get(
@@ -121,8 +152,7 @@ def documents(request):
                 context_plane = get_info_from_education_plane(path + "/planes/03-5190 - ВЕБ 2020 (1).xlsx")[
                     discipline]
             except KeyError:
-                for error_key in get_info_from_education_plane(path + "/planes/planes/03-5190 - ВЕБ 2020 ("
-                                                                      "1).xlsx"):
+                for error_key in get_info_from_education_plane(path + "/planes/03-5190 - ВЕБ 2020 (1).xlsx"):
                     if SequenceMatcher(None, discipline, error_key).ratio() >= 0.75:
                         context_plane = \
                             get_info_from_education_plane(path + "/planes/planes/03-5190 -"
@@ -136,8 +166,15 @@ def documents(request):
                 context_plane['courses'][i]['hours_check'] = check_number(context_plane['courses'][i]['hours'])
                 context_plane['courses'][i]['homework_time_check'] = check_number(
                     context_plane['courses'][i]['homework_time'])
+            try:
+                context_plane["hours"] = hours[discipline]
+            except KeyError:
+                for error_key in get_info_from_education_plane("../media/excel/planes/03-5190 - ВЕБ 2020 (1).xlsx"):
+                    if SequenceMatcher(None, discipline, error_key).ratio() >= 0.75:
+                        context_plane["hours"] = hours[error_key]
+                        break
             doc = DocxTemplate(
-                join(str(BASE_DIR), "excel_to_doc_parser/templates/template.docx"))
+                join(str(BASE_DIR), "excel_to_doc_parser/py/template.docx"))
             data = dict(data[discipline], **xml_parser(request))
             doc.render(dict(data, **context_plane))
             for i in range(len(doc.tables)):
@@ -224,8 +261,9 @@ def sections_content_parser(part, content):
     data = []
     for i, field in enumerate(part):
         if field[0].text != "#TODO":
-            data.append([field[0].text, int(field[1].text), field[2].text])
+            data.append([field[0].text, int(field[1].text), int(field[2].text), int(field[3].text), int(field[4].text), field[5].text])
     content["sections"] = data
+    print(data)
     return content
 
 
@@ -448,15 +486,26 @@ def generate_xml(request):
     sections = etree.Element("sections")
     try:
         for element in request.POST.get("all_sections").split(";"):
-            data = element.split(":")
-            section = etree.Element("section")
-            section_name = etree.Element("section_name")
-            section_name.text = data[0]
-            section.append(section_name)
-            hours = etree.Element("hours")
-            hours.text = data[1]
-            section.append(hours)
-            sections.append(section)
+            if element:
+                data = element.split(":")
+                print(data)
+                section = etree.Element("section")
+                section_name = etree.Element("section_name")
+                section_name.text = data[0]
+                section.append(section_name)
+                hours_lections = etree.Element("hours_lections")
+                hours_lections.text = data[1]
+                section.append(hours_lections)
+                hours_labs = etree.Element("hours_labs")
+                hours_labs.text = data[2]
+                section.append(hours_labs)
+                hours_seminars = etree.Element("hours_seminars")
+                hours_seminars.text = data[3]
+                section.append(hours_seminars)
+                hours_srs = etree.Element("hours_srs")
+                hours_srs.text = data[4]
+                section.append(hours_srs)
+                sections.append(section)
     except Exception as exc:
         section = etree.Element("section")
         section_name = etree.Element("section_name")
@@ -488,11 +537,20 @@ def generate_xml(request):
             theme = etree.Element("theme")
             theme.text = data[0]
             section_content.append(theme)
-            hours = etree.Element("hours")
-            hours.text = data[1]
-            section_content.append(hours)
+            hours_lections = etree.Element("hours_lections")
+            hours_lections.text = data[1]
+            section_content.append(hours_lections)
+            hours_labs = etree.Element("hours_labs")
+            hours_labs.text = data[2]
+            section_content.append(hours_labs)
+            hours_seminars = etree.Element("hours_seminars")
+            hours_seminars.text = data[3]
+            section_content.append(hours_seminars)
+            hours_srs = etree.Element("hours_srs")
+            hours_srs.text = data[4]
+            section_content.append(hours_srs)
             content = etree.Element("content")
-            content.text = data[2]
+            content.text = data[-1]
             section_content.append(content)
             sections_content.append(section_content)
     except Exception as exc:
@@ -761,3 +819,93 @@ def info(request):
         context["custom_user"] = CustomUser.objects.get(user=request.user)
         context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
     return render(request, "feedback.html", context)
+
+
+def get_disciplines_hours(data, header, keys):
+    for key in keys:
+        for index, row in data[header[key]].items():
+            if not pd.isna(row):
+                keys[key].append((
+                    data.iloc[index - 1].iloc[header["Название дисциплины"] - 1],
+                    data.iloc[index - 1].iloc[header[key] - 1]))
+    return keys
+
+
+def get_sem(data, index):
+    context = {}
+    for i, key in enumerate(data.iloc[:, index:].values[1], index + 1):
+        if not pd.isna(key):
+            context[key] = i
+        else:
+            break
+    return context
+
+
+def get_hours(data, index):
+    context = {}
+    for i, key in enumerate(data.iloc[:, index:].values[1], index + 1):
+        if not pd.isna(key) and "курс" not in key:
+            context[key] = i
+        else:
+            break
+    return context
+
+
+def get_courses(data, index):
+    context = {}
+    for i, key in enumerate(data.iloc[:, index:].values[2], index + 1):
+        if not pd.isna(key) and "курс" not in key:
+            context[key] = i
+        else:
+            break
+    return context
+
+
+def get_header(filename):
+    header = {}
+    df = pd.read_excel(filename, header=None, index_col=None)
+    data = df.dropna(axis="columns", how="all")
+    disciplines = data.copy()
+    header_row = disciplines[disciplines.loc[disciplines[2] == "Шифр"].head().index[0]: disciplines.loc[disciplines[2] == "Шифр"].head().index[0] + 3].dropna(axis="columns", how='all')
+    header_row.columns = pd.RangeIndex(header_row.columns.size)
+    for i, key in enumerate(header_row.values[0], 1):
+        if not pd.isna(key):
+            if "распределение по семестрам" in key.lower():
+                header = dict(**header, **get_sem(header_row, i - 1))
+            elif "часы" in key.lower():
+                header = dict(**header, **get_hours(header_row, i - 1))
+            elif "распределение по курсам" in key.lower():
+                header = dict(**header, **get_courses(header_row, i - 1))
+            else:
+                header[key] = i
+    return header
+
+
+def parse_plane(filename):
+    context = {}
+    df = pd.read_excel(filename, header=None, index_col=None)
+    # with open("columns.json", "w", encoding='utf-8') as f:
+    #     json.dump(df.to_dict(), f, ensure_ascii=False)
+    data = df.dropna(axis="columns", how="all")
+    disciplines = data.copy()
+    start_index = 0
+    for index, column in disciplines.items():
+        if "Блок 1. Дисциплины (модули)" in numpy.array2string(column.values):
+            start_index = index
+    disciplines = disciplines.drop(range(data.loc[data[start_index] == "Блок 1. Дисциплины (модули)"].head().index[0] - 1))
+    context["Факультативные дисциплины"] = data[3].iloc[
+        range(data.loc[data[2].isin(["№ п/п"])].head().index[0], data.iloc[-1:].head().index[0] + 1)]
+    disciplines = disciplines.drop(
+        range(data.loc[data[2].isin(["№ п/п"])].head().index[0], data.iloc[-1:].head().index[0] + 1))
+    for column in data:
+        if data[column].isin(["8 семестр\n6 недель"]).any():
+            break
+    disciplines = disciplines.iloc[:, range(column - 1)]
+    disciplines = disciplines.dropna(axis='columns', how="all").dropna(axis="rows", how="all")
+    # context["Факультативные дисциплины"] = context["Факультативные дисциплины"].dropna(axis='columns', how='all').dropna(axiss='rows', how='all')
+    disciplines.reset_index(drop=True, inplace=True)
+    new_header = disciplines.iloc[0].astype(int)
+    disciplines = disciplines[1:]
+    disciplines.columns = new_header
+    context["Основные дисциплины"] = disciplines
+    return context

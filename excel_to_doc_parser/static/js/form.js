@@ -110,24 +110,24 @@ $("#smartwizard").on("showStep", function (e, anchorObject, stepIndex, stepDirec
                 theme.setAttribute("id", iuliia.translate(key, iuliia.WIKIPEDIA))
                 theme.setAttribute("class", "d-none");
                 //Create hours input field
-                let hour = document.createElement("div");
-                hour.setAttribute("class", "row mb-3 " + iuliia.translate(key, iuliia.WIKIPEDIA));
-                let hour_label = document.createElement("label");
-                hour_label.textContent = "Часы";
-                hour_label.setAttribute("for", "hour");
-                hour_label.setAttribute("class", "col-sm-2 col-form-label");
-                hour.appendChild(hour_label);
-                let hour_input_div = document.createElement("div");
-                hour_input_div.setAttribute("class", "col-sm-10");
-                let hour_input = document.createElement("input");
-                hour_input.setAttribute("value", value.toString());
-                hour_input.setAttribute("class", "form-control");
-                hour_input.setAttribute("type", "number");
-                hour_input.setAttribute("readonly", "");
-                hour_input.setAttribute("id", "hour");
-                hour_input_div.appendChild(hour_input);
-                hour.appendChild(hour_input_div);
-                theme.appendChild(hour);
+                // let hour = document.createElement("div");
+                // hour.setAttribute("class", "row mb-3 " + iuliia.translate(key, iuliia.WIKIPEDIA));
+                // let hour_label = document.createElement("label");
+                // hour_label.textContent = "Часы";
+                // hour_label.setAttribute("for", "hour");
+                // hour_label.setAttribute("class", "col-sm-2 col-form-label");
+                // hour.appendChild(hour_label);
+                // let hour_input_div = document.createElement("div");
+                // hour_input_div.setAttribute("class", "col-sm-10");
+                // let hour_input = document.createElement("input");
+                // hour_input.setAttribute("value", value.toString());
+                // hour_input.setAttribute("class", "form-control");
+                // hour_input.setAttribute("type", "number");
+                // hour_input.setAttribute("readonly", "");
+                // hour_input.setAttribute("id", "hour");
+                // hour_input_div.appendChild(hour_input);
+                // hour.appendChild(hour_input_div);
+                // theme.appendChild(hour);
                 //Create content input field
                 let content = document.createElement("div");
                 content.setAttribute("class", "mb-3 " + iuliia.translate(key, iuliia.WIKIPEDIA));
@@ -184,11 +184,26 @@ function addInputs() {
     section_input.setAttribute("class", "form-control section");
     section_input.setAttribute("type", "text");
     section_input.setAttribute("name", "section");
-    let hours_input = document.createElement("input");
-    new_div_group.appendChild(hours_input);
-    hours_input.setAttribute("class", "form-control hour");
-    hours_input.setAttribute("type", "number");
-    hours_input.setAttribute("name", "hours");
+    let hours_input_lections = document.createElement("input");
+    new_div_group.appendChild(hours_input_lections);
+    hours_input_lections.setAttribute("class", "form-control hours_lections");
+    hours_input_lections.setAttribute("type", "number");
+    hours_input_lections.setAttribute("name", "hours_lections");
+    let hours_input_labs = document.createElement("input");
+    new_div_group.appendChild(hours_input_labs);
+    hours_input_labs.setAttribute("class", "form-control hours_labs");
+    hours_input_labs.setAttribute("type", "number");
+    hours_input_labs.setAttribute("name", "hours_labs");
+    let hours_input_seminars = document.createElement("input");
+    new_div_group.appendChild(hours_input_seminars);
+    hours_input_seminars.setAttribute("class", "form-control hours_seminars");
+    hours_input_seminars.setAttribute("type", "number");
+    hours_input_seminars.setAttribute("name", "hours_seminars");
+    let hours_input_srs = document.createElement("input");
+    new_div_group.appendChild(hours_input_srs);
+    hours_input_srs.setAttribute("class", "form-control hours_srs");
+    hours_input_srs.setAttribute("type", "number");
+    hours_input_srs.setAttribute("name", "hours_srs");
     let new_result_block = document.createElement("div");
     new_result_block.setAttribute("class", "mb-3");
     new_result_block.setAttribute("id", "result_block");
@@ -200,20 +215,62 @@ function addInputs() {
     result_text.setAttribute("class", "form-control");
     result_text.setAttribute("readonly", "");
     new_result_section.appendChild(result_text);
-    let hours_result = document.createElement("input");
+    let hours_lections_result = document.createElement("input");
     let hours = 0;
-    let sections = document.getElementsByClassName("hour");
+    let sections = document.getElementsByClassName("hours_lections");
     for (let section of sections) {
         if (section.value !== '') {
             hours += parseInt(section.value);
         }
     }
-    hours_result.value = hours;
-    hours_result.setAttribute("id", "hours_result");
-    hours_result.setAttribute("type", "number");
-    hours_result.setAttribute("class", "form-control");
-    hours_result.setAttribute("readonly", "");
-    new_result_section.appendChild(hours_result);
+    hours_lections_result.value = hours;
+    hours_lections_result.setAttribute("id", "hours_lections_result");
+    hours_lections_result.setAttribute("type", "number");
+    hours_lections_result.setAttribute("class", "form-control");
+    hours_lections_result.setAttribute("readonly", "");
+    new_result_section.appendChild(hours_lections_result);
+    let hours_labs_result = document.createElement("input");
+    hours = 0;
+    sections = document.getElementsByClassName("hours_labs");
+    for (let section of sections) {
+        if (section.value !== '') {
+            hours += parseInt(section.value);
+        }
+    }
+    hours_labs_result.value = hours;
+    hours_labs_result.setAttribute("id", "hours_labs_result");
+    hours_labs_result.setAttribute("type", "number");
+    hours_labs_result.setAttribute("class", "form-control");
+    hours_labs_result.setAttribute("readonly", "");
+    new_result_section.appendChild(hours_labs_result);
+    let hours_seminars_result = document.createElement("input");
+    hours = 0;
+    sections = document.getElementsByClassName("hours_seminars");
+    for (let section of sections) {
+        if (section.value !== '') {
+            hours += parseInt(section.value);
+        }
+    }
+    hours_seminars_result.value = hours;
+    hours_seminars_result.setAttribute("id", "hours_seminars_result");
+    hours_seminars_result.setAttribute("type", "number");
+    hours_seminars_result.setAttribute("class", "form-control");
+    hours_seminars_result.setAttribute("readonly", "");
+    new_result_section.appendChild(hours_seminars_result);
+    let hours_srs_result = document.createElement("input");
+    hours = 0;
+    sections = document.getElementsByClassName("hours_srs");
+    for (let section of sections) {
+        if (section.value !== '') {
+            hours += parseInt(section.value);
+        }
+    }
+    hours_srs_result.value = hours;
+    hours_srs_result.setAttribute("id", "hours_srs_result");
+    hours_srs_result.setAttribute("type", "number");
+    hours_srs_result.setAttribute("class", "form-control");
+    hours_srs_result.setAttribute("readonly", "");
+    new_result_section.appendChild(hours_srs_result);
     new_result_block.appendChild(new_result_section);
     document.getElementById("sections").appendChild(new_result_block);
     let new_button = document.createElement("button");
@@ -257,12 +314,15 @@ function addInputsMarks() {
 function generate_output() {
     //generate input with all sections
     let sections = document.getElementsByClassName("section");
-    let hours = document.getElementsByClassName("hour");
+    let hours_lections = document.getElementsByClassName("hours_lections");
+    let hours_labs = document.getElementsByClassName("hours_labs");
+    let hours_seminars = document.getElementsByClassName("hours_seminars");
+    let hours_srs = document.getElementsByClassName("hours_srs");
     let contents = document.getElementById("section");
     let sections_str = "";
-    if (sections.length === hours.length && sections.length === contents.children.length) {
+    if (sections.length === hours_lections.length && sections.length === contents.children.length) {
         for (let i = 0; i < sections.length; i++) {
-            sections_str += sections[i].value + ":" + hours[i].value + ":" + contents.children[i].children[1].children[1].value + ";";
+            sections_str += sections[i].value + ":" + hours_lections[i].value + ":" + hours_labs[i].value + ":" + hours_seminars[i].value + ":" + hours_srs[i].value + ":" + contents.children[i].children[0].children[1].value + ";";
         }
         let all_sections = document.createElement("input");
         all_sections.value = sections_str;
