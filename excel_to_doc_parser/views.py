@@ -89,7 +89,8 @@ def index(request):
 
 @login_required(login_url='/login/')
 def documents(request):
-    data = parse_plane(join(str(BASE_DIR), "excel_to_doc_parser/media/excel/planes/18048 09.03.01 ВЕБ ОФО 2022.xlsx"))["Основные дисциплины"]
+    data = parse_plane(join(str(BASE_DIR), "excel_to_doc_parser/media/excel/planes/18048 09.03.01 ВЕБ ОФО 2022.xlsx"))[
+        "Основные дисциплины"]
     header = get_header(join(str(BASE_DIR), "excel_to_doc_parser/media/excel/planes/18048 09.03.01 ВЕБ ОФО 2022.xlsx"))
     # disciplines = []
     # for i, row in data[header["Название дисциплины"]].iteritems():
@@ -261,7 +262,8 @@ def sections_content_parser(part, content):
     data = []
     for i, field in enumerate(part):
         if field[0].text != "#TODO":
-            data.append([field[0].text, int(field[1].text), int(field[2].text), int(field[3].text), int(field[4].text), field[5].text])
+            data.append([field[0].text, int(field[1].text), int(field[2].text), int(field[3].text), int(field[4].text),
+                         field[5].text])
     content["sections"] = data
     print(data)
     return content
@@ -419,11 +421,31 @@ def document_information(request):
                         "сформированность компетенций",
                         "оформление материала в соответствии с требованиями"],
             "optional": []}
+        path = join(str(BASE_DIR), "excel_to_doc_parser/media/excel")
+        data = parse_plane(path + "/planes/03-5190 - ВЕБ 2020 (1).xlsx")["Основные дисциплины"]
+        header = get_header(path + "/planes/03-5190 - ВЕБ 2020 (1).xlsx")
+        hours = {}
+        for i, row in data[header['Название дисциплины']].items():
+            if not ("блок" in row.lower() or "часть" in row.lower() or "дисциплины" in row.lower()):
+                if "*" in row:
+                    row = row[:row.find("*")].strip()
+                hours[row] = {}
+                hours[row]["lections"] = []
+                hours[row]["seminars"] = []
+                hours[row]["labs"] = []
+                hours[row]["srs"] = []
+                if not pd.isna(data.iloc[i - 1][header["Лекции"]]):
+                    hours[row]["lections"].append(data.iloc[i - 1][header["Лекции"]])
+                if not pd.isna(data.iloc[i - 1][header["Семинары и практические занятия"]]):
+                    hours[row]["seminars"].append(data.iloc[i - 1][header["Семинары и практические занятия"]])
+                if not pd.isna(data.iloc[i - 1][header["Лаборатоные занятия"]]):
+                    hours[row]["labs"].append(data.iloc[i - 1][header["Лаборатоные занятия"]])
+                if not pd.isna(data.iloc[i - 1][header["СРС"]]):
+                    hours[row]["srs"].append(data.iloc[i - 1][header["СРС"]])
         if request.method == "GET":
             context["document"] = request.GET.get("document")
             context["theme"] = Document.objects.get(pk=request.GET.get("document")).program_name.program_name
-            context["hours"] = TimePlan.objects.get(
-                program_name=Document.objects.get(pk=request.GET.get("document")).program_name).classwork_hours
+            context["hours"] = hours[context["theme"]]
         if request.method == "POST":
             # context["last_values"] = xml_parser(request)
             context["hours"] = TimePlan.objects.get(
@@ -866,7 +888,9 @@ def get_header(filename):
     df = pd.read_excel(filename, header=None, index_col=None)
     data = df.dropna(axis="columns", how="all")
     disciplines = data.copy()
-    header_row = disciplines[disciplines.loc[disciplines[2] == "Шифр"].head().index[0]: disciplines.loc[disciplines[2] == "Шифр"].head().index[0] + 3].dropna(axis="columns", how='all')
+    header_row = disciplines[disciplines.loc[disciplines[2] == "Шифр"].head().index[0]:
+                             disciplines.loc[disciplines[2] == "Шифр"].head().index[0] + 3].dropna(axis="columns",
+                                                                                                   how='all')
     header_row.columns = pd.RangeIndex(header_row.columns.size)
     for i, key in enumerate(header_row.values[0], 1):
         if not pd.isna(key):
@@ -892,7 +916,8 @@ def parse_plane(filename):
     for index, column in disciplines.items():
         if "Блок 1. Дисциплины (модули)" in numpy.array2string(column.values):
             start_index = index
-    disciplines = disciplines.drop(range(data.loc[data[start_index] == "Блок 1. Дисциплины (модули)"].head().index[0] - 1))
+    disciplines = disciplines.drop(
+        range(data.loc[data[start_index] == "Блок 1. Дисциплины (модули)"].head().index[0] - 1))
     context["Факультативные дисциплины"] = data[3].iloc[
         range(data.loc[data[2].isin(["№ п/п"])].head().index[0], data.iloc[-1:].head().index[0] + 1)]
     disciplines = disciplines.drop(

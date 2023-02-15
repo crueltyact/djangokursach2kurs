@@ -107,38 +107,72 @@
                                             <input type="text" value="Раздел" aria-label="First name"
                                                    class="form-control"
                                                    readonly>
-                                            <input type="Text" value="Лекции" aria-label="Last name" class="form-control"
+                                            {% if hours.lections.0 %}
+                                            <input type="Text" value="Лекции" aria-label="Last name"
+                                                   class="form-control"
                                                    readonly>
-                                            <input type="Text" value="Лабораторные занятия" aria-label="Last name" class="form-control"
+                                            {% endif %}
+                                            {% if hours.labs.0 %}
+                                            <input type="Text" value="Лабораторные занятия" aria-label="Last name"
+                                                   class="form-control"
                                                    readonly>
+                                            {% endif %}
+                                            {% if hours.seminars.0 %}
                                             <input type="Text" value="П/С" aria-label="Last name" class="form-control"
                                                    readonly>
+                                            {% endif %}
+                                            {% if hours.srs.0 %}
                                             <input type="Text" value="СРС" aria-label="Last name" class="form-control"
                                                    readonly>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     <div class="mb-3">
                                         <div class="input-group sections">
                                             <input type="text" name="section" aria-label="First name"
                                                    class="form-control section">
-                                            <input type="text" name="hours_lections" aria-label="Last name" class="form-control hours_lections">
-                                            <input type="text" name="hours_labs" aria-label="Last name" class="form-control hours_labs">
-                                            <input type="text" name="hours_seminars" aria-label="Last name" class="form-control hours_seminars">
-                                            <input type="text" name="hours_srs" aria-label="Last name" class="form-control hours_srs">
+                                            {% if hours.lections.0 %}
+                                            <input type="text" name="hours_lections" aria-label="Last name"
+                                                   class="form-control hours_lections">
+                                            {% endif %}
+                                            {% if hours.labs.0 %}
+                                            <input type="text" name="hours_labs" aria-label="Last name"
+                                                   class="form-control hours_labs">
+                                            {% endif %}
+                                            {% if hours.seminars.0 %}
+                                            <input type="text" name="hours_seminars" aria-label="Last name"
+                                                   class="form-control hours_seminars">
+                                            {% endif %}
+                                            {% if hours.srs.0 %}
+                                            <input type="text" name="hours_srs" aria-label="Last name"
+                                                   class="form-control hours_srs">
+                                            {% endif %}
                                         </div>
                                     </div>
                                     <div class="mb-3" id="result_block">
                                         <div class="input-group">
                                             <input type="text" aria-label="First name"
                                                    class="form-control" value="Итого" readonly>
-                                            <input id="hours_result_lections" type="number" name="hours" aria-label="Last name"
+                                            {% if hours.lections.0 %}
+                                            <input id="hours_result_lections" type="number" name="hours"
+                                                   aria-label="Last name"
                                                    class="form-control" readonly>
-                                            <input id="hours_result_labs" type="number" name="hours" aria-label="Last name"
+                                            {% endif %}
+                                            {% if hours.labs.0 %}
+                                            <input id="hours_result_labs" type="number" name="hours"
+                                                   aria-label="Last name"
                                                    class="form-control" readonly>
-                                            <input id="hours_result_seminars" type="number" name="hours" aria-label="Last name"
+                                            {% endif %}
+                                            {% if hours.seminars.0 %}
+                                            <input id="hours_result_seminars" type="number" name="hours"
+                                                   aria-label="Last name"
                                                    class="form-control" readonly>
-                                            <input id="hours_result_srs" type="number" name="hours" aria-label="Last name"
+                                            {% endif %}
+                                            {% if hours.srs.0 %}
+                                            <input id="hours_result_srs" type="number" name="hours"
+                                                   aria-label="Last name"
                                                    class="form-control" readonly>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     <input id="max_hours" type="hidden" name="max_hours" value="{{ hours }}">
@@ -156,9 +190,10 @@
                                         <div class="col-sm-6">
                                             <div id="modules">
                                                 {% for cur_theme in all_themes %}
-                                                    {% if cur_theme.program_name != theme %}
-                                                        <p class="drag"><a class="btn btn-default text-start">{{ cur_theme.program_name }}</a></p>
-                                                    {% endif %}
+                                                {% if cur_theme.program_name != theme %}
+                                                <p class="drag"><a class="btn btn-default text-start">{{
+                                                    cur_theme.program_name }}</a></p>
+                                                {% endif %}
                                                 {% endfor %}
                                             </div>
                                         </div>
@@ -230,21 +265,22 @@
                                     </div>
                                 </fieldset>
                                 <div class="row mb-3 ml-3" id="marks">
-<!--                                    <div class="col-md-6">-->
-<!--                                        <div class="col-md-5">-->
-<!--                                            <label for="competention" class="form-label">Компетенция</label>-->
-<!--                                        </div>-->
-<!--                                        <div class="col-sm-5">-->
-<!--                                            <input type="text" name="competention" class="form-control"-->
-<!--                                                   id="competention">-->
-<!--                                        </div>-->
-<!--                                    </div>-->
+                                    <!--                                    <div class="col-md-6">-->
+                                    <!--                                        <div class="col-md-5">-->
+                                    <!--                                            <label for="competention" class="form-label">Компетенция</label>-->
+                                    <!--                                        </div>-->
+                                    <!--                                        <div class="col-sm-5">-->
+                                    <!--                                            <input type="text" name="competention" class="form-control"-->
+                                    <!--                                                   id="competention">-->
+                                    <!--                                        </div>-->
+                                    <!--                                    </div>-->
                                     <div class="mb-3">
                                         <div class="input-group">
                                             <input type="text" value="Оценка" aria-label="First name"
                                                    class="form-control"
                                                    readonly>
-                                            <input type="text" value="Описание" aria-label="Last name" class="form-control"
+                                            <input type="text" value="Описание" aria-label="Last name"
+                                                   class="form-control"
                                                    readonly>
                                         </div>
                                     </div>
@@ -252,7 +288,8 @@
                                         <div class="input-group marks">
                                             <input type="text" name="mark" aria-label="First name"
                                                    class="form-control mark">
-                                            <input type="text" name="description" aria-label="Last name" class="form-control description">
+                                            <input type="text" name="description" aria-label="Last name"
+                                                   class="form-control description">
                                         </div>
                                     </div>
                                     <button id="addInputGroupMarks" type="button" class="btn btn-primary"
@@ -312,22 +349,33 @@
                             </div>
                             <div id="step-10" class="tab-pane" role="tabpanel" aria-labelledby="step-10">
                                 <div class="mb-3">
-                                    <label for="tasks_from_file" class="form-label"><p class="h2">Образовательные технологии</p></label>
+                                    <label for="tasks_from_file" class="form-label"><p class="h2">Образовательные
+                                        технологии</p></label>
                                     <div class="row">
                                         <fieldset class="col">
                                             <div><p class="h3">Предопределённые технологии на занятиях</p>
                                                 {% for tech in predefined_techs_in_class.default %}
                                                 <div class="form-check form-switch">
-                                                    <input class="form-check-input" name="default_tech_in_class" type="checkbox" id="default_tech_in_class{{ forloop.counter }}" value="{{ tech }}" checked onclick="return false;">
-                                                    <label class="form-check-label" for="default_tech_in_class{{ forloop.counter }}">{{ tech }}</label>
+                                                    <input class="form-check-input" name="default_tech_in_class"
+                                                           type="checkbox"
+                                                           id="default_tech_in_class{{ forloop.counter }}"
+                                                           value="{{ tech }}" checked onclick="return false;">
+                                                    <label class="form-check-label"
+                                                           for="default_tech_in_class{{ forloop.counter }}">{{ tech
+                                                        }}</label>
                                                 </div>
                                                 {% endfor %}
                                             </div>
                                             <div><p class="h3">Технологии на выбор на занятиях</p>
                                                 {% for tech in predefined_techs_in_class.optional %}
                                                 <div class="form-check form-switch">
-                                                    <input class="form-check-input" name="optional_tech_in_class" type="checkbox" id="optional_tech_in_class{{ forloop.counter }}" value="{{ tech }}">
-                                                    <label class="form-check-label" for="optional_tech_in_class{{ forloop.counter }}">{{ tech }}</label>
+                                                    <input class="form-check-input" name="optional_tech_in_class"
+                                                           type="checkbox"
+                                                           id="optional_tech_in_class{{ forloop.counter }}"
+                                                           value="{{ tech }}">
+                                                    <label class="form-check-label"
+                                                           for="optional_tech_in_class{{ forloop.counter }}">{{ tech
+                                                        }}</label>
                                                 </div>
                                                 {% endfor %}
                                             </div>
@@ -336,16 +384,26 @@
                                             <div><p class="h3">Предопределённые технологии вне занятий</p>
                                                 {% for tech in predefined_techs_out_class.default %}
                                                 <div class="form-check form-switch">
-                                                    <input class="form-check-input" name="default_tech_out_class" type="checkbox" id="default_tech_out_class{{ forloop.counter }}" value="{{ tech }}" checked onclick="return false;">
-                                                    <label class="form-check-label" for="default_tech_out_class{{ forloop.counter }}">{{ tech }}</label>
+                                                    <input class="form-check-input" name="default_tech_out_class"
+                                                           type="checkbox"
+                                                           id="default_tech_out_class{{ forloop.counter }}"
+                                                           value="{{ tech }}" checked onclick="return false;">
+                                                    <label class="form-check-label"
+                                                           for="default_tech_out_class{{ forloop.counter }}">{{ tech
+                                                        }}</label>
                                                 </div>
                                                 {% endfor %}
                                             </div>
                                             <div><p class="h3">Технологии на выбор вне занятий</p>
                                                 {% for tech in predefined_techs_out_class.optional %}
                                                 <div class="form-check form-switch">
-                                                    <input class="form-check-input" name="optional_tech_out_class" type="checkbox" id="optional_tech_out_class{{ forloop.counter }}" value="{{ tech }}">
-                                                    <label class="form-check-label" for="optional_tech_out_class{{ forloop.counter }}">{{ tech }}</label>
+                                                    <input class="form-check-input" name="optional_tech_out_class"
+                                                           type="checkbox"
+                                                           id="optional_tech_out_class{{ forloop.counter }}"
+                                                           value="{{ tech }}">
+                                                    <label class="form-check-label"
+                                                           for="optional_tech_out_class{{ forloop.counter }}">{{ tech
+                                                        }}</label>
                                                 </div>
                                                 {% endfor %}
                                             </div>
@@ -355,35 +413,41 @@
                             </div>
                             <div id="step-11" class="tab-pane" role="tabpanel" aria-labelledby="step-11">
                                 <div class="mb-3">
-                                    <label for="tasks_from_file" class="form-label"><p class="h2">Методические рекомендации для самостоятельной работы студентов</p></label>
+                                    <label for="tasks_from_file" class="form-label"><p class="h2">Методические
+                                        рекомендации для самостоятельной работы студентов</p></label>
                                     <div class="row">
                                         <fieldset class="col">
-                                            <div><p class="h3">Предопределённые критерии оценки самостоятельной работы студента</p>
+                                            <div><p class="h3">Предопределённые критерии оценки самостоятельной работы
+                                                студента</p>
                                                 {% for tech in predefined_criteries_in_methods_for_students.default %}
                                                 <div class="form-check form-switch">
-                                                    <input class="form-check-input" name="default_criteries" type="checkbox" id="default_criteries{{ forloop.counter }}" value="{{ tech }}" checked onclick="return false;">
-                                                    <label class="form-check-label" for="default_criteries{{ forloop.counter }}">{{ tech }}</label>
+                                                    <input class="form-check-input" name="default_criteries"
+                                                           type="checkbox" id="default_criteries{{ forloop.counter }}"
+                                                           value="{{ tech }}" checked onclick="return false;">
+                                                    <label class="form-check-label"
+                                                           for="default_criteries{{ forloop.counter }}">{{ tech
+                                                        }}</label>
                                                 </div>
                                                 {% endfor %}
                                             </div>
-<!--                                            <label><p class="h3">Критерии оценки самостоятельной работы студента на выбор</p>-->
-<!--                                                {% for tech in predefined_criteries_in_methods_for_students.optional %}-->
-<!--                                                    <label><input type="checkbox" name="optional_tech_in_class" value="{{tech}}">{{ tech }}</label>-->
-<!--                                                {% endfor %}-->
-<!--                                            </label>-->
+                                            <!--                                            <label><p class="h3">Критерии оценки самостоятельной работы студента на выбор</p>-->
+                                            <!--                                                {% for tech in predefined_criteries_in_methods_for_students.optional %}-->
+                                            <!--                                                    <label><input type="checkbox" name="optional_tech_in_class" value="{{tech}}">{{ tech }}</label>-->
+                                            <!--                                                {% endfor %}-->
+                                            <!--                                            </label>-->
                                         </fieldset>
-<!--                                        <fieldset class="col">-->
-<!--                                            <label><p class="h3">Предопределённые технологии вне занятий</p>-->
-<!--                                                {% for tech in predefined_techs_out_class.default %}-->
-<!--                                                    <input type="checkbox" name="default_tech_out_class" value="{{tech}}" readonly>-->
-<!--                                                {% endfor %}-->
-<!--                                            </label>-->
-<!--                                            <label><p class="h3">Технологии на выбор вне занятий</p>-->
-<!--                                                {% for tech in predefined_techs_out_class.optional %}-->
-<!--                                                    <input type="checkbox" name="optional_tech_out_class" value="{{tech}}">-->
-<!--                                                {% endfor %}-->
-<!--                                            </label>-->
-<!--                                        </fieldset>-->
+                                        <!--                                        <fieldset class="col">-->
+                                        <!--                                            <label><p class="h3">Предопределённые технологии вне занятий</p>-->
+                                        <!--                                                {% for tech in predefined_techs_out_class.default %}-->
+                                        <!--                                                    <input type="checkbox" name="default_tech_out_class" value="{{tech}}" readonly>-->
+                                        <!--                                                {% endfor %}-->
+                                        <!--                                            </label>-->
+                                        <!--                                            <label><p class="h3">Технологии на выбор вне занятий</p>-->
+                                        <!--                                                {% for tech in predefined_techs_out_class.optional %}-->
+                                        <!--                                                    <input type="checkbox" name="optional_tech_out_class" value="{{tech}}">-->
+                                        <!--                                                {% endfor %}-->
+                                        <!--                                            </label>-->
+                                        <!--                                        </fieldset>-->
                                     </div>
                                 </div>
                             </div>
