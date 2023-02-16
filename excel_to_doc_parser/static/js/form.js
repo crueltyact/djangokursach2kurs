@@ -171,6 +171,10 @@ $("#smartwizard").on("showStep", function (e, anchorObject, stepIndex, stepDirec
 });
 
 function addInputs() {
+    let max_hours_lections = document.getElementById("lections").value
+    let max_hours_labs = document.getElementById("labs").value
+    let max_hours_seminars = document.getElementById("seminars").value
+    let max_hours_srs = document.getElementById("srs").value
     document.getElementById("addInputGroup").remove();
     document.getElementById("result_block").remove();
     let new_div = document.createElement("div");
@@ -184,26 +188,34 @@ function addInputs() {
     section_input.setAttribute("class", "form-control section");
     section_input.setAttribute("type", "text");
     section_input.setAttribute("name", "section");
-    let hours_input_lections = document.createElement("input");
-    new_div_group.appendChild(hours_input_lections);
-    hours_input_lections.setAttribute("class", "form-control hours_lections");
-    hours_input_lections.setAttribute("type", "number");
-    hours_input_lections.setAttribute("name", "hours_lections");
-    let hours_input_labs = document.createElement("input");
-    new_div_group.appendChild(hours_input_labs);
-    hours_input_labs.setAttribute("class", "form-control hours_labs");
-    hours_input_labs.setAttribute("type", "number");
-    hours_input_labs.setAttribute("name", "hours_labs");
-    let hours_input_seminars = document.createElement("input");
-    new_div_group.appendChild(hours_input_seminars);
-    hours_input_seminars.setAttribute("class", "form-control hours_seminars");
-    hours_input_seminars.setAttribute("type", "number");
-    hours_input_seminars.setAttribute("name", "hours_seminars");
-    let hours_input_srs = document.createElement("input");
-    new_div_group.appendChild(hours_input_srs);
-    hours_input_srs.setAttribute("class", "form-control hours_srs");
-    hours_input_srs.setAttribute("type", "number");
-    hours_input_srs.setAttribute("name", "hours_srs");
+    if (max_hours_lections > 0) {
+        let hours_input_lections = document.createElement("input");
+        new_div_group.appendChild(hours_input_lections);
+        hours_input_lections.setAttribute("class", "form-control hours_lections");
+        hours_input_lections.setAttribute("type", "number");
+        hours_input_lections.setAttribute("name", "hours_lections");
+    }
+    if (max_hours_labs > 0) {
+        let hours_input_labs = document.createElement("input");
+        new_div_group.appendChild(hours_input_labs);
+        hours_input_labs.setAttribute("class", "form-control hours_labs");
+        hours_input_labs.setAttribute("type", "number");
+        hours_input_labs.setAttribute("name", "hours_labs");
+    }
+    if (max_hours_seminars > 0) {
+        let hours_input_seminars = document.createElement("input");
+        new_div_group.appendChild(hours_input_seminars);
+        hours_input_seminars.setAttribute("class", "form-control hours_seminars");
+        hours_input_seminars.setAttribute("type", "number");
+        hours_input_seminars.setAttribute("name", "hours_seminars");
+    }
+    if (max_hours_srs > 0) {
+        let hours_input_srs = document.createElement("input");
+        new_div_group.appendChild(hours_input_srs);
+        hours_input_srs.setAttribute("class", "form-control hours_srs");
+        hours_input_srs.setAttribute("type", "number");
+        hours_input_srs.setAttribute("name", "hours_srs");
+    }
     let new_result_block = document.createElement("div");
     new_result_block.setAttribute("class", "mb-3");
     new_result_block.setAttribute("id", "result_block");
@@ -215,62 +227,71 @@ function addInputs() {
     result_text.setAttribute("class", "form-control");
     result_text.setAttribute("readonly", "");
     new_result_section.appendChild(result_text);
-    let hours_lections_result = document.createElement("input");
     let hours = 0;
-    let sections = document.getElementsByClassName("hours_lections");
-    for (let section of sections) {
-        if (section.value !== '') {
-            hours += parseInt(section.value);
+    let sections;
+    if (max_hours_lections > 0) {
+        let hours_lections_result = document.createElement("input");
+        sections = document.getElementsByClassName("hours_lections");
+        for (let section of sections) {
+            if (section.value !== '') {
+                hours += parseInt(section.value);
+            }
         }
+        hours_lections_result.value = hours + "/" + max_hours_lections;
+        hours_lections_result.setAttribute("id", "hours_result_lections");
+        hours_lections_result.setAttribute("type", "text");
+        hours_lections_result.setAttribute("class", "form-control");
+        hours_lections_result.setAttribute("readonly", "");
+        new_result_section.appendChild(hours_lections_result);
     }
-    hours_lections_result.value = hours;
-    hours_lections_result.setAttribute("id", "hours_lections_result");
-    hours_lections_result.setAttribute("type", "number");
-    hours_lections_result.setAttribute("class", "form-control");
-    hours_lections_result.setAttribute("readonly", "");
-    new_result_section.appendChild(hours_lections_result);
-    let hours_labs_result = document.createElement("input");
-    hours = 0;
-    sections = document.getElementsByClassName("hours_labs");
-    for (let section of sections) {
-        if (section.value !== '') {
-            hours += parseInt(section.value);
+    if (max_hours_labs > 0) {
+        let hours_labs_result = document.createElement("input");
+        hours = 0;
+        sections = document.getElementsByClassName("hours_labs");
+        for (let section of sections) {
+            if (section.value !== '') {
+                hours += parseInt(section.value);
+            }
         }
+        hours_labs_result.value = hours + "/" + max_hours_labs;
+        hours_labs_result.setAttribute("id", "hours_result_labs");
+        hours_labs_result.setAttribute("type", "text");
+        hours_labs_result.setAttribute("class", "form-control");
+        hours_labs_result.setAttribute("readonly", "");
+        new_result_section.appendChild(hours_labs_result);
     }
-    hours_labs_result.value = hours;
-    hours_labs_result.setAttribute("id", "hours_labs_result");
-    hours_labs_result.setAttribute("type", "number");
-    hours_labs_result.setAttribute("class", "form-control");
-    hours_labs_result.setAttribute("readonly", "");
-    new_result_section.appendChild(hours_labs_result);
-    let hours_seminars_result = document.createElement("input");
-    hours = 0;
-    sections = document.getElementsByClassName("hours_seminars");
-    for (let section of sections) {
-        if (section.value !== '') {
-            hours += parseInt(section.value);
+    if (max_hours_seminars > 0) {
+        let hours_seminars_result = document.createElement("input");
+        hours = 0;
+        sections = document.getElementsByClassName("hours_seminars");
+        for (let section of sections) {
+            if (section.value !== '') {
+                hours += parseInt(section.value);
+            }
         }
+        hours_seminars_result.value = hours + "/" + max_hours_seminars;
+        hours_seminars_result.setAttribute("id", "hours_result_seminars");
+        hours_seminars_result.setAttribute("type", "text");
+        hours_seminars_result.setAttribute("class", "form-control");
+        hours_seminars_result.setAttribute("readonly", "");
+        new_result_section.appendChild(hours_seminars_result);
     }
-    hours_seminars_result.value = hours;
-    hours_seminars_result.setAttribute("id", "hours_seminars_result");
-    hours_seminars_result.setAttribute("type", "number");
-    hours_seminars_result.setAttribute("class", "form-control");
-    hours_seminars_result.setAttribute("readonly", "");
-    new_result_section.appendChild(hours_seminars_result);
-    let hours_srs_result = document.createElement("input");
-    hours = 0;
-    sections = document.getElementsByClassName("hours_srs");
-    for (let section of sections) {
-        if (section.value !== '') {
-            hours += parseInt(section.value);
+    if (max_hours_srs > 0) {
+        let hours_srs_result = document.createElement("input");
+        hours = 0;
+        sections = document.getElementsByClassName("hours_srs");
+        for (let section of sections) {
+            if (section.value !== '') {
+                hours += parseInt(section.value);
+            }
         }
+        hours_srs_result.value = hours + "/" + max_hours_srs;
+        hours_srs_result.setAttribute("id", "hours_result_srs");
+        hours_srs_result.setAttribute("type", "text");
+        hours_srs_result.setAttribute("class", "form-control");
+        hours_srs_result.setAttribute("readonly", "");
+        new_result_section.appendChild(hours_srs_result);
     }
-    hours_srs_result.value = hours;
-    hours_srs_result.setAttribute("id", "hours_srs_result");
-    hours_srs_result.setAttribute("type", "number");
-    hours_srs_result.setAttribute("class", "form-control");
-    hours_srs_result.setAttribute("readonly", "");
-    new_result_section.appendChild(hours_srs_result);
     new_result_block.appendChild(new_result_section);
     document.getElementById("sections").appendChild(new_result_block);
     let new_button = document.createElement("button");
@@ -280,6 +301,11 @@ function addInputs() {
     new_button.setAttribute("id", "addInputGroup");
     new_button.setAttribute("onclick", "addInputs()");
     new_button.textContent = "Добавить раздел";
+    for (let item of document.querySelectorAll(".sections input")) {
+        item.addEventListener("change", function (event) {
+            updateHours()
+        });
+    }
     $('#smartwizard').smartWizard("fixHeight");
 }
 
@@ -361,6 +387,61 @@ function generate_output() {
     document.getElementById("marks").appendChild(all_marks);
 }
 
+function updateHours() {
+    let hours_lections = 0;
+    let hours_labs = 0
+    let hours_seminars = 0
+    let hours_srs = 0
+    let total_hours_lections = document.getElementById("lections")
+    let total_hours_labs = document.getElementById("labs")
+    let total_hours_seminars = document.getElementById("seminars")
+    let total_hours_srs = document.getElementById("srs")
+    let lections = document.getElementsByClassName("hours_lections")
+    let labs = document.getElementsByClassName("hours_labs")
+    let seminars = document.getElementsByClassName("hours_seminars")
+    let srs = document.getElementsByClassName("hours_srs")
+    for (let hoursListElement of lections) {
+        if (hoursListElement.value !== '')
+            hours_lections += parseInt(hoursListElement.value);
+    }
+    for (let hoursListElement of labs) {
+        if (hoursListElement.value !== '')
+            hours_labs += parseInt(hoursListElement.value);
+    }
+    for (let hoursListElement of seminars) {
+        if (hoursListElement.value !== '')
+            hours_seminars += parseInt(hoursListElement.value);
+    }
+    for (let hoursListElement of srs) {
+        if (hoursListElement.value !== '')
+            hours_srs += parseInt(hoursListElement.value);
+    }
+    let max_hours_lections = total_hours_lections.value
+    let max_hours_labs = total_hours_labs.value
+    let max_hours_seminars = total_hours_seminars.value
+    let max_hours_srs = total_hours_srs.value
+    if (hours_lections > max_hours_lections || hours_labs > max_hours_labs || hours_seminars > max_hours_seminars || hours_srs > max_hours_srs) {
+        alert("Число часов превышено");
+    }
+    console.log(hours_lections, hours_labs, hours_seminars, hours_srs)
+    if (isNaN(hours_lections))
+        hours_lections = 0
+    if (isNaN(hours_seminars))
+        hours_seminars = 0
+    if (isNaN(hours_labs))
+        hours_labs = 0
+    if (isNaN(hours_srs))
+        hours_srs = 0
+    if (document.getElementById("hours_result_lections"))
+        document.getElementById("hours_result_lections").value = hours_lections + "/" + max_hours_lections;
+    if (document.getElementById("hours_result_labs"))
+        document.getElementById("hours_result_labs").value = hours_labs + "/" + max_hours_labs;
+    if (document.getElementById("hours_result_seminars"))
+        document.getElementById("hours_result_seminars").value = hours_seminars + "/" + max_hours_seminars;
+    if (document.getElementById("hours_result_srs"))
+        document.getElementById("hours_result_srs").value = hours_srs + "/" + max_hours_srs;
+}
+
 window.onload = function () {
     let max_hours = document.getElementById("max_hours");
     let textareas = document.getElementsByTagName("textarea");
@@ -377,15 +458,9 @@ window.onload = function () {
         }
         $('#smartwizard').smartWizard("fixHeight");
     })
-    document.getElementById("sections").addEventListener('change', function () {
-        let hours = 0;
-        let hours_list = document.getElementsByClassName("hour");
-        for (let hoursListElement of hours_list) {
-            hours += parseInt(hoursListElement.value);
-        }
-        if (hours > max_hours) {
-            alert("Число часов превышено");
-        }
-        document.getElementById("hours_result").value = hours;
-    })
+    for (let item of document.querySelectorAll(".sections input")) {
+        item.addEventListener("change", function (event) {
+            updateHours()
+        });
+    }
 };
