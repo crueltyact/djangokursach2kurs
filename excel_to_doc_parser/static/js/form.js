@@ -232,7 +232,7 @@ function addInputs() {
                 hours += parseInt(section.value);
             }
         }
-        hours_lections_result.value = hours;
+        hours_lections_result.value = hours + "/" + document.getElementById("max_hours_lections").value;
         hours_lections_result.setAttribute("id", "hours_result_lections");
         hours_lections_result.setAttribute("type", "number");
         hours_lections_result.setAttribute("class", "form-control");
@@ -248,7 +248,7 @@ function addInputs() {
                 hours += parseInt(section.value);
             }
         }
-        hours_labs_result.value = hours;
+        hours_labs_result.value = hours + "/" + document.getElementById("max_hours_labs").value;
         hours_labs_result.setAttribute("id", "hours_result_labs");
         hours_labs_result.setAttribute("type", "number");
         hours_labs_result.setAttribute("class", "form-control");
@@ -264,7 +264,7 @@ function addInputs() {
                 hours += parseInt(section.value);
             }
         }
-        hours_seminars_result.value = hours;
+        hours_seminars_result.value = hours + "/" + document.getElementById("max_hours_seminars").value;
         hours_seminars_result.setAttribute("id", "hours_result_seminars");
         hours_seminars_result.setAttribute("type", "number");
         hours_seminars_result.setAttribute("class", "form-control");
@@ -280,7 +280,7 @@ function addInputs() {
                 hours += parseInt(section.value);
             }
         }
-        hours_srs_result.value = hours;
+        hours_srs_result.value = hours + "/" + document.getElementById("max_hours_srs").value;
         hours_srs_result.setAttribute("id", "hours_result_srs");
         hours_srs_result.setAttribute("type", "number");
         hours_srs_result.setAttribute("class", "form-control");
@@ -296,6 +296,11 @@ function addInputs() {
     new_button.setAttribute("id", "addInputGroup");
     new_button.setAttribute("onclick", "addInputs()");
     new_button.textContent = "Добавить раздел";
+    for (let item of document.querySelectorAll(".sections input")) {
+        item.addEventListener("change", function (event) {
+            updateHours()
+        });
+    }
     $('#smartwizard').smartWizard("fixHeight");
 }
 
@@ -456,6 +461,23 @@ function addEvents() {
         if (document.getElementById('max_hours_srs').value > 0) {
             document.getElementById("hours_result_srs").value = hours_srs
         }
+    if (isNaN(hours_lections))
+        hours_lections = 0
+    if (isNaN(hours_seminars))
+        hours_seminars = 0
+    if (isNaN(hours_labs))
+        hours_labs = 0
+    if (isNaN(hours_srs))
+        hours_srs = 0
+    if (document.getElementById("hours_result_lections"))
+        document.getElementById("hours_result_lections").value = hours_lections + "/" + max_hours_lections;
+    if (document.getElementById("hours_result_labs"))
+        document.getElementById("hours_result_labs").value = hours_labs + "/" + max_hours_labs;
+    if (document.getElementById("hours_result_seminars"))
+        document.getElementById("hours_result_seminars").value = hours_seminars + "/" + max_hours_seminars;
+    if (document.getElementById("hours_result_srs"))
+        document.getElementById("hours_result_srs").value = hours_srs + "/" + max_hours_srs;
+}
     }
 }
 

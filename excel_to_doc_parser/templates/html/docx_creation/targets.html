@@ -127,7 +127,7 @@
                                             {% endif %}
                                         </div>
                                     </div>
-                                    <div class="mb-3">
+                                    <div class="mb-3" id="hours">
                                         <div class="input-group sections">
                                             <input type="text" name="section" aria-label="First name"
                                                    class="form-control section">
@@ -154,24 +154,24 @@
                                             <input type="text" aria-label="First name"
                                                    class="form-control" value="Итого" readonly>
                                             {% if hours.lections.0 %}
-                                            <input id="hours_result_lections" type="number" name="hours_lections"
+                                            <input id="hours_result_lections" type="text" name="hours_lections"
                                                    aria-label="Last name"
-                                                   class="form-control" readonly>
+                                                   class="form-control" value="0/{{ hours.lections.0 }}" readonly>
                                             {% endif %}
                                             {% if hours.labs.0 %}
-                                            <input id="hours_result_labs" type="number" name="hours_labs"
+                                            <input id="hours_result_labs" type="text" name="hours_labs"
                                                    aria-label="Last name"
-                                                   class="form-control" readonly>
+                                                   class="form-control" value="0/{{ hours.labs.0 }}" readonly>
                                             {% endif %}
                                             {% if hours.seminars.0 %}
-                                            <input id="hours_result_seminars" type="number" name="hours_seminars"
+                                            <input id="hours_result_seminars" type="text" name="hours_seminars"
                                                    aria-label="Last name"
-                                                   class="form-control" readonly>
+                                                   class="form-control" value="0/{{ hours.seminars.0 }}" readonly>
                                             {% endif %}
                                             {% if hours.srs.0 %}
-                                            <input id="hours_result_srs" type="number" name="hours_srs"
+                                            <input id="hours_result_srs" type="text" name="hours_srs"
                                                    aria-label="Last name"
-                                                   class="form-control" readonly>
+                                                   class="form-control" value="0/{{ hours.srs.0 }}" readonly>
                                             {% endif %}
                                         </div>
                                     </div>
@@ -363,8 +363,7 @@
                                                            id="default_tech_in_class{{ forloop.counter }}"
                                                            value="{{ tech }}" checked onclick="return false;">
                                                     <label class="form-check-label"
-                                                           for="default_tech_in_class{{ forloop.counter }}">{{ tech
-                                                        }}</label>
+                                                           for="default_tech_in_class{{ forloop.counter }}">{{ tech }}</label>
                                                 </div>
                                                 {% endfor %}
                                             </div>
@@ -376,8 +375,7 @@
                                                            id="optional_tech_in_class{{ forloop.counter }}"
                                                            value="{{ tech }}">
                                                     <label class="form-check-label"
-                                                           for="optional_tech_in_class{{ forloop.counter }}">{{ tech
-                                                        }}</label>
+                                                           for="optional_tech_in_class{{ forloop.counter }}">{{ tech }}</label>
                                                 </div>
                                                 {% endfor %}
                                             </div>
@@ -391,8 +389,7 @@
                                                            id="default_tech_out_class{{ forloop.counter }}"
                                                            value="{{ tech }}" checked onclick="return false;">
                                                     <label class="form-check-label"
-                                                           for="default_tech_out_class{{ forloop.counter }}">{{ tech
-                                                        }}</label>
+                                                           for="default_tech_out_class{{ forloop.counter }}">{{ tech }}</label>
                                                 </div>
                                                 {% endfor %}
                                             </div>
@@ -427,8 +424,7 @@
                                                            type="checkbox" id="default_criteries{{ forloop.counter }}"
                                                            value="{{ tech }}" checked onclick="return false;">
                                                     <label class="form-check-label"
-                                                           for="default_criteries{{ forloop.counter }}">{{ tech
-                                                        }}</label>
+                                                           for="default_criteries{{ forloop.counter }}">{{ tech }}</label>
                                                 </div>
                                                 {% endfor %}
                                             </div>
