@@ -234,7 +234,7 @@ function addInputs() {
         }
         hours_lections_result.value = hours + "/" + document.getElementById("max_hours_lections").value;
         hours_lections_result.setAttribute("id", "hours_result_lections");
-        hours_lections_result.setAttribute("type", "number");
+        hours_lections_result.setAttribute("type", "text");
         hours_lections_result.setAttribute("class", "form-control");
         hours_lections_result.setAttribute("readonly", "");
         new_result_section.appendChild(hours_lections_result);
@@ -250,7 +250,7 @@ function addInputs() {
         }
         hours_labs_result.value = hours + "/" + document.getElementById("max_hours_labs").value;
         hours_labs_result.setAttribute("id", "hours_result_labs");
-        hours_labs_result.setAttribute("type", "number");
+        hours_labs_result.setAttribute("type", "text");
         hours_labs_result.setAttribute("class", "form-control");
         hours_labs_result.setAttribute("readonly", "");
         new_result_section.appendChild(hours_labs_result);
@@ -266,7 +266,7 @@ function addInputs() {
         }
         hours_seminars_result.value = hours + "/" + document.getElementById("max_hours_seminars").value;
         hours_seminars_result.setAttribute("id", "hours_result_seminars");
-        hours_seminars_result.setAttribute("type", "number");
+        hours_seminars_result.setAttribute("type", "text");
         hours_seminars_result.setAttribute("class", "form-control");
         hours_seminars_result.setAttribute("readonly", "");
         new_result_section.appendChild(hours_seminars_result);
@@ -282,7 +282,7 @@ function addInputs() {
         }
         hours_srs_result.value = hours + "/" + document.getElementById("max_hours_srs").value;
         hours_srs_result.setAttribute("id", "hours_result_srs");
-        hours_srs_result.setAttribute("type", "number");
+        hours_srs_result.setAttribute("type", "text");
         hours_srs_result.setAttribute("class", "form-control");
         hours_srs_result.setAttribute("readonly", "");
         new_result_section.appendChild(hours_srs_result);
@@ -298,7 +298,7 @@ function addInputs() {
     new_button.textContent = "Добавить раздел";
     for (let item of document.querySelectorAll(".sections input")) {
         item.addEventListener("change", function (event) {
-            updateHours()
+            addEvents()
         });
     }
     $('#smartwizard').smartWizard("fixHeight");
@@ -345,38 +345,41 @@ function generate_output() {
     let contents = document.getElementById("section");
     let sections_str = "";
     // if (sections.length === hours_lections.length && sections.length === contents.children.length) {
-        let hours_lections_i = 0
-        let hours_labs_i = 0
-        let hours_seminars_i = 0
-        let hours_srs_i = 0
-        for (let i = 0; i < sections.length; i++) {
-            if (hours_lections[i]) {
-                hours_lections_i = hours_lections[i].value
-            } else {
-                hours_lections_i = 0
-            }
-            if (hours_labs[i]) {
-                hours_labs_i = hours_labs[i].value
-            } else {
-                hours_labs_i = 0
-            }
-            if (hours_seminars[i]) {
-                hours_seminars_i = hours_seminars[i].value
-            } else {
-                hours_seminars_i = 0
-            }
-            if (hours_srs[i]) {
-                hours_srs_i = hours_srs[i].value
-            } else {
-                hours_srs_i = 0
-            }
+    let hours_lections_i = 0
+    let hours_labs_i = 0
+    let hours_seminars_i = 0
+    let hours_srs_i = 0
+    for (let i = 0; i < sections.length; i++) {
+        if (hours_lections[i]) {
+            hours_lections_i = hours_lections[i].value
+        } else {
+            hours_lections_i = 0
+        }
+        if (hours_labs[i]) {
+            hours_labs_i = hours_labs[i].value
+        } else {
+            hours_labs_i = 0
+        }
+        if (hours_seminars[i]) {
+            hours_seminars_i = hours_seminars[i].value
+        } else {
+            hours_seminars_i = 0
+        }
+        if (hours_srs[i]) {
+            hours_srs_i = hours_srs[i].value
+        } else {
+            hours_srs_i = 0
+        }
+        console.log(contents.children[i])
+        if (contents.children[i] && sections[i]) {
             sections_str += sections[i].value + ":" + hours_lections_i + ":" + hours_labs_i + ":" + hours_seminars_i + ":" + hours_srs_i + ":" + contents.children[i].children[0].children[1].value + ";";
         }
-        let all_sections = document.createElement("input");
-        all_sections.value = sections_str;
-        all_sections.setAttribute("type", "hidden");
-        all_sections.setAttribute("name", "all_sections");
-        document.getElementById("sections").appendChild(all_sections);
+    }
+    let all_sections = document.createElement("input");
+    all_sections.value = sections_str;
+    all_sections.setAttribute("type", "hidden");
+    all_sections.setAttribute("name", "all_sections");
+    document.getElementById("sections").appendChild(all_sections);
     // } else {
     //     let error_input = document.createElement("input");
     //     error_input.value = "error:sections-hour-mismatch" + ":" + sections_str;
@@ -423,16 +426,24 @@ function addEvents() {
     let hours_list_seminars = document.getElementsByClassName("hours_seminars");
     let hours_list_srs = document.getElementsByClassName("hours_srs");
     for (let hoursListElement of hours_list_lections) {
-        hours_lections += parseInt(hoursListElement.value);
+        if (!isNaN(parseInt(hoursListElement.value))) {
+            hours_lections += parseInt(hoursListElement.value);
+        }
     }
     for (let hoursListElement of hours_list_labs) {
-        hours_labs += parseInt(hoursListElement.value);
+        if (!isNaN(parseInt(hoursListElement.value))) {
+            hours_labs += parseInt(hoursListElement.value);
+        }
     }
     for (let hoursListElement of hours_list_seminars) {
-        hours_seminars += parseInt(hoursListElement.value);
+        if (!isNaN(parseInt(hoursListElement.value))) {
+            hours_seminars += parseInt(hoursListElement.value);
+        }
     }
     for (let hoursListElement of hours_list_srs) {
-        hours_srs += parseInt(hoursListElement.value);
+        if (!isNaN(parseInt(hoursListElement.value))) {
+            hours_srs += parseInt(hoursListElement.value);
+        }
     }
     if (hours_lections > max_hours_lections) {
         alert("Число часов лекций превышено");
@@ -461,23 +472,22 @@ function addEvents() {
         if (document.getElementById('max_hours_srs').value > 0) {
             document.getElementById("hours_result_srs").value = hours_srs
         }
-    if (isNaN(hours_lections))
-        hours_lections = 0
-    if (isNaN(hours_seminars))
-        hours_seminars = 0
-    if (isNaN(hours_labs))
-        hours_labs = 0
-    if (isNaN(hours_srs))
-        hours_srs = 0
-    if (document.getElementById("hours_result_lections"))
-        document.getElementById("hours_result_lections").value = hours_lections + "/" + max_hours_lections;
-    if (document.getElementById("hours_result_labs"))
-        document.getElementById("hours_result_labs").value = hours_labs + "/" + max_hours_labs;
-    if (document.getElementById("hours_result_seminars"))
-        document.getElementById("hours_result_seminars").value = hours_seminars + "/" + max_hours_seminars;
-    if (document.getElementById("hours_result_srs"))
-        document.getElementById("hours_result_srs").value = hours_srs + "/" + max_hours_srs;
-}
+        if (isNaN(hours_lections))
+            hours_lections = 0
+        if (isNaN(hours_seminars))
+            hours_seminars = 0
+        if (isNaN(hours_labs))
+            hours_labs = 0
+        if (isNaN(hours_srs))
+            hours_srs = 0
+        if (document.getElementById("hours_result_lections"))
+            document.getElementById("hours_result_lections").value = hours_lections + "/" + max_hours_lections;
+        if (document.getElementById("hours_result_labs"))
+            document.getElementById("hours_result_labs").value = hours_labs + "/" + max_hours_labs;
+        if (document.getElementById("hours_result_seminars"))
+            document.getElementById("hours_result_seminars").value = hours_seminars + "/" + max_hours_seminars;
+        if (document.getElementById("hours_result_srs"))
+            document.getElementById("hours_result_srs").value = hours_srs + "/" + max_hours_srs;
     }
 }
 
