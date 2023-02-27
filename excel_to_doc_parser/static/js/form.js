@@ -184,26 +184,34 @@ function addInputs() {
     section_input.setAttribute("class", "form-control section");
     section_input.setAttribute("type", "text");
     section_input.setAttribute("name", "section");
-    let hours_input_lections = document.createElement("input");
-    new_div_group.appendChild(hours_input_lections);
-    hours_input_lections.setAttribute("class", "form-control hours_lections");
-    hours_input_lections.setAttribute("type", "number");
-    hours_input_lections.setAttribute("name", "hours_lections");
-    let hours_input_labs = document.createElement("input");
-    new_div_group.appendChild(hours_input_labs);
-    hours_input_labs.setAttribute("class", "form-control hours_labs");
-    hours_input_labs.setAttribute("type", "number");
-    hours_input_labs.setAttribute("name", "hours_labs");
-    let hours_input_seminars = document.createElement("input");
-    new_div_group.appendChild(hours_input_seminars);
-    hours_input_seminars.setAttribute("class", "form-control hours_seminars");
-    hours_input_seminars.setAttribute("type", "number");
-    hours_input_seminars.setAttribute("name", "hours_seminars");
-    let hours_input_srs = document.createElement("input");
-    new_div_group.appendChild(hours_input_srs);
-    hours_input_srs.setAttribute("class", "form-control hours_srs");
-    hours_input_srs.setAttribute("type", "number");
-    hours_input_srs.setAttribute("name", "hours_srs");
+    if (document.getElementById("max_hours_lections").value > 0) {
+        let hours_input_lections = document.createElement("input");
+        new_div_group.appendChild(hours_input_lections);
+        hours_input_lections.setAttribute("class", "form-control hours_lections");
+        hours_input_lections.setAttribute("type", "number");
+        hours_input_lections.setAttribute("name", "hours_lections");
+    }
+    if (document.getElementById("max_hours_labs").value > 0) {
+        let hours_input_labs = document.createElement("input");
+        new_div_group.appendChild(hours_input_labs);
+        hours_input_labs.setAttribute("class", "form-control hours_labs");
+        hours_input_labs.setAttribute("type", "number");
+        hours_input_labs.setAttribute("name", "hours_labs");
+    }
+    if (document.getElementById("max_hours_seminars").value > 0) {
+        let hours_input_seminars = document.createElement("input");
+        new_div_group.appendChild(hours_input_seminars);
+        hours_input_seminars.setAttribute("class", "form-control hours_seminars");
+        hours_input_seminars.setAttribute("type", "number");
+        hours_input_seminars.setAttribute("name", "hours_seminars");
+    }
+    if (document.getElementById("max_hours_srs").value > 0) {
+        let hours_input_srs = document.createElement("input");
+        new_div_group.appendChild(hours_input_srs);
+        hours_input_srs.setAttribute("class", "form-control hours_srs");
+        hours_input_srs.setAttribute("type", "number");
+        hours_input_srs.setAttribute("name", "hours_srs");
+    }
     let new_result_block = document.createElement("div");
     new_result_block.setAttribute("class", "mb-3");
     new_result_block.setAttribute("id", "result_block");
@@ -215,62 +223,70 @@ function addInputs() {
     result_text.setAttribute("class", "form-control");
     result_text.setAttribute("readonly", "");
     new_result_section.appendChild(result_text);
-    let hours_lections_result = document.createElement("input");
-    let hours = 0;
-    let sections = document.getElementsByClassName("hours_lections");
-    for (let section of sections) {
-        if (section.value !== '') {
-            hours += parseInt(section.value);
+    if (document.getElementById("max_hours_lections").value > 0) {
+        let hours_lections_result = document.createElement("input");
+        let hours = 0;
+        let sections = document.getElementsByClassName("hours_lections");
+        for (let section of sections) {
+            if (section.value !== '') {
+                hours += parseInt(section.value);
+            }
         }
+        hours_lections_result.value = hours;
+        hours_lections_result.setAttribute("id", "hours_result_lections");
+        hours_lections_result.setAttribute("type", "number");
+        hours_lections_result.setAttribute("class", "form-control");
+        hours_lections_result.setAttribute("readonly", "");
+        new_result_section.appendChild(hours_lections_result);
     }
-    hours_lections_result.value = hours;
-    hours_lections_result.setAttribute("id", "hours_lections_result");
-    hours_lections_result.setAttribute("type", "number");
-    hours_lections_result.setAttribute("class", "form-control");
-    hours_lections_result.setAttribute("readonly", "");
-    new_result_section.appendChild(hours_lections_result);
-    let hours_labs_result = document.createElement("input");
-    hours = 0;
-    sections = document.getElementsByClassName("hours_labs");
-    for (let section of sections) {
-        if (section.value !== '') {
-            hours += parseInt(section.value);
+    if (document.getElementById("max_hours_labs").value > 0) {
+        let hours_labs_result = document.createElement("input");
+        let hours = 0;
+        let sections = document.getElementsByClassName("hours_labs");
+        for (let section of sections) {
+            if (section.value !== '') {
+                hours += parseInt(section.value);
+            }
         }
+        hours_labs_result.value = hours;
+        hours_labs_result.setAttribute("id", "hours_result_labs");
+        hours_labs_result.setAttribute("type", "number");
+        hours_labs_result.setAttribute("class", "form-control");
+        hours_labs_result.setAttribute("readonly", "");
+        new_result_section.appendChild(hours_labs_result);
     }
-    hours_labs_result.value = hours;
-    hours_labs_result.setAttribute("id", "hours_labs_result");
-    hours_labs_result.setAttribute("type", "number");
-    hours_labs_result.setAttribute("class", "form-control");
-    hours_labs_result.setAttribute("readonly", "");
-    new_result_section.appendChild(hours_labs_result);
-    let hours_seminars_result = document.createElement("input");
-    hours = 0;
-    sections = document.getElementsByClassName("hours_seminars");
-    for (let section of sections) {
-        if (section.value !== '') {
-            hours += parseInt(section.value);
+    if (document.getElementById("max_hours_seminars").value > 0) {
+        let hours_seminars_result = document.createElement("input");
+        let hours = 0;
+        let sections = document.getElementsByClassName("hours_seminars");
+        for (let section of sections) {
+            if (section.value !== '') {
+                hours += parseInt(section.value);
+            }
         }
+        hours_seminars_result.value = hours;
+        hours_seminars_result.setAttribute("id", "hours_result_seminars");
+        hours_seminars_result.setAttribute("type", "number");
+        hours_seminars_result.setAttribute("class", "form-control");
+        hours_seminars_result.setAttribute("readonly", "");
+        new_result_section.appendChild(hours_seminars_result);
     }
-    hours_seminars_result.value = hours;
-    hours_seminars_result.setAttribute("id", "hours_seminars_result");
-    hours_seminars_result.setAttribute("type", "number");
-    hours_seminars_result.setAttribute("class", "form-control");
-    hours_seminars_result.setAttribute("readonly", "");
-    new_result_section.appendChild(hours_seminars_result);
-    let hours_srs_result = document.createElement("input");
-    hours = 0;
-    sections = document.getElementsByClassName("hours_srs");
-    for (let section of sections) {
-        if (section.value !== '') {
-            hours += parseInt(section.value);
+    if (document.getElementById("max_hours_srs").value > 0) {
+        let hours_srs_result = document.createElement("input");
+        let hours = 0;
+        let sections = document.getElementsByClassName("hours_srs");
+        for (let section of sections) {
+            if (section.value !== '') {
+                hours += parseInt(section.value);
+            }
         }
+        hours_srs_result.value = hours;
+        hours_srs_result.setAttribute("id", "hours_result_srs");
+        hours_srs_result.setAttribute("type", "number");
+        hours_srs_result.setAttribute("class", "form-control");
+        hours_srs_result.setAttribute("readonly", "");
+        new_result_section.appendChild(hours_srs_result);
     }
-    hours_srs_result.value = hours;
-    hours_srs_result.setAttribute("id", "hours_srs_result");
-    hours_srs_result.setAttribute("type", "number");
-    hours_srs_result.setAttribute("class", "form-control");
-    hours_srs_result.setAttribute("readonly", "");
-    new_result_section.appendChild(hours_srs_result);
     new_result_block.appendChild(new_result_section);
     document.getElementById("sections").appendChild(new_result_block);
     let new_button = document.createElement("button");
@@ -308,6 +324,9 @@ function addInputsMarks() {
     new_button.setAttribute("id", "addInputGroupMarks");
     new_button.setAttribute("onclick", "addInputsMarks()");
     new_button.textContent = "Добавить оценку";
+    document.getElementById("sections").addEventListener('change', function () {
+        addEvents()
+    })
     $('#smartwizard').smartWizard("fixHeight");
 }
 
@@ -320,22 +339,46 @@ function generate_output() {
     let hours_srs = document.getElementsByClassName("hours_srs");
     let contents = document.getElementById("section");
     let sections_str = "";
-    if (sections.length === hours_lections.length && sections.length === contents.children.length) {
+    // if (sections.length === hours_lections.length && sections.length === contents.children.length) {
+        let hours_lections_i = 0
+        let hours_labs_i = 0
+        let hours_seminars_i = 0
+        let hours_srs_i = 0
         for (let i = 0; i < sections.length; i++) {
-            sections_str += sections[i].value + ":" + hours_lections[i].value + ":" + hours_labs[i].value + ":" + hours_seminars[i].value + ":" + hours_srs[i].value + ":" + contents.children[i].children[0].children[1].value + ";";
+            if (hours_lections[i]) {
+                hours_lections_i = hours_lections[i].value
+            } else {
+                hours_lections_i = 0
+            }
+            if (hours_labs[i]) {
+                hours_labs_i = hours_labs[i].value
+            } else {
+                hours_labs_i = 0
+            }
+            if (hours_seminars[i]) {
+                hours_seminars_i = hours_seminars[i].value
+            } else {
+                hours_seminars_i = 0
+            }
+            if (hours_srs[i]) {
+                hours_srs_i = hours_srs[i].value
+            } else {
+                hours_srs_i = 0
+            }
+            sections_str += sections[i].value + ":" + hours_lections_i + ":" + hours_labs_i + ":" + hours_seminars_i + ":" + hours_srs_i + ":" + contents.children[i].children[0].children[1].value + ";";
         }
         let all_sections = document.createElement("input");
         all_sections.value = sections_str;
         all_sections.setAttribute("type", "hidden");
         all_sections.setAttribute("name", "all_sections");
         document.getElementById("sections").appendChild(all_sections);
-    } else {
-        let error_input = document.createElement("input");
-        error_input.value = "error:sections-hour-mismatch";
-        error_input.setAttribute("type", "hidden");
-        error_input.setAttribute("name", "all_sections");
-        document.getElementById("sections").appendChild(error_input);
-    }
+    // } else {
+    //     let error_input = document.createElement("input");
+    //     error_input.value = "error:sections-hour-mismatch" + ":" + sections_str;
+    //     error_input.setAttribute("type", "hidden");
+    //     error_input.setAttribute("name", "all_sections");
+    //     document.getElementById("sections").appendChild(error_input);
+    // }
     //generate input with all modules
     let modules = document.getElementById("dropzone");
     let modules_str = "";
@@ -361,6 +404,61 @@ function generate_output() {
     document.getElementById("marks").appendChild(all_marks);
 }
 
+function addEvents() {
+    let hours_lections = 0;
+    let hours_labs = 0;
+    let hours_seminars = 0;
+    let hours_srs = 0;
+    let max_hours_lections = document.getElementById("max_hours_lections").value
+    let max_hours_labs = document.getElementById("max_hours_labs").value
+    let max_hours_seminars = document.getElementById("max_hours_seminars").value
+    let max_hours_srs = document.getElementById("max_hours_srs").value
+    let hours_list_lections = document.getElementsByClassName("hours_lections");
+    let hours_list_labs = document.getElementsByClassName("hours_labs");
+    let hours_list_seminars = document.getElementsByClassName("hours_seminars");
+    let hours_list_srs = document.getElementsByClassName("hours_srs");
+    for (let hoursListElement of hours_list_lections) {
+        hours_lections += parseInt(hoursListElement.value);
+    }
+    for (let hoursListElement of hours_list_labs) {
+        hours_labs += parseInt(hoursListElement.value);
+    }
+    for (let hoursListElement of hours_list_seminars) {
+        hours_seminars += parseInt(hoursListElement.value);
+    }
+    for (let hoursListElement of hours_list_srs) {
+        hours_srs += parseInt(hoursListElement.value);
+    }
+    if (hours_lections > max_hours_lections) {
+        alert("Число часов лекций превышено");
+    } else {
+        if (document.getElementById('max_hours_lections').value > 0) {
+            document.getElementById("hours_result_lections").value = hours_lections
+        }
+    }
+    if (hours_seminars > max_hours_seminars) {
+        alert("Число часов семинаров превышено");
+    } else {
+        if (document.getElementById('max_hours_seminars').value > 0) {
+            document.getElementById("hours_result_seminars").value = hours_seminars
+        }
+    }
+    if (hours_labs > max_hours_labs) {
+        alert("Число часов лабораторных работ превышено");
+    } else {
+        if (document.getElementById('max_hours_labs').value > 0) {
+            document.getElementById("hours_result_labs").value = hours_labs
+        }
+    }
+    if (hours_srs > max_hours_srs) {
+        alert("Число часов самостоятельной работы студентов превышено");
+    } else {
+        if (document.getElementById('max_hours_srs').value > 0) {
+            document.getElementById("hours_result_srs").value = hours_srs
+        }
+    }
+}
+
 window.onload = function () {
     let max_hours = document.getElementById("max_hours");
     let textareas = document.getElementsByTagName("textarea");
@@ -378,14 +476,6 @@ window.onload = function () {
         $('#smartwizard').smartWizard("fixHeight");
     })
     document.getElementById("sections").addEventListener('change', function () {
-        let hours = 0;
-        let hours_list = document.getElementsByClassName("hour");
-        for (let hoursListElement of hours_list) {
-            hours += parseInt(hoursListElement.value);
-        }
-        if (hours > max_hours) {
-            alert("Число часов превышено");
-        }
-        document.getElementById("hours_result").value = hours;
+        addEvents()
     })
 };

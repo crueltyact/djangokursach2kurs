@@ -154,28 +154,31 @@
                                             <input type="text" aria-label="First name"
                                                    class="form-control" value="Итого" readonly>
                                             {% if hours.lections.0 %}
-                                            <input id="hours_result_lections" type="number" name="hours"
+                                            <input id="hours_result_lections" type="number" name="hours_lections"
                                                    aria-label="Last name"
                                                    class="form-control" readonly>
                                             {% endif %}
                                             {% if hours.labs.0 %}
-                                            <input id="hours_result_labs" type="number" name="hours"
+                                            <input id="hours_result_labs" type="number" name="hours_labs"
                                                    aria-label="Last name"
                                                    class="form-control" readonly>
                                             {% endif %}
                                             {% if hours.seminars.0 %}
-                                            <input id="hours_result_seminars" type="number" name="hours"
+                                            <input id="hours_result_seminars" type="number" name="hours_seminars"
                                                    aria-label="Last name"
                                                    class="form-control" readonly>
                                             {% endif %}
                                             {% if hours.srs.0 %}
-                                            <input id="hours_result_srs" type="number" name="hours"
+                                            <input id="hours_result_srs" type="number" name="hours_srs"
                                                    aria-label="Last name"
                                                    class="form-control" readonly>
                                             {% endif %}
                                         </div>
                                     </div>
-                                    <input id="max_hours" type="hidden" name="max_hours" value="{{ hours }}">
+                                    <input id="max_hours_lections" type="hidden" name="max_hours_lections" value="{{ hours.lections.0 }}">
+                                    <input id="max_hours_labs" type="hidden" name="max_hours_labs" value="{{ hours.labs.0 }}">
+                                    <input id="max_hours_seminars" type="hidden" name="max_hours_seminars" value="{{ hours.seminars.0 }}">
+                                    <input id="max_hours_srs" type="hidden" name="max_hours_srs" value="{{ hours.srs.0 }}">
                                     <button id="addInputGroup" type="button" class="btn btn-primary"
                                             onclick="addInputs()">Добавить раздел
                                     </button>
@@ -191,8 +194,7 @@
                                             <div id="modules">
                                                 {% for cur_theme in all_themes %}
                                                 {% if cur_theme.program_name != theme %}
-                                                <p class="drag"><a class="btn btn-default text-start">{{
-                                                    cur_theme.program_name }}</a></p>
+                                                <p class="drag"><a class="btn btn-default text-start">{{ cur_theme.program_name }}</a></p>
                                                 {% endif %}
                                                 {% endfor %}
                                             </div>

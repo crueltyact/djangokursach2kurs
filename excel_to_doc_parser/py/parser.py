@@ -114,13 +114,12 @@ def get_info_from_excel(filename):
     cols = len(matrix[0])
     title = parse_title(matrix[0][0])
     data = {}
-    key_data = []
+    all_competencies = {}
     # заполняем data всеми дисциплинами и их данными
     for c in range(cols)[3::]:
         key = matrix[2][c]
         if key == '':
             continue
-        key_data.append(key)
         data[key] = {}
         data[key]['program_name'] = key
         data[key]['profile_name'] = title['profile_name']
@@ -132,10 +131,14 @@ def get_info_from_excel(filename):
         universal_competences = get_info_for_table(matrix, skill_types[0], c)
         general_professional_competencies = get_info_for_table(matrix, skill_types[1], c)
         professional_competencies = get_info_for_table(matrix, skill_types[2], c)
+        all_competencies[key] = []
         if len(universal_competences) > 0:
             data[key]['universal_competences'] = universal_competences
+            all_competencies[key].append(universal_competences)
         if len(general_professional_competencies) > 0:
             data[key]['general_professional_competencies'] = general_professional_competencies
+            all_competencies[key].append(general_professional_competencies)
         if len(professional_competencies) > 0:
             data[key]['professional_competencies'] = professional_competencies
-    return data, key_data
+            all_competencies[key].append(professional_competencies)
+    return data, all_competencies

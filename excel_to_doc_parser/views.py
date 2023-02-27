@@ -1,12 +1,15 @@
 import datetime
+import json
 import os.path
 import os.path
+import pprint
 import shutil
 from difflib import SequenceMatcher
 from os.path import join
 from pathlib import Path
 
 import numpy
+import numpy as np
 import pandas as pd
 import requests
 
@@ -118,6 +121,8 @@ def documents(request):
                     hours[row]["seminars"] = []
                     hours[row]["labs"] = []
                     hours[row]["srs"] = []
+                    hours[row]["exam"] = []
+                    hours[row]["test"] = []
                     if not pd.isna(data.iloc[i - 1][header["Лекции"]]):
                         hours[row]["lections"].append(data.iloc[i - 1][header["Лекции"]])
                     if not pd.isna(data.iloc[i - 1][header["Семинары и практические занятия"]]):
@@ -126,6 +131,10 @@ def documents(request):
                         hours[row]["labs"].append(data.iloc[i - 1][header["Лаборатоные занятия"]])
                     if not pd.isna(data.iloc[i - 1][header["СРС"]]):
                         hours[row]["srs"].append(data.iloc[i - 1][header["СРС"]])
+                    if not pd.isna(data.iloc[i - 1][header["Экзамены"]]):
+                        hours[row]["exam"].append(data.iloc[i - 1][header["Экзамены"]])
+                    if not pd.isna(data.iloc[i - 1][header["Зачёты"]]):
+                        hours[row]["test"].append(data.iloc[i - 1][header["Зачёты"]])
             for filename in os.listdir(folder):
                 file_path = os.path.join(folder, filename)
                 if filename == ".gitkeep":
@@ -138,7 +147,7 @@ def documents(request):
                 except Exception as e:
                     print('An error appear ' + str(e))
 
-            data, _ = get_info_from_excel(
+            data, all_competencies = get_info_from_excel(
                 path + "/matrices/09_03_01_Информатика_и_ВТ,_Матрица_ВЕБ_технологии_2020.xlsx")
             discipline = Document.objects.get(pk=request.POST.get('document')).program_name.program_name
             data["program_name"] = discipline
@@ -177,11 +186,17 @@ def documents(request):
             doc = DocxTemplate(
                 join(str(BASE_DIR), "excel_to_doc_parser/py/template.docx"))
             data = dict(data[discipline], **xml_parser(request))
+            data['all_comp'] = list(np.concatenate(all_competencies[discipline]))
+            data['dean'] = "Д.Г. Демидов"
+            data['head_of_faculty'] = "Е.В. Пухова"
+            data['rop'] = "М.В. Даньшина"
+            print(dict(data, **context_plane)['all_comp'])
             doc.render(dict(data, **context_plane))
             for i in range(len(doc.tables)):
                 table = doc.tables[i]._tbl
                 for row in doc.tables[i].rows:
-                    if len(row.cells[0].text.strip()) == 0 and len(set(row.cells)) == 1:
+                    print(row.cells)
+                    if len(row.cells) and len(row.cells[0].text.strip()) == 0 and len(set(row.cells)) == 1:
                         table.remove(row._tr)
             doc.save(join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files/docx/{}.docx".format(discipline)))
             context['path'] = "excel_to_doc_parser/media/generated_files/docx/{}.docx".format(discipline)
@@ -445,18 +460,15 @@ def document_information(request):
         if request.method == "GET":
             context["document"] = request.GET.get("document")
             context["theme"] = Document.objects.get(pk=request.GET.get("document")).program_name.program_name
-            context["hours"] = hours[context["theme"]]
         if request.method == "POST":
             # context["last_values"] = xml_parser(request)
-            context["hours"] = TimePlan.objects.get(
-                program_name=Document.objects.get(pk=request.POST.get("document")).program_name).classwork_hours
             context["document"] = request.POST.get("document")
             context["theme"] = Document.objects.get(pk=request.POST.get("document")).program_name.program_name
         context["all_themes"] = ProgramNames.objects.all()
+        context["hours"] = hours[context["theme"]]
     return render(request, "./docx_creation/targets.html", context)
 
 
-@login_required(login_url='/login/')
 def generate_xml(request):
     root = etree.Element("root")
     tree = etree.ElementTree(root)
@@ -537,7 +549,7 @@ def generate_xml(request):
         hours.text = "#TODO"
         section.append(hours)
         sections.append(section)
-        print(exc)
+        raise exc
     root.append(sections)
     disciplines = etree.Element("disciplines")
     try:
