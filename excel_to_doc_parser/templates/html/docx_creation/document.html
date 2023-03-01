@@ -29,8 +29,8 @@
                         <tbody>
                         {% for document in documents %}
                         <tr>
-                            <td><a class="btn" href="/themes?document={{ document.id }}">{{ document.program_name.program_name }}</a></td>
-                            <td>{{ document.program_name.work_program.profile_name }}</td>
+                            <td><a class="btn" href="/themes?document={{ document.id }}">{{ document.document_name }}</a></td>
+                            <td>{{ document.profile_name }}</td>
                             <td>-</td>
                             <td>-</td>
                             <td>{{ document.status.status }}</td>
@@ -50,8 +50,9 @@
                         {% csrf_token %}
                         <label>
                             <select name="program_name">
+                                {{ disciplines }}
                                 {% for discipline in disciplines %}
-                                <option value="{{ discipline.program_name }}">{{ discipline.program_name }}</option>
+                                <option value="{{ discipline }}">{{ discipline }}</option>
                                 {% endfor %}
                             </select>
                         </label>

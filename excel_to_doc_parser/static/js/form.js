@@ -165,6 +165,7 @@ $("#smartwizard").on("showStep", function (e, anchorObject, stepIndex, stepDirec
                     // console.log(visElement.className);
                 }
             }
+            fix_textareas()
             $('#smartwizard').smartWizard("fixHeight");
         });
     }
@@ -301,6 +302,7 @@ function addInputs() {
             addEvents()
         });
     }
+    fix_textareas()
     $('#smartwizard').smartWizard("fixHeight");
 }
 
@@ -332,6 +334,7 @@ function addInputsMarks() {
     document.getElementById("sections").addEventListener('change', function () {
         addEvents()
     })
+    fix_textareas()
     $('#smartwizard').smartWizard("fixHeight");
 }
 
@@ -410,6 +413,24 @@ function generate_output() {
     all_marks.setAttribute("type", "hidden");
     all_marks.setAttribute("name", "all_marks");
     document.getElementById("marks").appendChild(all_marks);
+}
+
+let kr_amount = 0
+function addKr() {
+    let parent = document.getElementById("kr-fields")
+    let textarea = document.createElement("textarea")
+    let label = document.createElement("label")
+    kr_amount += 1
+    textarea.setAttribute("class", "form-control")
+    textarea.setAttribute("name", "kr")
+    textarea.setAttribute("id", "kr_textarea_" + kr_amount)
+    label.setAttribute("class", "form-label")
+    label.setAttribute("for", "kr_textarea_" + kr_amount)
+    label.textContent = "Вопросы для контрольной работы " + kr_amount
+    parent.appendChild(label)
+    parent.appendChild(textarea)
+    fix_textareas()
+    $('#smartwizard').smartWizard("fixHeight")
 }
 
 function addEvents() {
@@ -491,20 +512,24 @@ function addEvents() {
     }
 }
 
-window.onload = function () {
-    let max_hours = document.getElementById("max_hours");
+function fix_textareas() {
     let textareas = document.getElementsByTagName("textarea");
     for (const textarea of textareas) {
         textarea.addEventListener('mouseout', function () {
             $('#smartwizard').smartWizard("fixHeight");
         });
     }
+}
+
+window.onload = function () {
+    let max_hours = document.getElementById("max_hours");
     document.getElementById("score_system").addEventListener('change', function () {
         if (this.checked) {
             document.getElementById("brs").className = "mb-3";
         } else {
             document.getElementById("brs").className = "mb-3 d-none";
         }
+        fix_textareas()
         $('#smartwizard').smartWizard("fixHeight");
     })
     document.getElementById("sections").addEventListener('change', function () {

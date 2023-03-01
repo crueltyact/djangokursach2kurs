@@ -62,6 +62,7 @@ def parse_title(txt):
     txt = re.sub('[»«]', '"', txt)
     txt = re.sub('[\n,]', '', txt)
     mas = txt.split('"')
+    print(mas)
     res['profile_name'] = mas[5]
     res['program_code'] = mas[3]
     txt = re.sub('["]', ' ', txt)

@@ -78,6 +78,12 @@
                                     <!--                                    Образовательные технологии-->
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#step-12">
+                                    <span class="num">12</span>
+                                    <!--                                    ФОС-->
+                                </a>
+                            </li>
                         </ul>
 
                         <div class="tab-content">
@@ -193,8 +199,8 @@
                                         <div class="col-sm-6">
                                             <div id="modules">
                                                 {% for cur_theme in all_themes %}
-                                                {% if cur_theme.program_name != theme %}
-                                                <p class="drag"><a class="btn btn-default text-start">{{ cur_theme.program_name }}</a></p>
+                                                {% if cur_theme != theme %}
+                                                <p class="drag"><a class="btn btn-default text-start">{{ cur_theme }}</a></p>
                                                 {% endif %}
                                                 {% endfor %}
                                             </div>
@@ -445,6 +451,52 @@
                                         <!--                                                {% endfor %}-->
                                         <!--                                            </label>-->
                                         <!--                                        </fieldset>-->
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="step-12" class="tab-pane" role="tabpanel" aria-labelledby="step-12">
+                                <div class="mb-3">
+                                    <label for="tasks_from_file" class="form-label"><p class="h2">Фонд оценочных средств</p></label>
+                                    <div class="row">
+                                        <fieldset class="col">
+                                            <div><p class="h3">Контрольные работы</p>
+                                                <div class="form-check" id="kr-fields"></div>
+                                                <button id="add_kr" type="button" class="btn btn-primary mt-3" onclick="addKr()">Добавить оценку</button>
+                                            </div>
+                                            {% if course_work %}
+                                                <div><p class="h3">Курсовая работа</p>
+                                                    <div class="form-check form-switch">
+                                                        <label class="form-check-label" for="cw_themes"><p class="h4">Примеры тем для курсовой работы</p></label>
+                                                        <textarea class="form-control" id="cw_themes" name="course_work_themes"></textarea>
+                                                    </div>
+                                                    <div class="form-check form-switch">
+                                                        <label class="form-check-label" for="cw_contents"><p class="h4">Содержательная часть курсовой работы</p></label>
+                                                        <textarea class="form-control" id="cw_contents" name="course_work_contents"></textarea>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        </fieldset>
+                                        <fieldset class="col">
+                                            {% if exam %}
+                                                <div><p class="h3">Экзаменационные вопросы</p>
+                                                    <div class="form-check form-switch">
+                                                        <label class="form-check-label" for="eq_theory"><p class="h4">Теоретические вопросы к экзамену</p></label>
+                                                        <textarea class="form-control" id="eq_theory" name="eq_theory"></textarea>
+                                                    </div>
+                                                    <div class="form-check form-switch">
+                                                        <label class="form-check-label" for="eq_tasks"><p class="h4">Практические задания к экзамену</p></label>
+                                                        <textarea class="form-control" id="eq_tasks" name="eq_tasks"></textarea>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                <div><p class="h3">Вопросы к зачету</p>
+                                                    <div class="form-check form-switch">
+                                                        <label class="form-check-label" for="test_questions"><p class="h4">Теоретические вопросы к зачету</p></label>
+                                                        <textarea class="form-control" id="test_questions" name="test_questions"></textarea>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        </fieldset>
                                     </div>
                                 </div>
                             </div>
