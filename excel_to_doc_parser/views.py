@@ -90,7 +90,7 @@ def get_profile_name() -> str:
     # print(data.to_string())
 
 
-def parse_matrix(filename) -> (dict, list):
+def parse_matrix(filename) -> (dict, dict):
     frame = pd.read_excel(filename, header=None, index_col=None)
     header = {}
     data = {}
@@ -106,25 +106,31 @@ def parse_matrix(filename) -> (dict, list):
     frame = frame.dropna(axis="columns", how="all")
     frame.reset_index(drop=True, inplace=True)
     all_comps = frame[frame.columns[:2]]
+    all_comps.columns = ['competency', 'indicator']
     all_comps.reset_index(drop=True, inplace=True)
-    universal_comp_end = all_comps.loc[all_comps[0] == "Общепрофессиональные компетенции и индикаторы"].head().index[0]
-    universal_comp = all_comps[1:universal_comp_end]
+    universal_comp_end = all_comps.loc[all_comps['competency'] == "Общепрофессиональные компетенции и индикаторы"].head().index[0]
+    # universal_comp = all_comps[1:universal_comp_end]
     common_prof_comp_end = \
-        all_comps.loc[all_comps[0].str.strip() == "Профессиональные компетенции и индикаторы"].head().index[0]
-    common_prof_comp = all_comps[universal_comp_end + 1:common_prof_comp_end]
-    prof_comp = all_comps[common_prof_comp_end + 1:]
-    universal_comp.reset_index(drop=True, inplace=True)
-    universal_comp.columns = ['competency', 'indicator']
-    universal_comp.set_index('competency')
+        all_comps.loc[all_comps['competency'].str.strip() == "Профессиональные компетенции и индикаторы"].head().index[0]
+    # common_prof_comp = all_comps[universal_comp_end + 1:common_prof_comp_end]
+    # prof_comp = all_comps[common_prof_comp_end + 1:]
+    # universal_comp.reset_index(drop=True, inplace=True)
+    # universal_comp.columns = ['competency', 'indicator']
+    # universal_comp.set_index('competency')
     # print(universal_comp.melt('competency', var_name='indicator').set_index(['competency', 'indicator']))
     # universal_comp = universal_comp.melt('competency', var_name='indicator').set_index(['competency', 'indicator'])
-    common_prof_comp.columns = ['competency', 'indicator']
-    common_prof_comp.index -= 2
-    prof_comp.columns = ['competency', 'indicator']
-    prof_comp.index -= 3
+    # common_prof_comp.columns = ['competency', 'indicator']
+    # common_prof_comp.index -= 2
+    # prof_comp.columns = ['competency', 'indicator']
+    # prof_comp.index -= 3
     relation_matrix = frame[frame.columns[2:]]
     relation_matrix.drop([0, universal_comp_end, common_prof_comp_end], axis=0, inplace=True)
     relation_matrix.reset_index(drop=True, inplace=True)
+    all_comps.drop([0, universal_comp_end, common_prof_comp_end], axis=0, inplace=True)
+    all_comps.reset_index(drop=True, inplace=True)
+    all_competencies_names = all_comps['competency'].dropna()
+    all_competencies_names.reset_index(drop=True, inplace=True)
+    all_indicators = all_comps['indicator']
     disciplines = header
     disciplines.pop('КОМПЕТЕНЦИИ', None)
     disciplines.pop("ИНДИКАТОРЫ", None)
@@ -138,63 +144,28 @@ def parse_matrix(filename) -> (dict, list):
         data[key]['general_professional_competencies'] = []
         data[key]['professional_competencies'] = []
 
-        for position in range(len(disciplines)):
-            data[key]['universal_competencies'].append(
-                {"competency_code": '',
-                 "competency_name": '',
-                 "indicators": matrix_of_indicators}
-            )
-            data[key]['general_professional_competencies'].append(
-                {"competency_code": '',
-                 "competency_name": '',
-                 "indicators": matrix_of_indicators}
-            )
-            data[key]['professional_competencies'].append(
-                {"competency_code": '',
-                 "competency_name": '',
-                 "indicators": matrix_of_indicators}
-            )
-            comp_code_index_prev = relation_column.dropna().index[0]
-            for i in relation_column.dropna().index:
-                if i % 3 == 0:
-                    comp_code_index = i - 1
-                elif i % 3 == 1:
-                    comp_code_index = i - 2
-                else:
-                    comp_code_index = i - 3
-                if comp_code_index != comp_code_index_prev:
-                    for item in list_of_indicators:
-                        item = item.values[0]
-                        matrix_of_indicators.append(
-                            (item.split(' ')[0], ' '.join([word for word in item.split(' ')[1:]]).strip()))
-                    list_of_indicators = []
-                    if i < universal_comp_end - 1:
-                        data[key]['universal_competencies'][position]['indicators'] = matrix_of_indicators
-                    elif i < common_prof_comp_end - 1:
-                        data[key]['general_professional_competencies'][position]['indicators'] = matrix_of_indicators
-                    else:
-                        data[key]['professional_competencies'][position]['indicators'] = matrix_of_indicators
-                    comp_code_index_prev = comp_code_index
-                if i < universal_comp_end - 1:
-                    list_of_indicators.append(universal_comp['indicator'].loc[[i]])
-                    comp_code = universal_comp['competency'].loc[[comp_code_index + 1]].values[0]
-                    data[key]['universal_competencies'][position]['competency_code'] = comp_code.split(' ')[0]
-                    data[key]['universal_competencies'][position]['competency_name'] = ' '.join(
-                        [word for word in comp_code.split(' ')[1:]]).strip()
-                elif i < common_prof_comp_end - 2:
-                    list_of_indicators.append(common_prof_comp['indicator'].loc[[i]])
-                    comp_code = common_prof_comp['competency'].loc[[comp_code_index + 1]].values[0]
-                    data[key]['general_professional_competencies'][position]['competency_code'] = comp_code.split(' ')[0]
-                    data[key]['general_professional_competencies'][position]['competency_name'] = ' '.join(
-                        [word for word in comp_code.split(' ')[1:]]).strip()
-                else:
-                    list_of_indicators.append(prof_comp['indicator'].loc[[i]])
-                    comp_code = prof_comp['competency'].loc[[comp_code_index + 1]].values[0]
-                    data[key]['professional_competencies'][position]['competency_code'] = comp_code.split(' ')[0]
-                    data[key]['professional_competencies'][position]['competency_name'] = ' '.join(
-                        [word for word in comp_code.split(' ')[1:]]).strip()
-    for key, value in data.items():
-        print(key, value)
+        current_discipline_relation = pd.concat([all_indicators, relation_column], axis=1)
+        current_discipline_relation.columns = ['indicator', 'value']
+        current_discipline_relation = current_discipline_relation[current_discipline_relation['value'].notna()]
+        all_comp_for_disc = {}
+        all_comp_for_disc['competency'] = []
+        all_comp_for_disc['indicator'] = []
+        for i, values in current_discipline_relation.iterrows():
+            # print(i, values)
+            if i % 3 == 2:
+                comp_name_index = i - 2
+            elif i % 3 == 1:
+                comp_name_index = i - 1
+            else:
+                comp_name_index = i
+            all_comp_for_disc['competency'].append(all_competencies_names.iloc[comp_name_index // 3])
+            all_comp_for_disc['indicator'].append(values['indicator'])
+        all_comp_for_disc_df = pd.DataFrame.from_dict(all_comp_for_disc)
+        print(all_comp_for_disc_df.groupby(['competency'])['indicator'].apply(list).to_string())
+        # all_competencies[key].append()
+        raise
+    # for key, value in data.items():
+    #     print(key, value)
     return data, all_competencies
     # for index, row in frame.iterrows():
     #     print(index, row)
