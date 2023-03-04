@@ -461,9 +461,9 @@
                                         <fieldset class="col">
                                             <div><p class="h3">Контрольные работы</p>
                                                 <div class="form-check" id="kr-fields"></div>
-                                                <button id="add_kr" type="button" class="btn btn-primary mt-3" onclick="addKr()">Добавить оценку</button>
+                                                <button id="add_kr" type="button" class="btn btn-primary mt-3" onclick="addKr()">Добавить работу</button>
                                             </div>
-                                            {% if course_work %}
+                                            {% if hours.course_work %}
                                                 <div><p class="h3">Курсовая работа</p>
                                                     <div class="form-check form-switch">
                                                         <label class="form-check-label" for="cw_themes"><p class="h4">Примеры тем для курсовой работы</p></label>
@@ -477,15 +477,15 @@
                                             {% endif %}
                                         </fieldset>
                                         <fieldset class="col">
-                                            {% if exam %}
+                                            {% if hours.exam %}
                                                 <div><p class="h3">Экзаменационные вопросы</p>
                                                     <div class="form-check form-switch">
                                                         <label class="form-check-label" for="eq_theory"><p class="h4">Теоретические вопросы к экзамену</p></label>
-                                                        <textarea class="form-control" id="eq_theory" name="eq_theory"></textarea>
+                                                        <textarea class="form-control" id="eq_theory" name="exam_questions_theory"></textarea>
                                                     </div>
                                                     <div class="form-check form-switch">
                                                         <label class="form-check-label" for="eq_tasks"><p class="h4">Практические задания к экзамену</p></label>
-                                                        <textarea class="form-control" id="eq_tasks" name="eq_tasks"></textarea>
+                                                        <textarea class="form-control" id="eq_tasks" name="exam_questions_tasks"></textarea>
                                                     </div>
                                                 </div>
                                             {% else %}

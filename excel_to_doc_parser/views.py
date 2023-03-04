@@ -1,6 +1,7 @@
 import datetime
 import os.path
 import os.path
+import random
 import shutil
 from difflib import SequenceMatcher
 from os.path import join
@@ -81,13 +82,23 @@ def get_current_disciplines() -> list:
 def get_profile_name() -> str:
     df = pd.read_excel(PLANE_PATH, header=None, index_col=None)
     data = df.dropna(axis="columns", how="all").dropna(axis="rows", how="all")
-    for index, row in data.iterrows():
+    for _, row in data.iterrows():
         if "Профиль" in np.array2string(row.values):
             for cell in row.values:
                 if isinstance(cell, str) and "Профиль:" in cell:
                     return cell.replace("Профиль:", "").strip()
     return ""
-    # print(data.to_string())
+
+
+def get_program_code() -> str:
+    df = pd.read_excel(PLANE_PATH, header=None, index_col=None)
+    data = df.dropna(axis="columns", how="all").dropna(axis="rows", how="all")
+    for _, row in data.iterrows():
+        if "по направлению подготовки" in np.array2string(row.values):
+            for cell in row.values:
+                if isinstance(cell, str) and "по направлению подготовки" in cell:
+                    return cell.replace("по направлению подготовки", "").strip()
+    return ""
 
 
 def parse_matrix(filename) -> (dict, dict):
@@ -108,21 +119,11 @@ def parse_matrix(filename) -> (dict, dict):
     all_comps = frame[frame.columns[:2]]
     all_comps.columns = ['competency', 'indicator']
     all_comps.reset_index(drop=True, inplace=True)
-    universal_comp_end = all_comps.loc[all_comps['competency'] == "Общепрофессиональные компетенции и индикаторы"].head().index[0]
-    # universal_comp = all_comps[1:universal_comp_end]
+    universal_comp_end = \
+        all_comps.loc[all_comps['competency'] == "Общепрофессиональные компетенции и индикаторы"].head().index[0]
     common_prof_comp_end = \
-        all_comps.loc[all_comps['competency'].str.strip() == "Профессиональные компетенции и индикаторы"].head().index[0]
-    # common_prof_comp = all_comps[universal_comp_end + 1:common_prof_comp_end]
-    # prof_comp = all_comps[common_prof_comp_end + 1:]
-    # universal_comp.reset_index(drop=True, inplace=True)
-    # universal_comp.columns = ['competency', 'indicator']
-    # universal_comp.set_index('competency')
-    # print(universal_comp.melt('competency', var_name='indicator').set_index(['competency', 'indicator']))
-    # universal_comp = universal_comp.melt('competency', var_name='indicator').set_index(['competency', 'indicator'])
-    # common_prof_comp.columns = ['competency', 'indicator']
-    # common_prof_comp.index -= 2
-    # prof_comp.columns = ['competency', 'indicator']
-    # prof_comp.index -= 3
+        all_comps.loc[all_comps['competency'].str.strip() == "Профессиональные компетенции и индикаторы"].head().index[
+            0]
     relation_matrix = frame[frame.columns[2:]]
     relation_matrix.drop([0, universal_comp_end, common_prof_comp_end], axis=0, inplace=True)
     relation_matrix.reset_index(drop=True, inplace=True)
@@ -136,8 +137,6 @@ def parse_matrix(filename) -> (dict, dict):
     disciplines.pop("ИНДИКАТОРЫ", None)
     for key, value in disciplines.items():
         relation_column = relation_matrix.iloc[:, value - 3]
-        matrix_of_indicators = []
-        list_of_indicators = []
         data[key] = {}
         all_competencies[key] = []
         data[key]['universal_competencies'] = []
@@ -147,11 +146,8 @@ def parse_matrix(filename) -> (dict, dict):
         current_discipline_relation = pd.concat([all_indicators, relation_column], axis=1)
         current_discipline_relation.columns = ['indicator', 'value']
         current_discipline_relation = current_discipline_relation[current_discipline_relation['value'].notna()]
-        all_comp_for_disc = {}
-        all_comp_for_disc['competency'] = []
-        all_comp_for_disc['indicator'] = []
+        all_comp_for_disc = {'competency': [], 'indicator': []}
         for i, values in current_discipline_relation.iterrows():
-            # print(i, values)
             if i % 3 == 2:
                 comp_name_index = i - 2
             elif i % 3 == 1:
@@ -161,15 +157,69 @@ def parse_matrix(filename) -> (dict, dict):
             all_comp_for_disc['competency'].append(all_competencies_names.iloc[comp_name_index // 3])
             all_comp_for_disc['indicator'].append(values['indicator'])
         all_comp_for_disc_df = pd.DataFrame.from_dict(all_comp_for_disc)
-        print(all_comp_for_disc_df.groupby(['competency'])['indicator'].apply(list).to_string())
-        # all_competencies[key].append()
-        raise
-    # for key, value in data.items():
-    #     print(key, value)
+        all_comp_for_disc_df = all_comp_for_disc_df.groupby(['competency'])['indicator'].apply(list)
+        all_comp_for_disc_df = all_comp_for_disc_df.to_frame()
+        for i, values in all_comp_for_disc_df.iterrows():
+            indicators = []
+            for indicator in values['indicator']:
+                indicators.append([
+                    indicator.split(" ")[0],
+                    ' '.join(word for word in indicator.split(" ")[1:]).strip()
+                ])
+            all_competencies[key].append({
+                'competency_code': i.split(".")[0],
+                'competency_name': ' '.join(word for word in i.split(" ")[1:]).strip(),
+                'indicators': indicators
+            })
+            if i.startswith("УК"):
+                data[key]['universal_competencies'].append({
+                    'competency_code': i.split(".")[0],
+                    'competency_name': ' '.join(word for word in i.split(" ")[1:]).strip(),
+                    'indicators': indicators
+                })
+            elif i.startswith("ОПК"):
+                data[key]['general_professional_competencies'].append({
+                    'competency_code': i.split(".")[0],
+                    'competency_name': ' '.join(word for word in i.split(" ")[1:]).strip(),
+                    'indicators': indicators
+                })
+            else:
+                data[key]['professional_competencies'].append({
+                    'competency_code': i.split(".")[0],
+                    'competency_name': ' '.join(word for word in i.split(" ")[1:]).strip(),
+                    'indicators': indicators
+                })
     return data, all_competencies
-    # for index, row in frame.iterrows():
-    #     print(index, row)
-    # print(all_competencies)
+
+
+def hours_to_zet(z):
+    h = round(z / 36, 1)
+    if h == int(h):
+        return int(h)
+    else:
+        return h
+
+
+def number_to_words(n):
+    less_than_ten = {1: 'первом', 2: 'втором', 3: 'третьем', 4: 'четвёртом',
+                     5: 'пятом', 6: 'шестом', 7: 'седьмом', 8: 'восьмом',
+                     9: 'девятом'}
+    ten = {10: 'десятом'}
+    from_eleven_to_nineteen = {11: 'одиннадцатом', 12: 'двенадцатом',
+                               13: 'тринадцатом', 14: 'четырнадцатом',
+                               15: 'пятнадцатом', 16: 'шестнадцатом',
+                               17: 'семнадцатом', 18: 'восемнадцатом',
+                               19: 'девятнадцатом'}
+    n1 = n % 10
+    n2 = n - n1
+    if n < 10:
+        return less_than_ten.get(n)
+    elif 10 < n < 20:
+        return from_eleven_to_nineteen.get(n)
+    elif n >= 10 and n in ten:
+        return ten.get(n)
+    else:
+        return ten.get(n2) + ' ' + less_than_ten.get(n1)
 
 
 @login_required(login_url='/login/')
@@ -180,10 +230,10 @@ def documents(request):
     if request.method == "POST":
         if request.POST.get("generate"):
             folder = join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files/docx")
-            data = parse_plane(PLANE_PATH)["Основные дисциплины"]
+            data_df = parse_plane(PLANE_PATH)["Основные дисциплины"]
             header = get_header(PLANE_PATH)
             hours = {}
-            for i, row in data[header['Название дисциплины']].items():
+            for i, row in data_df[header['Название дисциплины']].items():
                 if not ("блок" in row.lower() or "часть" in row.lower() or "дисциплины" in row.lower()):
                     if "*" in row:
                         row = row[:row.find("*")].strip()
@@ -194,18 +244,18 @@ def documents(request):
                     hours[row]["srs"] = []
                     hours[row]["exam"] = []
                     hours[row]["test"] = []
-                    if not pd.isna(data.iloc[i - 1][header["Лекции"]]):
-                        hours[row]["lections"].append(data.iloc[i - 1][header["Лекции"]])
-                    if not pd.isna(data.iloc[i - 1][header["Семинары и практические занятия"]]):
-                        hours[row]["seminars"].append(data.iloc[i - 1][header["Семинары и практические занятия"]])
-                    if not pd.isna(data.iloc[i - 1][header["Лабораторные работы"]]):
-                        hours[row]["labs"].append(data.iloc[i - 1][header["Лабораторные работы"]])
-                    if not pd.isna(data.iloc[i - 1][header["СРС"]]):
-                        hours[row]["srs"].append(data.iloc[i - 1][header["СРС"]])
-                    if not pd.isna(data.iloc[i - 1][header["Экзамены"]]):
-                        hours[row]["exam"].append(data.iloc[i - 1][header["Экзамены"]])
-                    if not pd.isna(data.iloc[i - 1][header["Зачёты"]]):
-                        hours[row]["test"].append(data.iloc[i - 1][header["Зачёты"]])
+                    if not pd.isna(data_df.iloc[i - 1][header["Лекции"]]):
+                        hours[row]["lections"].append(data_df.iloc[i - 1][header["Лекции"]])
+                    if not pd.isna(data_df.iloc[i - 1][header["Семинары и практические занятия"]]):
+                        hours[row]["seminars"].append(data_df.iloc[i - 1][header["Семинары и практические занятия"]])
+                    if not pd.isna(data_df.iloc[i - 1][header["Лабораторные работы"]]):
+                        hours[row]["labs"].append(data_df.iloc[i - 1][header["Лабораторные работы"]])
+                    if not pd.isna(data_df.iloc[i - 1][header["СРС"]]):
+                        hours[row]["srs"].append(data_df.iloc[i - 1][header["СРС"]])
+                    if not pd.isna(data_df.iloc[i - 1][header["Экзамены"]]):
+                        hours[row]["exam"].append(data_df.iloc[i - 1][header["Экзамены"]])
+                    if not pd.isna(data_df.iloc[i - 1][header["Зачёты"]]):
+                        hours[row]["test"].append(data_df.iloc[i - 1][header["Зачёты"]])
             for filename in os.listdir(folder):
                 file_path = os.path.join(folder, filename)
                 if filename == ".gitkeep":
@@ -219,25 +269,38 @@ def documents(request):
                     print('An error appear ' + str(e))
             data, all_competencies = parse_matrix(MATRIX_PATH)
             discipline = Document.objects.get(pk=request.POST.get('document')).document_name
-            data["program_name"] = discipline
-            # # data["program_code"] = Document.objects.get(
-            # #     pk=request.POST.get('document')).profile_name
-            # data["program_code"] = Document.objects.get(
-            #     pk=request.POST.get('document')).program_name.work_program.profile_name
-            # data["program_code"] = Document.objects.get(
-            #     pk=request.POST.get('document')).program_name.work_program.year_start
-            data["current_year"] = datetime.date.today().year
             try:
-                context_plane = get_info_from_education_plane(PLANE_PATH)[
-                    discipline]
+                context_plane_df = data_df[data_df[header['Название дисциплины']] == discipline]
             except KeyError:
-                for error_key in get_info_from_education_plane(PLANE_PATH):
+                for error_key in data_df[header['Название дисциплины']]:
                     if SequenceMatcher(None, discipline, error_key).ratio() >= 0.75:
-                        context_plane = get_info_from_education_plane(PLANE_PATH)[error_key]
+                        context_plane_df = data_df[data_df[header['Название дисциплины']] == error_key]
                         break
+            context_plane = {
+                'intensity_ZET': int(context_plane_df[header['Всего, ЗЕТ']].values[0]),
+                'intensity_hours': int(context_plane_df[header['ВСЕГО по структуре']].values[0]),
+                'total_homework_hours': int(context_plane_df[header['СРС']].values[0]), 'courses': []
+            }
             context_plane['intensity_ZET_check'] = check_number(context_plane['intensity_ZET'])
             context_plane['intensity_hours_check'] = check_number(context_plane['intensity_hours'])
             context_plane['total_homework_hours_check'] = check_number(context_plane['total_homework_hours'])
+
+            for key in header:
+                if "семестр" in key:
+                    if not pd.isna(context_plane_df[header[key]].values[0]):
+                        context_plane['courses'].append({
+                            'ZET': hours_to_zet(int(context_plane_df[header[key]].values[0]) + int(
+                                context_plane_df[header['СРС']].values[0])),
+                            'hours': int(context_plane_df[header[key]].values[0]) + int(
+                                context_plane_df[header['СРС']].values[0]),
+                            'homework_time': int(context_plane_df[header['СРС']].values[0]),
+                            'semester': number_to_words(int(key.split(" ")[0])),
+                            'course': number_to_words(int(round(int(key.split(" ")[0]) / 2 + 0.1))),
+                            'exam': context_plane_df[header['Экзамены']].values[0] if not pd.isna(
+                                context_plane_df[header['Экзамены']].values[0]) and key.split(" ")[0] in context_plane_df[header['Экзамены']].values[0] else "",
+                            'test': context_plane_df[header['Зачёты']].values[0] if not pd.isna(
+                                context_plane_df[header['Зачёты']].values[0]) and key.split(" ")[0] in context_plane_df[header['Зачёты']].values[0] else ""
+                        })
             for i, _ in enumerate(context_plane['courses']):
                 context_plane['courses'][i]['ZET_check'] = check_number(context_plane['courses'][i]['ZET'])
                 context_plane['courses'][i]['hours_check'] = check_number(context_plane['courses'][i]['hours'])
@@ -246,16 +309,21 @@ def documents(request):
             try:
                 context_plane["hours"] = hours[discipline]
             except KeyError:
-                for error_key in get_info_from_education_plane(PLANE_PATH):
+                for error_key in data_df[header['Название дисциплины']]:
                     if SequenceMatcher(None, discipline, error_key).ratio() >= 0.75:
                         context_plane["hours"] = hours[error_key]
                         break
             doc = DocxTemplate(TEMPLATE_PATH)
             data = dict(data[discipline], **xml_parser(request))
-            data['all_comp'] = list(np.concatenate(all_competencies[discipline]))
+            data['all_comp'] = all_competencies[discipline]
             data['dean'] = "Д.Г. Демидов"
             data['head_of_faculty'] = "Е.В. Пухова"
             data['rop'] = "М.В. Даньшина"
+            data["program_name"] = discipline
+            data["current_year"] = datetime.date.today().year
+            data["program_code"] = Document.objects.get(pk=request.POST.get('document')).program_code
+            data["profile_name"] = Document.objects.get(pk=request.POST.get('document')).profile_name
+            data["year_start"] = data['current_year']
             doc.render(dict(data, **context_plane))
             for i in range(len(doc.tables)):
                 table = doc.tables[i]._tbl
@@ -263,7 +331,7 @@ def documents(request):
                     if len(row.cells) and len(row.cells[0].text.strip()) == 0 and len(set(row.cells)) == 1:
                         table.remove(row._tr)
             doc.save(join(str(BASE_DIR), folder, "{}.docx".format(discipline)))
-            context['path'] = join(folder + "{}.docx".format(discipline))
+            context['path'] = join(folder, "{}.docx".format(discipline))
             context['name'] = discipline + '.docx'
             return redirect("/download/?file={}&name=".format(context['path'], context["name"]))
         program_name = request.POST.get("program_name")
@@ -271,7 +339,7 @@ def documents(request):
         status = request.POST.get("status")
         user = request.user.id
         new_document = Document(link_to_xml_id=link, status_id=status, user_id=user, document_name=program_name,
-                                profile_name=get_profile_name())
+                                profile_name=get_profile_name(), program_code=get_program_code())
         new_document.save()
         return redirect('/documents')
     return render(request, "./docx_creation/document.html", context)
@@ -429,9 +497,48 @@ def mark_criteries_parser(part, content):
 
 
 def fos_parser(part, content):
-    data = []
+    data = {
+        'kr': {},
+        'course_work': {},
+        'exam_questions': {},
+        'test_questions': [],
+        'example_exam_questions': [],
+        'example_exam_task': ''
+    }
+    data['exam_questions']['theory'] = []
+    data['exam_questions']['tasks'] = []
+    data['course_work']['themes'] = []
+    data['course_work']['contents'] = []
     for field in part:
-        print(field)
+        if field.getchildren():
+            if field.tag == "kr":
+                for i, questions in enumerate(field.getchildren()):
+                    data['kr'][i] = []
+                    for question in questions:
+                        data['kr'][i].append(question.text)
+            elif field.tag == 'course_work':
+                for theme in field.getchildren()[0]:
+                    data['course_work']['themes'].append(theme.text)
+                for content in field.getchildren()[1]:
+                    data['course_work']['contents'].append(content.text)
+            elif field.tag == 'exam_questions':
+                for question in field.getchildren()[0]:
+                    data['exam_questions']['theory'].append(question.text)
+                for tasks in field.getchildren()[1]:
+                    data['exam_questions']['tasks'].append(tasks.text)
+            else:
+                for question in field:
+                    data['test_questions'].append(question.text)
+    print(data)
+    for key in data:
+        data[key] = {k: v for k, v in data[key].items() if v} if isinstance(data[key], dict) else data[key]
+
+    if data['exam_questions']:
+        data['example_exam_questions'] = random.sample(data['exam_questions']['theory'], 2)
+        data['example_exam_task'] = random.sample(data['exam_questions']['tasks'], 1)
+    print(data)
+    content['fos'] = data
+    return content
 
 
 def xml_parser(request) -> dict:
@@ -441,7 +548,7 @@ def xml_parser(request) -> dict:
             translit("{}.xml".format(
                 Document.objects.get(
                     pk=request.POST.get("document")
-                ).program_name.program_name).replace(" ", "_"), "ru", reversed=True))
+                ).document_name).replace(" ", "_"), "ru", reversed=True))
         ).content
     )
     content = {}
@@ -540,7 +647,6 @@ def document_information(request):
             # context["last_values"] = xml_parser(request)
             context["document"] = request.POST.get("document")
             context["theme"] = Document.objects.get(pk=request.POST.get("document")).document_name
-        print(hours)
         context["hours"] = hours[context["theme"]]
     return render(request, "./docx_creation/targets.html", context)
 
@@ -843,43 +949,48 @@ def generate_xml(request):
         for element in request.POST.getlist("kr"):
             questions = etree.Element("questions")
             for quest in element.split(";"):
-                question = etree.Element("questions")
+                question = etree.Element("question")
                 question.text = quest
                 questions.append(question)
             kr.append(questions)
 
-        cw_themes = etree.Element("themes")
-        for element in request.POST.get("course_work_themes").split(";"):
-            theme = etree.Element("theme")
-            theme.text = element
-            cw_themes.append(theme)
-        course_work.append(cw_themes)
+        if request.POST.get("course_work_themes"):
+            cw_themes = etree.Element("themes")
+            for element in request.POST.get("course_work_themes").split(";"):
+                theme = etree.Element("theme")
+                theme.text = element
+                cw_themes.append(theme)
+            course_work.append(cw_themes)
 
-        cw_contents = etree.Element("contents")
-        for element in request.POST.get("course_work_contents").split(";"):
-            content = etree.Element("content")
-            content.text = element
-            cw_contents.append(content)
-        course_work.append(cw_contents)
+        if request.POST.get("course_work_contents"):
+            cw_contents = etree.Element("contents")
+            for element in request.POST.get("course_work_contents").split(";"):
+                content = etree.Element("content")
+                content.text = element
+                cw_contents.append(content)
+            course_work.append(cw_contents)
 
-        eq_theory = etree.Element("theory")
-        for element in request.POST.get("exam_questions_theory").split(";"):
-            question = etree.Element("question")
-            question.text = element
-            eq_theory.append(question)
-        exam_questions.append(eq_theory)
+        if request.POST.get("exam_questions_theory"):
+            eq_theory = etree.Element("theory")
+            for element in request.POST.get("exam_questions_theory").split(";"):
+                question = etree.Element("question")
+                question.text = element
+                eq_theory.append(question)
+            exam_questions.append(eq_theory)
 
-        eq_tasks = etree.Element("tasks")
-        for element in request.POST.get("exam_questions_tasks").split(";"):
-            task = etree.Element("task")
-            task.text = element
-            eq_tasks.append(task)
-        exam_questions.append(eq_tasks)
+        if request.POST.get("exam_questions_tasks"):
+            eq_tasks = etree.Element("tasks")
+            for element in request.POST.get("exam_questions_tasks").split(";"):
+                task = etree.Element("task")
+                task.text = element
+                eq_tasks.append(task)
+            exam_questions.append(eq_tasks)
 
-        for element in request.POST.get("test_questions").split(";"):
-            question = etree.Element("question")
-            question.text = element
-            test_questions.append(question)
+        if request.POST.get("test_questions"):
+            for element in request.POST.get("test_questions").split(";"):
+                question = etree.Element("question")
+                question.text = element
+                test_questions.append(question)
 
     except Exception as exc:
         print(exc)
@@ -946,7 +1057,9 @@ def result(request):
 
 
 def download(request):
-    file = join(str(BASE_DIR), request.GET.get('file'))
+    file = join(str(BASE_DIR) + "/", request.GET.get('file'))
+    print(file)
+    print(request.GET.get('file'))
     response = FileResponse(open(file, 'rb'), as_attachment=True,
                             content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
     response['Content-Length'] = os.path.getsize(file)

@@ -66,6 +66,7 @@ class Document(models.Model):
     link_to_xml = models.ForeignKey(Link, on_delete=models.CASCADE)
     document_name = models.CharField(max_length=512, default="")
     profile_name = models.CharField(max_length=512, default="")
+    program_code = models.CharField(max_length=512, default="")
 
 
 # class Theme(models.Model):
