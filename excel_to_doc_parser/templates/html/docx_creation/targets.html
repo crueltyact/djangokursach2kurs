@@ -84,6 +84,12 @@
                                     <!--                                    ФОС-->
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#step-13">
+                                    <span class="num">13</span>
+                                    <!--                                    ФОС-->
+                                </a>
+                            </li>
                         </ul>
 
                         <div class="tab-content">
@@ -455,6 +461,33 @@
                                 </div>
                             </div>
                             <div id="step-12" class="tab-pane" role="tabpanel" aria-labelledby="step-12">
+                                <div class="mb-3">
+                                    <label for="tasks_from_file" class="form-label"><p class="h2">Фонд оценочных средств</p></label>
+                                    <div class="row">
+                                        <div><p class="h3">Примерный перечень оценочных средств</p>
+                                            <fieldset class="col">
+                                                {% for os in os_list %}
+                                                    <div class="row os">
+                                                        <div class="form-check form-switch">
+                                                            <input class="form-check-input" id="os_{{ forloop.counter }}" name="os_name" type="checkbox"></input>
+                                                            <label class="form-check-label" for="os_{{ forloop.counter }}" data-toggle="tooltip" data-placement="top" title="{{ os.description }}"><p class="h4">
+                                                                {{ os.name }}</p></label>
+                                                            <input type="hidden" value="{{ os.short_name }}">
+                                                        </div>
+                                                        <div class="form-check form-switch">
+                                                            <label class="form-check-label" for="os_content_{{ forloop.counter }}"><p class="h4">Представление оценочного средства в ФОС</p></label>
+                                                            <textarea class="form-control" id="os_content_{{ forloop.counter }}" name="os_content"></textarea>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                                <input type="hidden" name="os" id="os">
+                                                <input type="hidden" name="all_os" id="all_os">
+                                            </fieldset>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="step-13" class="tab-pane" role="tabpanel" aria-labelledby="step-13">
                                 <div class="mb-3">
                                     <label for="tasks_from_file" class="form-label"><p class="h2">Фонд оценочных средств</p></label>
                                     <div class="row">

@@ -413,9 +413,23 @@ function generate_output() {
     all_marks.setAttribute("type", "hidden");
     all_marks.setAttribute("name", "all_marks");
     document.getElementById("marks").appendChild(all_marks);
+    let os = document.getElementById("os")
+    let os_desc_list = document.getElementsByClassName("os")
+    let all_os = document.getElementById("all_os")
+    let output_os = ""
+    let output_all_os = ""
+    for (let os_desc of os_desc_list) {
+        if (os_desc.children[0].children[0].checked) {
+            output_os += os_desc.children[0].children[1].children[0].textContent + "::" + os_desc.children[0].children[1].getAttribute('data-bs-original-title') + "::" + os_desc.children[1].children[1].value + ";;"
+            output_all_os += os_desc.children[0].children[2].value + ", "
+        }
+    }
+    os.value = output_os
+    all_os.value = output_all_os
 }
 
 let kr_amount = 0
+
 function addKr() {
     let parent = document.getElementById("kr-fields")
     let textarea = document.createElement("textarea")
@@ -522,7 +536,9 @@ function fix_textareas() {
 }
 
 window.onload = function () {
-    let max_hours = document.getElementById("max_hours");
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
     document.getElementById("score_system").addEventListener('change', function () {
         if (this.checked) {
             document.getElementById("brs").className = "mb-3";

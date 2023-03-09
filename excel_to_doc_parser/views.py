@@ -8,7 +8,6 @@ from os.path import join
 from pathlib import Path
 
 import boto3 as boto3
-import numpy
 import numpy as np
 import pandas as pd
 import requests
@@ -22,9 +21,9 @@ from dotenv import load_dotenv
 from lxml import etree
 from transliterate import translit
 
+from docx import Document as Doc
+
 from excel_to_doc_parser.models import CustomUser, Role, Document
-from excel_to_doc_parser.py.parser import get_info_from_excel
-from excel_to_doc_parser.py.parser_plane import get_info_from_education_plane
 from parser_server.settings import BASE_DIR, MEDIA_ROOT
 
 PLANE_PATH = join(MEDIA_ROOT, "excel", "planes", "18048 09.03.01 ВЕБ ОФО 2022.xlsx")
@@ -503,7 +502,8 @@ def fos_parser(part, content):
         'exam_questions': {},
         'test_questions': [],
         'example_exam_questions': [],
-        'example_exam_task': ''
+        'example_exam_task': '',
+        'os': []
     }
     data['exam_questions']['theory'] = []
     data['exam_questions']['tasks'] = []
@@ -526,10 +526,14 @@ def fos_parser(part, content):
                     data['exam_questions']['theory'].append(question.text)
                 for tasks in field.getchildren()[1]:
                     data['exam_questions']['tasks'].append(tasks.text)
+            elif field.tag == 'os_list':
+                for os_list in field.getchildren():
+                    data['os'].append([child.text for child in os_list.getchildren()])
             else:
                 for question in field:
                     data['test_questions'].append(question.text)
-    print(data)
+        if field.tag == 'all_os':
+            data['all_os'] = field.text
     for key in data:
         data[key] = {k: v for k, v in data[key].items() if v} if isinstance(data[key], dict) else data[key]
 
@@ -612,6 +616,15 @@ def document_information(request):
                         "сформированность компетенций",
                         "оформление материала в соответствии с требованиями"],
             "optional": []}
+        document = Doc(join(BASE_DIR, "excel_to_doc_parser", "py", "Primerny_perechen_otsenochnykh_sredstv.docx"))
+        table = document.tables[0]
+        context['os_list'] = []
+        for row in table.rows[1:]:
+            context['os_list'].append({
+                'name': row.cells[0].text,
+                'description': row.cells[1].text,
+                'short_name': row.cells[2].text
+            })
         data = parse_plane(PLANE_PATH)["Основные дисциплины"]
         header = get_header(PLANE_PATH)
         hours = {}
@@ -945,14 +958,17 @@ def generate_xml(request):
     course_work = etree.Element("course_work")
     exam_questions = etree.Element("exam_questions")
     test_questions = etree.Element("test_questions")
+    os_list = etree.Element("os_list")
+    all_os = etree.Element("all_os")
     try:
-        for element in request.POST.getlist("kr"):
-            questions = etree.Element("questions")
-            for quest in element.split(";"):
-                question = etree.Element("question")
-                question.text = quest
-                questions.append(question)
-            kr.append(questions)
+        if request.POST.getlist('kr'):
+            for element in request.POST.getlist("kr"):
+                questions = etree.Element("questions")
+                for quest in element.split(";"):
+                    question = etree.Element("question")
+                    question.text = quest
+                    questions.append(question)
+                kr.append(questions)
 
         if request.POST.get("course_work_themes"):
             cw_themes = etree.Element("themes")
@@ -992,12 +1008,32 @@ def generate_xml(request):
                 question.text = element
                 test_questions.append(question)
 
+        if request.POST.get('os'):
+            for element in request.POST.get('os').split(";;"):
+                if element:
+                    os_element = etree.Element("os")
+                    name = etree.Element("name")
+                    name.text = element.split("::")[0].strip()
+                    os_element.append(name)
+                    description = etree.Element("description")
+                    description.text = element.split("::")[1].strip()
+                    os_element.append(description)
+                    os_content = etree.Element("content")
+                    os_content.text = element.split("::")[2].strip()
+                    os_element.append(os_content)
+                    os_list.append(os_element)
+
+        if request.POST.get('all_os'):
+            all_os.text = request.POST.get("all_os").strip()[:-1]
+
     except Exception as exc:
         print(exc)
     fos.append(kr)
     fos.append(course_work)
     fos.append(exam_questions)
     fos.append(test_questions)
+    fos.append(os_list)
+    fos.append(all_os)
     root.append(fos)
     path_to_save = join(str(BASE_DIR), "excel_to_doc_parser\\media\\generated_files\\xml\\{}".format(request.user.id))
     Path(path_to_save).mkdir(parents=True, exist_ok=True)
@@ -1058,8 +1094,6 @@ def result(request):
 
 def download(request):
     file = join(str(BASE_DIR) + "/", request.GET.get('file'))
-    print(file)
-    print(request.GET.get('file'))
     response = FileResponse(open(file, 'rb'), as_attachment=True,
                             content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
     response['Content-Length'] = os.path.getsize(file)
