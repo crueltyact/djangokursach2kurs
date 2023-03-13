@@ -1040,8 +1040,7 @@ def generate_xml(request):
     # filename = "{}-{}.xml".format(Document.objects.get(pk=request.POST.get("document")).program_name.program_name,
     #                               datetime.date.today().strftime("%m.%d.%Y"))
     filename = translit(
-        "{}.xml".format(Document.objects.get(pk=request.POST.get("document")).document_name).replace(" ",
-                                                                                                     "_"),
+        "{}.xml".format(Document.objects.get(pk=request.POST.get("document")).document_name).replace(" ", "_"),
         "ru", reversed=True)
     tree.write(join(str(BASE_DIR), path_to_save, filename), encoding="UTF-8", xml_declaration=True, pretty_print=True)
     upload_xml_to_s3(request, filename, path_to_save)

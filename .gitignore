@@ -1,6 +1,14 @@
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,pycharm+all,windows,linux
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,pycharm+all,windows,linux
+# Created by https://www.toptal.com/developers/gitignore/api/putty
+# Edit at https://www.toptal.com/developers/gitignore?templates=putty
+
+### PuTTY ###
+# Private key
+*.ppk
+
+# End of https://www.toptal.com/developers/gitignore/api/putty
 
 ### Linux ###
 *~
