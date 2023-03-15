@@ -25,8 +25,8 @@ from docx import Document as Doc
 from excel_to_doc_parser.models import CustomUser, Role, Document
 from parser_server.settings import BASE_DIR, MEDIA_ROOT
 
-PLANE_PATH = join(MEDIA_ROOT, "excel", "planes", "18048 09.03.01 ВЕБ ОФО 2022.xlsx")
-MATRIX_PATH = join(MEDIA_ROOT, "excel", "matrices", "Матрица ВЕБ.xlsx")
+PLANE_PATH = join(MEDIA_ROOT, "excel", "planes", "18048 09.03.01 WEB OFO 2022.xlsx")
+MATRIX_PATH = join(MEDIA_ROOT, "excel", "matrices", "Matrix WEB.xlsx")
 TEMPLATE_PATH = join(BASE_DIR, "excel_to_doc_parser", "py", "template.docx")
 
 
