@@ -407,7 +407,6 @@ def sections_content_parser(part, content):
             data.append([field[0].text, int(field[1].text), int(field[2].text), int(field[3].text), int(field[4].text),
                          field[5].text])
     content["sections"] = data
-    print(data)
     return content
 
 
@@ -539,7 +538,6 @@ def fos_parser(part, content):
     if data['exam_questions']:
         data['example_exam_questions'] = random.sample(data['exam_questions']['theory'], 2)
         data['example_exam_task'] = random.sample(data['exam_questions']['tasks'], 1)
-    print(data)
     content['fos'] = data
     return content
 
@@ -716,7 +714,6 @@ def generate_xml(request):
         for element in request.POST.get("all_sections").split(";"):
             if element:
                 data = element.split(":")
-                print(data)
                 section = etree.Element("section")
                 section_name = etree.Element("section_name")
                 section_name.text = data[0]
