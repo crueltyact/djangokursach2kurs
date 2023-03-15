@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
+import locale
 import os
 import sys
 import dotenv
@@ -7,6 +8,7 @@ import dotenv
 
 def main():
     dotenv.read_dotenv()
+    locale.setlocale(locale.LC_ALL, 'ru_RU')
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'parser_server.settings')
     try:
