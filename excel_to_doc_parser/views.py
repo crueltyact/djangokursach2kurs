@@ -17,7 +17,6 @@ from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponseForbidden, FileResponse
 from django.shortcuts import render, redirect
 from docxtpl import DocxTemplate
-from dotenv import load_dotenv
 from lxml import etree
 from transliterate import translit
 
@@ -1048,7 +1047,6 @@ def generate_xml(request):
 
 
 def upload_xml_to_s3(request, filename, filepath):
-    load_dotenv()
     session = boto3.session.Session()
     s3 = session.client(
         service_name='s3',
@@ -1062,7 +1060,6 @@ def upload_xml_to_s3(request, filename, filepath):
 
 
 def download_xml_from_s3(request, filename):
-    load_dotenv()
     session = boto3.session.Session()
     s3 = session.client(
         service_name='s3',
