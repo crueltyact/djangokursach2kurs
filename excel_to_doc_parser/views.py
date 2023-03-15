@@ -328,7 +328,7 @@ def documents(request):
                 for row in doc.tables[i].rows:
                     if len(row.cells) and len(row.cells[0].text.strip()) == 0 and len(set(row.cells)) == 1:
                         table.remove(row._tr)
-            doc.save(join(str(BASE_DIR), folder, "{}.docx".format(discipline)))
+            doc.save(join(str(BASE_DIR), folder, "{}.docx".format(discipline.encode('utf-8').decode('utf-8'))))
             context['path'] = join(folder, "{}.docx".format(discipline))
             context['name'] = discipline + '.docx'
             return redirect("/download/?file={}&name=".format(context['path'], context["name"]))
