@@ -1,0 +1,103 @@
+{% include 'base/header.html' %}
+{% load static %}
+<body>
+{% include 'base/body.html' %}
+{% block body %}
+<div class="main">
+    <div class="container h-100">
+        <div class="row d-flex h-100">
+            {% include 'base/menu.html' %}
+            <fieldset class="col-9 pt-5">
+                <form method="post" action="/document_information/?document={{ document }}">
+                    {% csrf_token %}
+                    <div class="row mb-3">
+                        <label for="discipline" class="col-sm-2 col-form-label">Дисциплина</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="discipline" class="form-control" id="discipline" value="{{ discipline }}">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="profile" class="col-sm-2 col-form-label">Профиль</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="profile" class="form-control" id="profile" value="{{ profile }}">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="status" class="col-sm-2 col-form-label">Текущее состояние</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="status" class="form-control" id="status" value="{{ status }}">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="course" class="col-sm-2 col-form-label">Эл. курс</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="course" class="form-control" id="course">
+                        </div>
+                    </div>
+                    <fieldset class="row mb-3">
+                        <legend class="col-form-label col-sm-2 pt-0">Файлы</legend>
+                        <div class="col-sm-10 offset-sm-2">
+                            <div class="form-check">
+                                <input class="form-check-input" name="rpd" value="rpd" type="checkbox" id="rpd">
+                                <label class="form-check-label" for="rpd">
+                                    РПД
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" name="plan" value="plan" type="checkbox" id="plan">
+                                <label class="form-check-label" for="plan">
+                                    Учебный план
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" name="matrix" value="matrix" type="checkbox" id="matrix">
+                                <label class="form-check-label" for="matrix">
+                                    Матрца
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" name="obr" value="obr" type="checkbox" id="obr">
+                                <label class="form-check-label" for="obr">
+                                    Обр.пр.
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" name="method" value="method" type="checkbox" id="method">
+                                <label class="form-check-label" for="method">
+                                    Метод
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" name="review" value="review" type="checkbox" id="review">
+                                <label class="form-check-label" for="review">
+                                    Рецензия
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" name="annotation" value="annotation" type="checkbox" id="annotation">
+                                <label class="form-check-label" for="annotation">
+                                    Аннотация
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" name="fos" value="fos" type="checkbox" id="fos">
+                                <label class="form-check-label" for="fos">
+                                    ФОС
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <input type="hidden" name="document" value="{{ document }}">
+                    <button type="submit" name="edit" value="edit" class="btn btn-primary">Изменить</button>
+                    <button type="submit" name="create" value="create" class="btn btn-primary">Создать</button>
+                </form>
+            </fieldset>
+        </div>
+    </div>
+</div>
+{% endblock %}
+<!-- <footer class="footer">
+    <p>&copy Лучшая команда КИС 2022</p>
+</footer> -->
+{% include 'base/scripts.html' %}
+</body>

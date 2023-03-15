@@ -1,0 +1,68 @@
+{% include 'base/header.html' %}
+{% load static %}
+<body>
+{% include 'base/body.html' %}
+{% block body %}
+<div class="main">
+    <div class="container h-100">
+        <div class="row d-flex h-100">
+            {% include 'base/menu.html' %}
+            <div class="col-9 pt-5">
+                <div class="feedback">
+                    <div class="feedback__title">Спасибо, что пользуетесь нашей программой!</div>
+                    <div class="feedback__suptitle">Контакты нашей команды, которая участвовала в разработке:</div>
+                    <div class="feedback-cards">
+                        <!--card-->
+                        <div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h5 class="card-title">Логачёв Максим Сергеевич</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">Руководитель проекта</h6>
+                                <p class="card-phone">Контактный телефон: <br> <span>Заполнить</span></p>
+                                <p class="card-email">Почта: <br> <span>Заполнить</span></p>
+                            </div>
+                        </div>
+                        <!--/card-->
+                        <!--card-->
+                        <div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h5 class="card-title">Ткачёв Андрей Владимирович</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">Fullstack developer</h6>
+                                <p class="card-phone">Контактный телефон: <br> <a href="tel: +798525541989">+7 (985) 255-41-98</a></p>
+                                <p class="card-email">Почта: <br> <a href="mailto: Andrew@Tkacheff.su">Andrew@Tkacheff.su</a></p>
+                            </div>
+                        </div>
+                        <!--/card-->
+                        <!--card-->
+                        <div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h5 class="card-title">Углов Артём Евгеньевич</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">HR-Manager</h6>
+                                <p class="card-phone">Контактный телефон: <br> <a href="tel: +79236139055">+7 (923) 613-90-55</a></p>
+                                <p class="card-email">Почта: <br> <a href="mailto:artiomuglov@yandex.ru">artiomuglov@yandex.ru</a></p>
+                            </div>
+                        </div>
+                        <!--/card-->
+                        <!--card-->
+                        <div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h5 class="card-title">Тимашов Пётр Валерьевич</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">Back-end developer</h6>
+                                <p class="card-phone">Контактный телефон: <br> <a href="tel: +79685485489">+7 (968) 548-54-89</a></p>
+                                <p class="card-email">Почта: <br> <a href="mailto: kalij2228@gmail.com">kalij2228@gmail.com</a></p>
+                            </div>
+                        </div>
+                        <!--/card-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+<!-- <footer class="footer">
+    <p>&copy Лучшая команда КИС 2022</p>
+</footer> -->
+{% include 'base/scripts.html' %}
+</body>
+
+</html>

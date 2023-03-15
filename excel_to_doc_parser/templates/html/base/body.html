@@ -1,0 +1,24 @@
+<!--Loader-->
+<div class="mask">
+    <div class="lds-ring">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+</div>
+<!--/Loader-->
+<header class="header">
+    <div class="container">
+        <div class="row d-flex">
+            <div class="col text-start">
+                <div class="header__logo">Curriculum Creator</div>
+            </div>
+            <div class="col text-end">
+                <div class="header__user">Вы авторизированы, как <span>{{ custom_user.user }}</span></div>
+            </div>
+        </div>
+    </div>
+</header>
+{% block body %}
+{% endblock %}

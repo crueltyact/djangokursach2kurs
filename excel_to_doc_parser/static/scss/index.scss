@@ -1,0 +1,30 @@
+@import "./normalize";
+@import "./scss-vars/vars";
+@import "./scss-vars/fonts";
+@import "./components/header";
+@import "./components/menu";
+@import "./pages-styles/main";
+@import "./components/footer";
+@import "./pages-styles/registration";
+@import "./pages-styles/authorization";
+@import "./components/preloader";
+@import "./components/preloader";
+@import "./components/canvas";
+@import "./components/cards";
+@import "./pages-styles/feedback";
+@import "../node_modules/bootstrap/scss/bootstrap.scss";
+
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0; 
+}
+
+body {
+    font-family: "Roboto-Regular", sans-serif !important;
+}
+
+.hidden {
+    display: none !important;
+}

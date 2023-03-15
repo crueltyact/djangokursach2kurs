@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../static/css/index.css">
+    <title>Регистрация</title>
+</head>
+
+<body>
+    <!--Loader-->
+    <div class="mask">
+        <div class="lds-ring">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+    <!--/Loader-->
+    <div class="registration">
+        <div class="registration-block">
+            <div class="registration__title">Регистрация <span>Curriculum Creator</span></div>
+            <form method="POST" action="" class="registration-form">
+                <div class="registration-form__block">
+                    <label for="name">Имя:</label>
+                    <input id="name" name="name" type="text">
+                </div>
+                <div class="registration-form__block">
+                    <label for="secondName">Фамилия:</label>
+                    <input id="secondName" name="secondName" type="text">
+                </div>
+                <div class="registration-form__block">
+                    <label for="patronymic">Отчество:</label>
+                    <input id="patronymic" name="patronymic" type="text">
+                </div>
+                <div class="registration-form__block">
+                    <label for="email">Почта:</label>
+                    <input id="email" name="email" type="email">
+                </div>
+                <div class="registration-form__block">
+                    <label for="password">Пароль:</label>
+                    <input id="password" name="password" type="password">
+                </div>
+                <div class="registration-form__block">
+                    <label for="repeat-password">Повторите пароль:</label>
+                    <input id="repeat-password" name="repeat-password" type="password">
+                </div>
+
+                <div>
+                    <button type="submit">Зарегистрироваться</button>
+                </div>
+                <p>Если вы уже зарегистрированы, нажмите <a href="authorization.html"><span>сюда</span></a></p>
+            </form>
+        </div>
+    </div>
+
+    <script src="../../static/js/loader.js"></script>
+    <script src="../../static/js/canvas.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,85 @@
+{% include 'base/header.html' %}
+{% load static %}
+<body>
+{% include 'base/body.html' %}
+{% block body %}
+<div class="main">
+    <div class="container h-100">
+        <div class="row d-flex h-100">
+            {% include 'base/menu.html' %}
+            <fieldset class="col-9 pt-5">
+                <form method="post" action="disciplines.html">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <input type="text" value="Раздел" aria-label="First name" class="form-control" readonly>
+                            <input type="text" value="Часов" aria-label="Last name" class="form-control" readonly>
+                        </div>
+
+                    </div>
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <input type="text" name="section" aria-label="First name" class="form-control">
+                            <input type="text" name="hours" aria-label="Last name" class="form-control">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <input type="text" name="section" aria-label="First name" class="form-control">
+                            <input type="text" name="hours" aria-label="Last name" class="form-control">
+                        </div>
+                    </div>
+                    <!--                    <button type="submit" name="edit" value="edit" class="btn btn-primary">Назад</button>-->
+                    <button type="submit" name="next" value="next" class="btn btn-primary">Далее</button>
+                </form>
+            </fieldset>
+        </div>
+    </div>
+</div>
+{% endblock %}
+<!-- <footer class="footer">
+    <p>&copy Лучшая команда КИС 2022</p>
+</footer> -->
+{% include 'base/scripts.html' %}
+<script>
+    let classwork_hours = {{classwork_hours}};
+    let homework_hours = {{homework_hours}};
+    let classwork = document.querySelectorAll(".classwork");
+    let homework = document.querySelectorAll(".homework");
+    classwork.forEach(el => el.addEventListener('change', event => {
+        let sum = 0;
+        for (let i = 0; i < classwork.length; i++) {
+            let tmp = parseInt(classwork[i].value, 10);
+            if (!isNaN(tmp)) {
+                sum += tmp;
+            }
+        }
+        // console.log(sum)
+        if (sum > classwork_hours) {
+            alert("Вы превысили максимальное допустимое число часов: {{ classwork_hours }}");
+            el.value = 0;
+        }
+        if (sum % 2 !== 0) {
+            alert('Вы ввели нечётное число');
+            el.value = 0;
+        }
+    }));
+    homework.forEach(el => el.addEventListener('change', event => {
+        let sum = 0;
+        for (let i = 0; i < homework.length; i++) {
+            let tmp = parseInt(homework[i].value, 10);
+            if (!isNaN(tmp)) {
+                sum += tmp;
+            }
+        }
+        if (sum > homework_hours) {
+            alert("Вы превысили максимальное допустимое число часов: {{ homework_hours }} ");
+            el.value = 0;
+        }
+        if (sum % 2 !== 0) {
+            alert('Вы ввели нечётное число');
+            el.value = 0;
+        }
+    }));
+</script>
+</body>

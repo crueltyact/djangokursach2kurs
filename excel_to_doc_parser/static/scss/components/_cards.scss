@@ -1,0 +1,66 @@
+@import "../scss-vars/vars";
+
+.card {
+    margin: 10px 10px;
+
+    &-inner {
+
+        button {
+            @include btn-blue;
+            font-size: 14px;
+            margin: 10px 0 10px 11px;
+
+            &:hover {
+                @include btn-blue-hover
+            }
+        }
+    }
+
+    &-module {
+        width: 100%;
+        padding: 15px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+        margin: 10px 0;
+
+        p {
+            cursor: pointer;
+            margin: 0;
+            padding: 5px;
+
+        }
+
+        &__content {
+            transition: 1s ease-in;
+            justify-content: center;
+            flex-direction: column;
+            display: none;  
+        }
+
+        &__cards {
+            display: flex;
+            flex-wrap: wrap;
+        }
+    }
+
+    &-link {
+        text-decoration: none;
+        &__delete {
+            span {
+                color: red;
+            }
+        }
+    }
+
+    &-phone {
+        span {
+            color: $main-blue;
+        }
+    }
+
+    &-email {
+        span {
+            color: $main-blue;
+        }
+    }
+
+}

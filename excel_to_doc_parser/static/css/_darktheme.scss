@@ -1,0 +1,55 @@
+@import "./colors";
+
+.left-half,
+.right-half {
+    float: left;
+    width: 0.95em;
+    height: 1.95em;
+    color: white;
+    text-align: center;
+    margin: 0 1px;
+}
+.left-half:nth-child(1) {
+  border-radius: 1em 0 0 1em;
+  background: $main-black;
+  -webkit-border-radius: 1em 0 0 1em;
+  -moz-border-radius: 1em 0 0 1em;
+  -ms-border-radius: 1em 0 0 1em;
+  -o-border-radius: 1em 0 0 1em;
+}
+.right-half:nth-child(2) {
+  border-radius: 0 1em 1em 0;
+  background: #fff;
+  -webkit-border-radius: 0 1em 1em 0;
+  -moz-border-radius: 0 1em 1em 0;
+  -ms-border-radius: 0 1em 1em 0;
+  -o-border-radius: 0 1em 1em 0;
+}
+
+.dark-btn {
+    color: rgb(255, 255, 255);
+    border-color: rgb(255, 255, 255);
+    background-color: $main-black;
+
+    &:hover {
+    color: $main-black;
+    border-color: $main-black;
+    }
+}
+
+.bg-black {
+    background-color: rgb(5, 5, 5);
+}
+
+.white-color {
+    color: #fff;
+}
+
+.main-styles {
+    box-shadow: 0 0 15px rgb(95, 95, 95);
+    background-color: $main-black;
+}
+
+.border-white {
+    border-color: #fff;
+}

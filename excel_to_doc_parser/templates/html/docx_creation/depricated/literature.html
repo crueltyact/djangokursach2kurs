@@ -1,0 +1,40 @@
+{% include 'base/header.html' %}
+{% load static %}
+<body>
+{% include 'base/body.html' %}
+{% block body %}
+<div class="main">
+    <div class="container h-100">
+        <div class="row d-flex h-100">
+            {% include 'base/menu.html' %}
+            <fieldset class="col-9 pt-5">
+                <form method="post" action="../result.html">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="main_lit" class="form-label">Основные</label>
+                        <textarea class="form-control is-invalid" name="main_lit" id="main_lit"
+                                  placeholder="Основные источники литературы"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="extra_lit" class="form-label">Дополнительные</label>
+                        <textarea class="form-control is-invalid" name="extra_lit" id="extra_lit"
+                                  placeholder="Дополнительные источники литературы"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="digital_lit" class="form-label">Электронные</label>
+                        <textarea class="form-control is-invalid" name="digital_lit" id="digital_lit"
+                                  placeholder="Цифровые источники литературы"></textarea>
+                    </div>
+                    <!--                    <button type="submit" name="edit" value="edit" class="btn btn-primary">Назад</button>-->
+                    <button type="submit" name="next" value="next" class="btn btn-primary">Далее</button>
+                </form>
+            </fieldset>
+        </div>
+    </div>
+</div>
+{% endblock %}
+<!-- <footer class="footer">
+    <p>&copy Лучшая команда КИС 2022</p>
+</footer> -->
+{% include 'base/scripts.html' %}
+</body>

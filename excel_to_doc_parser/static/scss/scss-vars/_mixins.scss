@@ -1,0 +1,42 @@
+@import "./vars";
+
+// --btn-mixins
+@mixin btn-blue {
+    color: #fff;
+    background-color: $main-blue;
+    border-radius: 50px;
+    outline: none;
+    border: 1px solid $main-blue;
+    padding: 12px 15px;
+    transition: 0.1s ease-in-out;
+    min-width: 150px;
+}
+
+@mixin btn-blue-hover {
+    background-color: #fff;
+    color: $main-blue;
+}
+
+// --reg/authorization-mixins
+@mixin form-block {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 18px;
+}
+
+@mixin form-label {
+    width: 100%;
+    text-align: start;
+    font-weight: 400;
+    font-size: 18px;
+}
+
+@mixin form-input {
+    width: 100%;
+    outline: none;
+    border: none;
+    background-color: #f5f5f5;
+    padding: 15px;
+    font-size: 18px;
+}

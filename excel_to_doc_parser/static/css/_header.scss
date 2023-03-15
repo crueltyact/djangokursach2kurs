@@ -1,0 +1,22 @@
+@import "./fonts";
+
+
+.header {
+    width: 100%;
+    height: 3em;
+    margin-bottom: 1em;
+
+    &-wrapper {
+        margin: 0 auto;
+        padding: 0 0.5em;
+        width: 100%;
+        max-width: 1024px;
+    }
+
+    &__title {
+        text-align: center;
+        font-family: "Roboto-thin", sans-serif;
+        letter-spacing: 0.1em;
+    }
+
+}

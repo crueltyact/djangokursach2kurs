@@ -1,0 +1,555 @@
+{% include 'base/header.html' %}
+{% load static %}
+<body>
+{% include 'base/body.html' %}
+{% block body %}
+<div class="main">
+    <div class="container h-100">
+        <div class="row d-flex h-100">
+            {% include 'base/menu.html' %}
+            <fieldset class="col-9 pt-5">
+                <form method="post" action="/result/">
+                    {% csrf_token %}
+                    <div id="smartwizard">
+                        <ul class="nav">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#step-1">
+                                    <div class="num">1</div>
+                                    <!--                                    Цели и задачи-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#step-2">
+                                    <span class="num">2</span>
+                                    <!--                                    Разделы-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#step-3">
+                                    <span class="num">3</span>
+                                    <!--                                    Связанные дисциплины-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#step-4">
+                                    <span class="num">4</span>
+                                    <!--                                    Дидактическое содержание-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#step-5">
+                                    <span class="num">5</span>
+                                    <!--                                    Оценка результатов-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#step-6">
+                                    <span class="num">6</span>
+                                    <!--                                    Литература-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#step-7">
+                                    <span class="num">7</span>
+                                    <!--                                    Требования к ПО-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#step-8">
+                                    <span class="num">8</span>
+                                    <!--                                    Перечень оценочных средств-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#step-9">
+                                    <span class="num">9</span>
+                                    <!--                                    Задания-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#step-10">
+                                    <span class="num">10</span>
+                                    <!--                                    Образовательные технологии-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#step-11">
+                                    <span class="num">11</span>
+                                    <!--                                    Образовательные технологии-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#step-12">
+                                    <span class="num">12</span>
+                                    <!--                                    ФОС-->
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="#step-13">
+                                    <span class="num">13</span>
+                                    <!--                                    ФОС-->
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div id="step-1" class="tab-pane" role="tabpanel" aria-labelledby="step-1">
+                                <fieldset class="col-12 pt-5">
+                                    <legend class="col-form-label col-md-12 pt-0"><p class="h2">Цели и задачи</p>
+                                    </legend>
+                                    <div class="mb-3">
+                                        <label for="targets" class="form-label">Цели изучения</label>
+                                        <textarea class="form-control" name="targets" id="targets"
+                                                  placeholder="Добавьте цели изучения"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="tasks" class="form-label">Задачи</label>
+                                        <textarea class="form-control" name="tasks" id="tasks"
+                                                  placeholder="Добавьте задачи"></textarea>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div id="step-2" class="tab-pane" role="tabpanel" aria-labelledby="step-2">
+                                <fieldset id="sections" class="col-12 pt-5">
+                                    <legend class="col-form-label col-md-12 pt-0"><p class="h2">Выпишите изучаемые
+                                        разделы</p>
+                                    </legend>
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <input type="text" value="Раздел" aria-label="First name"
+                                                   class="form-control"
+                                                   readonly>
+                                            {% if hours.lections.0 %}
+                                            <input type="Text" value="Лекции" aria-label="Last name"
+                                                   class="form-control"
+                                                   readonly>
+                                            {% endif %}
+                                            {% if hours.labs.0 %}
+                                            <input type="Text" value="Лабораторные занятия" aria-label="Last name"
+                                                   class="form-control"
+                                                   readonly>
+                                            {% endif %}
+                                            {% if hours.seminars.0 %}
+                                            <input type="Text" value="П/С" aria-label="Last name" class="form-control"
+                                                   readonly>
+                                            {% endif %}
+                                            {% if hours.srs.0 %}
+                                            <input type="Text" value="СРС" aria-label="Last name" class="form-control"
+                                                   readonly>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="mb-3" id="hours">
+                                        <div class="input-group sections">
+                                            <input type="text" name="section" aria-label="First name"
+                                                   class="form-control section">
+                                            {% if hours.lections.0 %}
+                                            <input type="text" name="hours_lections" aria-label="Last name"
+                                                   class="form-control hours_lections">
+                                            {% endif %}
+                                            {% if hours.labs.0 %}
+                                            <input type="text" name="hours_labs" aria-label="Last name"
+                                                   class="form-control hours_labs">
+                                            {% endif %}
+                                            {% if hours.seminars.0 %}
+                                            <input type="text" name="hours_seminars" aria-label="Last name"
+                                                   class="form-control hours_seminars">
+                                            {% endif %}
+                                            {% if hours.srs.0 %}
+                                            <input type="text" name="hours_srs" aria-label="Last name"
+                                                   class="form-control hours_srs">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="mb-3" id="result_block">
+                                        <div class="input-group">
+                                            <input type="text" aria-label="First name"
+                                                   class="form-control" value="Итого" readonly>
+                                            {% if hours.lections.0 %}
+                                            <input id="hours_result_lections" type="text" name="hours_lections"
+                                                   aria-label="Last name"
+                                                   class="form-control" value="0/{{ hours.lections.0 }}" readonly>
+                                            {% endif %}
+                                            {% if hours.labs.0 %}
+                                            <input id="hours_result_labs" type="text" name="hours_labs"
+                                                   aria-label="Last name"
+                                                   class="form-control" value="0/{{ hours.labs.0 }}" readonly>
+                                            {% endif %}
+                                            {% if hours.seminars.0 %}
+                                            <input id="hours_result_seminars" type="text" name="hours_seminars"
+                                                   aria-label="Last name"
+                                                   class="form-control" value="0/{{ hours.seminars.0 }}" readonly>
+                                            {% endif %}
+                                            {% if hours.srs.0 %}
+                                            <input id="hours_result_srs" type="text" name="hours_srs"
+                                                   aria-label="Last name"
+                                                   class="form-control" value="0/{{ hours.srs.0 }}" readonly>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <input id="max_hours_lections" type="hidden" name="max_hours_lections" value="{{ hours.lections.0 }}">
+                                    <input id="max_hours_labs" type="hidden" name="max_hours_labs" value="{{ hours.labs.0 }}">
+                                    <input id="max_hours_seminars" type="hidden" name="max_hours_seminars" value="{{ hours.seminars.0 }}">
+                                    <input id="max_hours_srs" type="hidden" name="max_hours_srs" value="{{ hours.srs.0 }}">
+                                    <button id="addInputGroup" type="button" class="btn btn-primary"
+                                            onclick="addInputs()">Добавить раздел
+                                    </button>
+                                </fieldset>
+                            </div>
+                            <div id="step-3" class="tab-pane" role="tabpanel" aria-labelledby="step-3">
+                                <fieldset class="col-12 pt-5">
+                                    <legend class="col-form-label col-md-12 pt-0"><p class="h2">Выберите дисциплины, с
+                                        которыми связана {{theme}}</p>
+                                    </legend>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div id="modules">
+                                                {% for cur_theme in all_themes %}
+                                                {% if cur_theme != theme %}
+                                                <p class="drag"><a class="btn btn-default text-start">{{ cur_theme }}</a></p>
+                                                {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div id="dropzone"></div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div id="step-4" class="tab-pane" role="tabpanel" aria-labelledby="step-4">
+                                <fieldset class="col-12 pt-5">
+                                    <legend class="col-form-label col-md-12 pt-0"><p class="h2">Дидактическое содержание
+                                        разделов</p>
+                                    </legend>
+                                    <div class="input-group mb-3">
+                                        <label class="input-group-text" for="theme">Тема</label>
+                                        <select class="form-select" id="theme" name="theme">
+                                            <option selected value="choose_theme" id="choose_theme">Выберите тему
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div id="section">
+
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div id="step-5" class="tab-pane" role="tabpanel" aria-labelledby="step-5">
+                                <fieldset class="row mb-3">
+                                    <legend class="col-form-label col-sm-2 pt-0">Оценка результатов</legend>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-5">
+                                            <label for="competentions" class="col-sm-2 col-form-label">По
+                                                компетенциям</label>
+                                        </div>
+                                        <div class="col-sm-5  ms-3">
+                                            <input type="checkbox" name="competentions" value="1"
+                                                   class="form-check-input"
+                                                   id="competentions">
+                                            <input type="checkbox" name="competentions" value="0"
+                                                   class="form-check-input"
+                                                   id="competentions1">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-5">
+                                            <label for="attestation" class="col-sm-2 col-form-label">По промежуточной
+                                                аттестации</label>
+                                        </div>
+                                        <div class="col-sm-5  ms-3">
+                                            <input type="checkbox" name="attestation" value="1" class="form-check-input"
+                                                   id="attestation">
+                                            <input type="checkbox" name="attestation" value="0" class="form-check-input"
+                                                   id="attestation1">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 ml-3">
+                                        <div class="col-sm-5">
+                                            <label for="score_system" class="col-sm-2 col-form-label">Есть бальная
+                                                система</label>
+                                        </div>
+                                        <div class="col-sm-5 ms-3">
+                                            <input type="checkbox" name="score_system" value="1"
+                                                   class="form-check-input"
+                                                   id="score_system">
+                                            <input type="checkbox" name="score_system" value="0"
+                                                   class="form-check-input"
+                                                   id="score_system1">
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <div class="row mb-3 ml-3" id="marks">
+                                    <!--                                    <div class="col-md-6">-->
+                                    <!--                                        <div class="col-md-5">-->
+                                    <!--                                            <label for="competention" class="form-label">Компетенция</label>-->
+                                    <!--                                        </div>-->
+                                    <!--                                        <div class="col-sm-5">-->
+                                    <!--                                            <input type="text" name="competention" class="form-control"-->
+                                    <!--                                                   id="competention">-->
+                                    <!--                                        </div>-->
+                                    <!--                                    </div>-->
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <input type="text" value="Оценка" aria-label="First name"
+                                                   class="form-control"
+                                                   readonly>
+                                            <input type="text" value="Описание" aria-label="Last name"
+                                                   class="form-control"
+                                                   readonly>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="input-group marks">
+                                            <input type="text" name="mark" aria-label="First name"
+                                                   class="form-control mark">
+                                            <input type="text" name="description" aria-label="Last name"
+                                                   class="form-control description">
+                                        </div>
+                                    </div>
+                                    <button id="addInputGroupMarks" type="button" class="btn btn-primary"
+                                            onclick="addInputsMarks()">Добавить оценку
+                                    </button>
+                                </div>
+                                <div id="brs" class="mb-3 d-none">
+                                    <label for="score_system_desc" class="form-label">Описание БРС</label>
+                                    <textarea class="form-control" name="score_system_desc"
+                                              id="score_system_desc"
+                                              placeholder="Описание БРС"></textarea>
+                                </div>
+                            </div>
+                            <div id="step-6" class="tab-pane" role="tabpanel" aria-labelledby="step-6">
+                                <fieldset class="col-12 pt-5">
+                                    <legend class="col-form-label col-md-12 pt-0"><p class="h2">Добавление
+                                        источников</p>
+                                    </legend>
+                                    <div class="mb-3">
+                                        <label for="main_lit" class="form-label">Основные</label>
+                                        <textarea class="form-control" name="main_lit" id="main_lit"
+                                                  placeholder="Основные источники литературы"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="extra_lit" class="form-label">Дополнительные</label>
+                                        <textarea class="form-control" name="extra_lit" id="extra_lit"
+                                                  placeholder="Дополнительные источники литературы"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="digital_lit" class="form-label">Электронные</label>
+                                        <textarea class="form-control" name="digital_lit" id="digital_lit"
+                                                  placeholder="Цифровые источники литературы"></textarea>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div id="step-7" class="tab-pane" role="tabpanel" aria-labelledby="step-7">
+                                <div class="mb-3">
+                                    <label for="software" class="form-label"><p class="h2">Требования к ПО</p></label>
+                                    <textarea class="form-control" name="software" id="software"
+                                              placeholder="Требования к ПО"></textarea>
+                                </div>
+                            </div>
+                            <div id="step-8" class="tab-pane" role="tabpanel" aria-labelledby="step-8">
+                                <div class="mb-3">
+                                    <label for="evaluation_tools" class="form-label"><p class="h2">Перечень оценочных
+                                        средств</p></label>
+                                    <textarea class="form-control" name="evaluation_tools" id="evaluation_tools"
+                                              placeholder="Переченб оценочных средств"></textarea>
+                                </div>
+                            </div>
+                            <div id="step-9" class="tab-pane" role="tabpanel" aria-labelledby="step-9">
+                                <div class="mb-3">
+                                    <label for="tasks_from_file" class="form-label"><p class="h2">Задания</p></label>
+                                    <textarea class="form-control" name="tasks_from_file" id="tasks_from_file"
+                                              placeholder="Задания"></textarea>
+                                </div>
+                            </div>
+                            <div id="step-10" class="tab-pane" role="tabpanel" aria-labelledby="step-10">
+                                <div class="mb-3">
+                                    <label for="tasks_from_file" class="form-label"><p class="h2">Образовательные
+                                        технологии</p></label>
+                                    <div class="row">
+                                        <fieldset class="col">
+                                            <div><p class="h3">Предопределённые технологии на занятиях</p>
+                                                {% for tech in predefined_techs_in_class.default %}
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" name="default_tech_in_class"
+                                                           type="checkbox"
+                                                           id="default_tech_in_class{{ forloop.counter }}"
+                                                           value="{{ tech }}" checked onclick="return false;">
+                                                    <label class="form-check-label"
+                                                           for="default_tech_in_class{{ forloop.counter }}">{{ tech }}</label>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                            <div><p class="h3">Технологии на выбор на занятиях</p>
+                                                {% for tech in predefined_techs_in_class.optional %}
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" name="optional_tech_in_class"
+                                                           type="checkbox"
+                                                           id="optional_tech_in_class{{ forloop.counter }}"
+                                                           value="{{ tech }}">
+                                                    <label class="form-check-label"
+                                                           for="optional_tech_in_class{{ forloop.counter }}">{{ tech }}</label>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        </fieldset>
+                                        <fieldset class="col">
+                                            <div><p class="h3">Предопределённые технологии вне занятий</p>
+                                                {% for tech in predefined_techs_out_class.default %}
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" name="default_tech_out_class"
+                                                           type="checkbox"
+                                                           id="default_tech_out_class{{ forloop.counter }}"
+                                                           value="{{ tech }}" checked onclick="return false;">
+                                                    <label class="form-check-label"
+                                                           for="default_tech_out_class{{ forloop.counter }}">{{ tech }}</label>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                            <div><p class="h3">Технологии на выбор вне занятий</p>
+                                                {% for tech in predefined_techs_out_class.optional %}
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" name="optional_tech_out_class"
+                                                           type="checkbox"
+                                                           id="optional_tech_out_class{{ forloop.counter }}"
+                                                           value="{{ tech }}">
+                                                    <label class="form-check-label"
+                                                           for="optional_tech_out_class{{ forloop.counter }}">{{ tech }}</label>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="step-11" class="tab-pane" role="tabpanel" aria-labelledby="step-11">
+                                <div class="mb-3">
+                                    <label for="tasks_from_file" class="form-label"><p class="h2">Методические
+                                        рекомендации для самостоятельной работы студентов</p></label>
+                                    <div class="row">
+                                        <fieldset class="col">
+                                            <div><p class="h3">Предопределённые критерии оценки самостоятельной работы
+                                                студента</p>
+                                                {% for tech in predefined_criteries_in_methods_for_students.default %}
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" name="default_criteries"
+                                                           type="checkbox" id="default_criteries{{ forloop.counter }}"
+                                                           value="{{ tech }}" checked onclick="return false;">
+                                                    <label class="form-check-label"
+                                                           for="default_criteries{{ forloop.counter }}">{{ tech }}</label>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                            <!--                                            <label><p class="h3">Критерии оценки самостоятельной работы студента на выбор</p>-->
+                                            <!--                                                {% for tech in predefined_criteries_in_methods_for_students.optional %}-->
+                                            <!--                                                    <label><input type="checkbox" name="optional_tech_in_class" value="{{tech}}">{{ tech }}</label>-->
+                                            <!--                                                {% endfor %}-->
+                                            <!--                                            </label>-->
+                                        </fieldset>
+                                        <!--                                        <fieldset class="col">-->
+                                        <!--                                            <label><p class="h3">Предопределённые технологии вне занятий</p>-->
+                                        <!--                                                {% for tech in predefined_techs_out_class.default %}-->
+                                        <!--                                                    <input type="checkbox" name="default_tech_out_class" value="{{tech}}" readonly>-->
+                                        <!--                                                {% endfor %}-->
+                                        <!--                                            </label>-->
+                                        <!--                                            <label><p class="h3">Технологии на выбор вне занятий</p>-->
+                                        <!--                                                {% for tech in predefined_techs_out_class.optional %}-->
+                                        <!--                                                    <input type="checkbox" name="optional_tech_out_class" value="{{tech}}">-->
+                                        <!--                                                {% endfor %}-->
+                                        <!--                                            </label>-->
+                                        <!--                                        </fieldset>-->
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="step-12" class="tab-pane" role="tabpanel" aria-labelledby="step-12">
+                                <div class="mb-3">
+                                    <label for="tasks_from_file" class="form-label"><p class="h2">Фонд оценочных средств</p></label>
+                                    <div class="row">
+                                        <div><p class="h3">Примерный перечень оценочных средств</p>
+                                            <fieldset class="col">
+                                                {% for os in os_list %}
+                                                    <div class="row os">
+                                                        <div class="form-check form-switch">
+                                                            <input class="form-check-input" id="os_{{ forloop.counter }}" name="os_name" type="checkbox"></input>
+                                                            <label class="form-check-label" for="os_{{ forloop.counter }}" data-toggle="tooltip" data-placement="top" title="{{ os.description }}"><p class="h4">
+                                                                {{ os.name }}</p></label>
+                                                            <input type="hidden" value="{{ os.short_name }}">
+                                                        </div>
+                                                        <div class="form-check form-switch">
+                                                            <label class="form-check-label" for="os_content_{{ forloop.counter }}"><p class="h4">Представление оценочного средства в ФОС</p></label>
+                                                            <textarea class="form-control" id="os_content_{{ forloop.counter }}" name="os_content"></textarea>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                                <input type="hidden" name="os" id="os">
+                                                <input type="hidden" name="all_os" id="all_os">
+                                            </fieldset>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="step-13" class="tab-pane" role="tabpanel" aria-labelledby="step-13">
+                                <div class="mb-3">
+                                    <label for="tasks_from_file" class="form-label"><p class="h2">Фонд оценочных средств</p></label>
+                                    <div class="row">
+                                        <fieldset class="col">
+                                            <div><p class="h3">Контрольные работы</p>
+                                                <div class="form-check" id="kr-fields"></div>
+                                                <button id="add_kr" type="button" class="btn btn-primary mt-3" onclick="addKr()">Добавить работу</button>
+                                            </div>
+                                            {% if hours.course_work %}
+                                                <div><p class="h3">Курсовая работа</p>
+                                                    <div class="form-check form-switch">
+                                                        <label class="form-check-label" for="cw_themes"><p class="h4">Примеры тем для курсовой работы</p></label>
+                                                        <textarea class="form-control" id="cw_themes" name="course_work_themes"></textarea>
+                                                    </div>
+                                                    <div class="form-check form-switch">
+                                                        <label class="form-check-label" for="cw_contents"><p class="h4">Содержательная часть курсовой работы</p></label>
+                                                        <textarea class="form-control" id="cw_contents" name="course_work_contents"></textarea>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        </fieldset>
+                                        <fieldset class="col">
+                                            {% if hours.exam %}
+                                                <div><p class="h3">Экзаменационные вопросы</p>
+                                                    <div class="form-check form-switch">
+                                                        <label class="form-check-label" for="eq_theory"><p class="h4">Теоретические вопросы к экзамену</p></label>
+                                                        <textarea class="form-control" id="eq_theory" name="exam_questions_theory"></textarea>
+                                                    </div>
+                                                    <div class="form-check form-switch">
+                                                        <label class="form-check-label" for="eq_tasks"><p class="h4">Практические задания к экзамену</p></label>
+                                                        <textarea class="form-control" id="eq_tasks" name="exam_questions_tasks"></textarea>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                <div><p class="h3">Вопросы к зачету</p>
+                                                    <div class="form-check form-switch">
+                                                        <label class="form-check-label" for="test_questions"><p class="h4">Теоретические вопросы к зачету</p></label>
+                                                        <textarea class="form-control" id="test_questions" name="test_questions"></textarea>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 0" aria-valuenow="0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="document" value="{{ document }}">
+                </form>
+            </fieldset>
+        </div>
+    </div>
+</div>
+{% endblock %}
+<!-- <footer class="footer">
+    <p>&copy Лучшая команда КИС 2022</p>
+</footer> -->
+{% include 'base/scripts.html' %}
+<script src="{% static 'js/form.js' %}"></script>
+</body>

@@ -1,0 +1,9 @@
+@import "../scss-vars/vars";
+
+.form-select {
+    option {
+        &:hover {
+            color: red;
+        }
+    }
+}

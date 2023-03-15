@@ -1,6 +1,14 @@
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,pycharm+all,windows,linux
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,pycharm+all,windows,linux
+# Created by https://www.toptal.com/developers/gitignore/api/putty
+# Edit at https://www.toptal.com/developers/gitignore?templates=putty
+
+### PuTTY ###
+# Private key
+*.ppk
+
+# End of https://www.toptal.com/developers/gitignore/api/putty
 
 ### Linux ###
 *~
@@ -16,7 +24,7 @@
 
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
-
+/Dump20220502
 ### PyCharm+all ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
@@ -34,6 +42,8 @@
 
 # Generated files
 .idea/**/contentModel.xml
+
+../templates/~$*
 
 # Sensitive or high-churn files
 .idea/**/dataSources/
@@ -98,7 +108,8 @@ fabric.properties
 # Ignores the whole .idea folder and all .iml files
 # See https://github.com/joeblau/gitignore.io/issues/186 and https://github.com/joeblau/gitignore.io/issues/360
 
-.idea/
+../.idea/
+.fleet/*
 
 # Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-249601023
 
@@ -275,5 +286,18 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+venv/*
+.idea/excel-to-doc-parser.iml
+~**.docx
+
+# scripts py
+Scripts/*
+pyvenv.cfg
+
+log.txt
+test.py
 
 # End of https://www.toptal.com/developers/gitignore/api/python,pycharm+all,windows,linux
+
+excel_to_doc_parser/media/generated_files/docx/*
+excel_to_doc_parser/media/generated_files/xml/*

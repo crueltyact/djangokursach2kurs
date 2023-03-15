@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - static:/app/staticfiles
+    restart: always
+    ports:
+      - "8000:8000"
+    networks:
+      - web_nw
+      - nginx_nw
+    depends_on:
+      - db
+  db:
+    image: mysql:10
+    container_name: mysql
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    restart: always
+    env_file: .env
+    networks:
+      - web_nw
+  nginx:
+    container_name: nginx
+    build:
+      context: nginx/
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - static:/app/staticfiles
+    networks:
+      - nginx_nw
+
+volumes:
+  postgres:
+    external: true
+  static:
+    external: true
+networks:
+  web_nw:
+    external: true
+  nginx_nw:
+    external: true

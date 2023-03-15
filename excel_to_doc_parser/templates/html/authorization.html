@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../static/css/index.css">
+    <title>Авторизация</title>
+</head>
+
+<body>
+    <!--Loader-->
+    <div class="mask">
+        <div class="lds-ring">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+    <!--/Loader-->
+    <div class="authorization">
+        <div class="authorization-block">
+            <div class="authorization__title">Авторизация <span>Curriculum Creator</span></div>
+            <form method="POST" action="" class="authorization-form">
+                {% csrf_token %}
+                <div class="authorization-form__block">
+                    <label for="name">Логин:</label>
+                    <input id="name" name="login" type="text">
+                </div>
+                <div class="authorization-form__block">
+                    <label for="password">Пароль:</label>
+                    <input id="password" name="password" type="password">
+                </div>
+
+                <div>
+                    <button type="submit" href="/">Войти</button>
+                </div>
+<!--                <p class="authorization-form__forget"><a href="forgetpassword.html">Забыли пароль?</a></p>-->
+<!--                <p>Не зарегистрированы? <a href="registration.html"><span>Создайте учетную запись</span></a></p>-->
+            </form>
+        </div>
+    </div>
+
+    <script src="../../static/js/loader.js"></script>
+    <script src="../../static/js/canvas.js"></script>
+</body>
+
+</html>

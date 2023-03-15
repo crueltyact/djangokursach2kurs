@@ -1,0 +1,48 @@
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Excel parser</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap5.min.css">
+</head>
+
+<body>
+<div>
+    <header class="header">
+        <div class="header-wrapper">
+            <h1 class="header__title">Excel parser app</h1>
+        </div>
+    </header>
+    <section class="main">
+        <form method="POST">
+            {% csrf_token %}
+            <label>
+                <input type="text" name="header" required>
+            </label>
+            <label>
+                <textarea type="text" name="description" required></textarea>
+            </label>
+            <label>
+                <input type="number" name="classwork_hours" required>
+            </label>
+            <label>
+                <input type="number" name="homework_hours" required>
+            </label>
+            <button type="submit" name="submit">Сохранить</button>
+        </form>
+        <button type="button" name="add">Добавить дисциплину</button>
+    </section>
+</div>
+
+
+<script src="../../static/js/darktheme.js"></script>
+<script src="../../static/js/jQuery.js"></script>
+<script src="../../static/js/jQuery-datatables.min.js"></script>
+<script src="../../static/js/jQuery-datatables-bootstrap5.min.js"></script>
+<script src="../../static/js/data-table.js"></script>
+<script src="../../static/js/dataTable-custom.js"></script>
+</body>
+</html>
