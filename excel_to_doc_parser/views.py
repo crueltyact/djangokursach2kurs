@@ -328,6 +328,7 @@ def documents(request):
                 for row in doc.tables[i].rows:
                     if len(row.cells) and len(row.cells[0].text.strip()) == 0 and len(set(row.cells)) == 1:
                         table.remove(row._tr)
+            discipline = translit(discipline)
             doc.save(join(str(BASE_DIR), folder, "{}.docx".format(discipline)))
             context['path'] = join(folder, "{}.docx".format(discipline))
             context['name'] = discipline + '.docx'
