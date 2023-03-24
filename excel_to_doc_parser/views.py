@@ -340,6 +340,21 @@ def documents(request):
         new_document = Document(link_to_xml_id=link, status_id=status, user_id=user, document_name=program_name,
                                 profile_name=get_profile_name(), program_code=get_program_code())
         new_document.save()
+
+        root = etree.Element("root")
+        tree = etree.ElementTree(root)
+        path_to_save = join(str(BASE_DIR),
+                            "excel_to_doc_parser\\media\\generated_files\\xml\\{}".format(request.user.id))
+        Path(path_to_save).mkdir(parents=True, exist_ok=True)
+        # filename = "{}-{}.xml".format(Document.objects.get(pk=request.POST.get("document")).program_name.program_name,
+        #                               datetime.date.today().strftime("%m.%d.%Y"))
+        filename = translit(
+            "{}.xml".format(program_name).replace(" ", "_"),
+            "ru", reversed=True)
+        tree.write(join(str(BASE_DIR), path_to_save, filename), encoding="UTF-8", xml_declaration=True,
+                   pretty_print=True)
+        upload_xml_to_s3(request, filename, path_to_save)
+        os.remove(join(str(BASE_DIR), path_to_save, filename))
         return redirect('/documents')
     return render(request, "./docx_creation/document.html", context)
 
