@@ -40,7 +40,8 @@ output/
 .idea/**/shelf
 .idea/*
 
-.idea
+.idea/*.iml
+.idea/*.xml
 
 # AWS User-specific
 .idea/**/aws.xml
