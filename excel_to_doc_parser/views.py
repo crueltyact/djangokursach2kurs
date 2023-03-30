@@ -251,6 +251,7 @@ def number_to_words(n):
     else:
         return ten.get(n2) + ' ' + less_than_ten.get(n1)
 
+
 def generate_docx(request, context, author_id):
     folder = join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files/docx")
     data_df = parse_plane(PLANE_PATH)["Основные дисциплины"]
@@ -364,6 +365,7 @@ def generate_docx(request, context, author_id):
     context['name'] = discipline + '.docx'
     return redirect("/download/?file={}&name={}".format(context['path'], context["name"]))
 
+
 @login_required(login_url='/login/')
 def documents(request):
     context = {"documents": Document.objects.filter(user_id=request.user.id),
@@ -384,7 +386,8 @@ def documents(request):
             root = etree.Element("root")
             tree = etree.ElementTree(root)
             path_to_save = join(str(BASE_DIR),
-                                "excel_to_doc_parser\\media\\generated_files\\xml\\{}".format(request.POST.get("teacher_id")))
+                                "excel_to_doc_parser\\media\\generated_files\\xml\\{}".format(
+                                    request.POST.get("teacher_id")))
             Path(path_to_save).mkdir(parents=True, exist_ok=True)
             # filename = "{}-{}.xml".format(Document.objects.get(pk=request.POST.get("document")).program_name.program_name,
             #                               datetime.date.today().strftime("%m.%d.%Y"))
@@ -1102,6 +1105,32 @@ def generate_xml(request):
     os.remove(join(str(BASE_DIR), path_to_save, filename))
 
 
+def upload_excel_plane_to_s3(filename, filepath):
+    session = boto3.session.Session()
+    s3 = session.client(
+        service_name='s3',
+        endpoint_url='https://storage.yandexcloud.net',
+        aws_access_key_id=os.environ.get('S3_ACCESS_KEY'),
+        aws_secret_access_key=os.environ.get('S3_SECRET_KEY'),
+    )
+    with open(join(str(BASE_DIR), filepath, filename), "rb") as excel:
+        s3.put_object(Bucket=os.environ.get('BUCKET_NAME'), Key='excel/planes/{}'.format(filename),
+                      Body=excel.read().decode("UTF-8"))
+
+
+def upload_excel_matrix_to_s3(filename, filepath):
+    session = boto3.session.Session()
+    s3 = session.client(
+        service_name='s3',
+        endpoint_url='https://storage.yandexcloud.net',
+        aws_access_key_id=os.environ.get('S3_ACCESS_KEY'),
+        aws_secret_access_key=os.environ.get('S3_SECRET_KEY'),
+    )
+    with open(join(str(BASE_DIR), filepath, filename), "rb") as excel:
+        s3.put_object(Bucket=os.environ.get('BUCKET_NAME'), Key='excel/matrices/{}'.format(filename),
+                      Body=excel.read().decode("UTF-8"))
+
+
 def upload_xml_to_s3(author_id, filename, filepath):
     session = boto3.session.Session()
     s3 = session.client(
@@ -1113,6 +1142,34 @@ def upload_xml_to_s3(author_id, filename, filepath):
     with open(join(str(BASE_DIR), filepath, filename), "rb") as xml:
         s3.put_object(Bucket=os.environ.get('BUCKET_NAME'), Key='xml/{}/{}'.format(author_id, filename),
                       Body=xml.read().decode("UTF-8"))
+
+
+def download_excel_plane_from_s3(filename):
+    session = boto3.session.Session()
+    s3 = session.client(
+        service_name='s3',
+        endpoint_url='https://storage.yandexcloud.net',
+        aws_access_key_id=os.environ.get('S3_ACCESS_KEY'),
+        aws_secret_access_key=os.environ.get('S3_SECRET_KEY'),
+    )
+    return s3.generate_presigned_url('get_object', Params={
+        'Bucket': os.environ.get('BUCKET_NAME'),
+        'Key': 'excel/planes/{}'.format(filename)},
+                                     ExpiresIn=60)
+
+
+def download_excel_matrix_from_s3(filename):
+    session = boto3.session.Session()
+    s3 = session.client(
+        service_name='s3',
+        endpoint_url='https://storage.yandexcloud.net',
+        aws_access_key_id=os.environ.get('S3_ACCESS_KEY'),
+        aws_secret_access_key=os.environ.get('S3_SECRET_KEY'),
+    )
+    return s3.generate_presigned_url('get_object', Params={
+        'Bucket': os.environ.get('BUCKET_NAME'),
+        'Key': 'excel/matrices/{}'.format(filename)},
+                                     ExpiresIn=60)
 
 
 def download_xml_from_s3(user_id, filename):
