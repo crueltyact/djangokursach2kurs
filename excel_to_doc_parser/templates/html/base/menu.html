@@ -14,7 +14,13 @@
                     <li>Главная</li>
                 </a>
                 <a href="/documents">
+                    {% if role.role_type == 'Teacher' %}
                     <li>Программы обучения</li>
+                    {% elif role.role_type == 'HOD' %}
+                    <li>Назначение программ обучения</li>
+                    {% else %}
+                    <li></li>
+                    {% endif %}
                 </a>
                 <a href="/about">
                     <li>Обратная связь</li>
