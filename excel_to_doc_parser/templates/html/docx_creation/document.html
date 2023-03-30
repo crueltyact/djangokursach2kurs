@@ -9,6 +9,41 @@
             {% include 'base/menu.html' %}
             <div class="col-9 pt-5">
                 <div class="card-inner">
+                    {% if role.role_type == 'HOD' %}
+                    {% for teacher in all_teachers %}
+                    <div class="card border-primary mb-3">
+                        <div class="card-header">
+                            <p>{{ teacher.last_name }} {{ teacher.first_name.0 }}.{{ teacher.second_name.0 }}.</p>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="">
+                                <p>Текущие РПД:</p>
+                                <ul>
+                                    {% for document in all_documents %}
+                                    {% if document.user == teacher %}
+                                        <li>{{ document.document_name }} ({{ document.status.status }})</li>
+                                    {% endif %}
+                                    {% endfor %}
+                                </ul>
+                                <input type="hidden" value="{{ teacher.id }}" name="teacher_id">
+                                {% csrf_token %}
+                                <label>
+                                    <select name="program_name" class="form-select">
+                                        {{ disciplines }}
+                                        {% for discipline in disciplines %}
+                                        <option value="{{ discipline }}">{{ discipline }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </label>
+                                <input type="hidden" name="link" value="1">
+                                <input type="hidden" name="status" value="1">
+                                <input type="hidden" name="new_document" value="True">
+                                <button type="submit" class="btn btn-primary">Назначить РПД</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% elif role.role_type == 'Teacher' %}
                     <table id="startingTable" class="table table-striped">
                         <thead>
                         <tr>
@@ -46,23 +81,7 @@
                         {% endfor %}
                         </tbody>
                     </table>
-                    <form action="" method="POST">
-                        {% csrf_token %}
-                        <label>
-                            <select name="program_name">
-                                {{ disciplines }}
-                                {% for discipline in disciplines %}
-                                <option value="{{ discipline }}">{{ discipline }}</option>
-                                {% endfor %}
-                            </select>
-                        </label>
-                        <input type="hidden" name="link" value="1">
-                        <input type="hidden" name="status" value="1">
-                        <input type="hidden" name="new_document" value="True">
-                        <button type="submit">
-                            Добавить документ +
-                        </button>
-                    </form>
+                    {% else %}{% endif %}
                 </div>
             </div>
         </div>

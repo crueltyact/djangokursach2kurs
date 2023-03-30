@@ -45,4 +45,3 @@ class Document(models.Model):
     document_name = models.CharField(max_length=512, default="")
     profile_name = models.CharField(max_length=512, default="")
     program_code = models.CharField(max_length=512, default="")
-

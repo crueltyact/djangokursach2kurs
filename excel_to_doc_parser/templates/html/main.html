@@ -1,34 +1,86 @@
 {% include 'base/header.html' %}
 {% load static %}
 <body>
-    {% include 'base/body.html' %}
-    {% block body %}
-    <div class="main">
-        <div class="container h-100">
-            <div class="row d-flex h-100">
-                {% include 'base/menu.html' %}
-                <div class="col-9 pt-5">
-                    <div class="card-inner">
-                        {% if custom_user.role_id != 1 %}
-                            {{ hello }}
-                        {% else %}
-                            <form method="POST" enctype="multipart/form-data" action="/">
-                                {% csrf_token %}
-                                <p>Файл матрицы компетенций</p>
-                                <input type="file" name="work_program">
-                                <p>Файл учебного плана</p>
-                                <input type="file" name="time_plane">
-                                <button type="submit">Загрузить файлы</button>
-                            </form>
-                        {% endif %}
+{% include 'base/body.html' %}
+{% block body %}
+<div class="main">
+    <div class="container h-100">
+        <div class="row d-flex h-100">
+            {% include 'base/menu.html' %}
+            <div class="col-9 pt-5">
+                <div class="card-inner">
+                    {% if role.role_type == 'Teacher' %}
+                    <p class="h2">Все РПД:</p>
+                    {% for document in all_documents %}
+                    <div class="card">
+                        <div class="card-header h4">{{ document.document_name }}</div>
+                        <form method="POST" action="">
+                            {% csrf_token %}
+                            <div class="card-body">
+                                <p class="h5">Автор: {{ document.user.last_name }} {{ document.user.first_name.0 }}.{{ document.user.second_name.0 }}.</p>
+                                <p class="h5">Статус: {{ document.status.status }}</p>
+                                <p class="h5">Направление подготовки: {{ document.program_code }}</p>
+                                <p class="h5">Профиль: {{ document.profile_name }}</p>
+                                <input type="hidden" name="document" value="{{ document.id }}">
+                                <input type="hidden" name="author_id" value="{{ document.user.id }}">
+                                <input type="hidden" name="generate" value="True">
+                                <button class="btn btn-primary" type="submit">Скачать документ</button>
+                            </div>
+                        </form>
                     </div>
+                    {% endfor %}
+                    {% elif role.role_type == 'HOD' %}
+                    {% for teacher in all_teachers %}
+                    <div class="card border-primary mb-3">
+                        <div class="card-header">
+                            <p>{{ teacher.last_name }} {{ teacher.first_name.0 }}.{{ teacher.second_name.0 }}.</p>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="">
+                                <p>Текущие РПД:</p>
+                                <ul>
+                                    {% for document in all_documents %}
+                                    {% if document.user == teacher %}
+                                    <li>{{ document.document_name }} ({{ document.status.status }})</li>
+                                    {% endif %}
+                                    {% endfor %}
+                                </ul>
+                                <input type="hidden" value="{{ teacher.id }}" name="teacher_id">
+                                {% csrf_token %}
+                                <label>
+                                    <select name="program_name" class="form-select">
+                                        {{ disciplines }}
+                                        {% for discipline in disciplines %}
+                                        <option value="{{ discipline }}">{{ discipline }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </label>
+                                <input type="hidden" name="link" value="1">
+                                <input type="hidden" name="status" value="1">
+                                <input type="hidden" name="new_document" value="True">
+                                <button type="submit" class="btn btn-primary">Назначить РПД</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <form method="POST" enctype="multipart/form-data" action="/">
+                        {% csrf_token %}
+                        <p>Файл матрицы компетенций</p>
+                        <input type="file" name="work_program">
+                        <p>Файл учебного плана</p>
+                        <input type="file" name="time_plane">
+                        <button type="submit">Загрузить файлы</button>
+                    </form>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
-    {% endblock %}
-    <!-- <footer class="footer">
-        <p>&copy Лучшая команда КИС 2022</p>
-    </footer> -->
-    {% include 'base/scripts.html' %}
+</div>
+{% endblock %}
+<!-- <footer class="footer">
+    <p>&copy Лучшая команда КИС 2022</p>
+</footer> -->
+{% include 'base/scripts.html' %}
 </body>

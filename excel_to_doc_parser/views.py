@@ -22,7 +22,7 @@ from transliterate import translit
 
 from docx import Document as Doc
 
-from excel_to_doc_parser.models import CustomUser, Role, Document
+from excel_to_doc_parser.models import CustomUser, Role, Document, Link, Status
 from parser_server.settings import BASE_DIR, MEDIA_ROOT
 
 PLANE_PATH = join(MEDIA_ROOT, "excel", "planes", "18048 09.03.01 WEB OFO 2022.xlsx")
@@ -41,11 +41,12 @@ def check_number(num):
 
 @login_required(login_url='/login/')
 def index(request):
-    context = {}
     if request.user.is_authenticated:
-        context = {"hello": "hello", "custom_user": CustomUser.objects.get(user=request.user)}
+        context = {"documents": Document.objects.filter(user_id=request.user.id),
+                   "custom_user": CustomUser.objects.get(user=request.user), "disciplines": get_current_disciplines()}
         context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
-        if context["custom_user"].role_id == 1:
+        context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
+        if context["role"].role_type == "Admin":
             if request.method == "POST":
                 fs = FileSystemStorage()
                 folder = MEDIA_ROOT
@@ -60,6 +61,37 @@ def index(request):
                             shutil.rmtree(file_path)
                     except Exception as e:
                         print('An error appear ' + str(e))
+        elif context['role'].role_type == "Teacher":
+            context['all_documents'] = Document.objects.all()
+            if request.method == "POST" and request.POST.get("generate"):
+                return generate_docx(request, context, request.POST.get("author_id"))
+        elif context['role'].role_type == 'HOD':
+            context["all_teachers"] = CustomUser.objects.filter(role=5)
+            context['all_documents'] = Document.objects.all()
+            if request.method == "POST":
+                new_doc = Document()
+                new_doc.user = CustomUser.objects.get(pk=request.POST.get("teacher_id"))
+                new_doc.link_to_xml = Link.objects.get(pk=request.POST.get("link"))
+                new_doc.status = Status.objects.get(pk=request.POST.get("status"))
+                new_doc.document_name = request.POST.get("program_name")
+                new_doc.profile_name = get_profile_name()
+                new_doc.program_code = get_program_code()
+                new_doc.save()
+                root = etree.Element("root")
+                tree = etree.ElementTree(root)
+                path_to_save = join(str(BASE_DIR),
+                                    "excel_to_doc_parser\\media\\generated_files\\xml\\{}".format(
+                                        request.POST.get("teacher_id")))
+                Path(path_to_save).mkdir(parents=True, exist_ok=True)
+                # filename = "{}-{}.xml".format(Document.objects.get(pk=request.POST.get("document")).program_name.program_name,
+                #                               datetime.date.today().strftime("%m.%d.%Y"))
+                filename = translit(
+                    "{}.xml".format(request.POST.get("program_name")).replace(" ", "_"),
+                    "ru", reversed=True)
+                tree.write(join(str(BASE_DIR), path_to_save, filename), encoding="UTF-8", xml_declaration=True,
+                           pretty_print=True)
+                upload_xml_to_s3(request.POST.get("teacher_id"), filename, path_to_save)
+                os.remove(join(str(BASE_DIR), path_to_save, filename))
     else:
         return HttpResponseForbidden()
     return render(request, "main.html", context)
@@ -219,143 +251,154 @@ def number_to_words(n):
     else:
         return ten.get(n2) + ' ' + less_than_ten.get(n1)
 
+def generate_docx(request, context, author_id):
+    folder = join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files/docx")
+    data_df = parse_plane(PLANE_PATH)["Основные дисциплины"]
+    header = get_header(PLANE_PATH)
+    hours = {}
+    for i, row in data_df[header['Название дисциплины']].items():
+        if not ("блок" in row.lower() or "часть" in row.lower() or "дисциплины" in row.lower()):
+            if "*" in row:
+                row = row[:row.find("*")].strip()
+            hours[row] = {}
+            hours[row]["lections"] = []
+            hours[row]["seminars"] = []
+            hours[row]["labs"] = []
+            hours[row]["srs"] = []
+            hours[row]["exam"] = []
+            hours[row]["test"] = []
+            if not pd.isna(data_df.iloc[i - 1][header["Лекции"]]):
+                hours[row]["lections"].append(data_df.iloc[i - 1][header["Лекции"]])
+            if not pd.isna(data_df.iloc[i - 1][header["Семинары и практические занятия"]]):
+                hours[row]["seminars"].append(data_df.iloc[i - 1][header["Семинары и практические занятия"]])
+            if not pd.isna(data_df.iloc[i - 1][header["Лабораторные работы"]]):
+                hours[row]["labs"].append(data_df.iloc[i - 1][header["Лабораторные работы"]])
+            if not pd.isna(data_df.iloc[i - 1][header["СРС"]]):
+                hours[row]["srs"].append(data_df.iloc[i - 1][header["СРС"]])
+            if not pd.isna(data_df.iloc[i - 1][header["Экзамены"]]):
+                hours[row]["exam"].append(data_df.iloc[i - 1][header["Экзамены"]])
+            if not pd.isna(data_df.iloc[i - 1][header["Зачёты"]]):
+                hours[row]["test"].append(data_df.iloc[i - 1][header["Зачёты"]])
+    for filename in os.listdir(folder):
+        file_path = os.path.join(folder, filename)
+        if filename == ".gitkeep":
+            continue
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('An error appear ' + str(e))
+    data, all_competencies = parse_matrix(MATRIX_PATH)
+    discipline = Document.objects.get(pk=request.POST.get('document')).document_name
+    try:
+        context_plane_df = data_df[data_df[header['Название дисциплины']] == discipline]
+    except KeyError:
+        for error_key in data_df[header['Название дисциплины']]:
+            if SequenceMatcher(None, discipline, error_key).ratio() >= 0.75:
+                context_plane_df = data_df[data_df[header['Название дисциплины']] == error_key]
+                break
+    context_plane = {
+        'intensity_ZET': int(context_plane_df[header['Всего, ЗЕТ']].values[0]),
+        'intensity_hours': int(context_plane_df[header['ВСЕГО по структуре']].values[0]),
+        'total_homework_hours': int(context_plane_df[header['СРС']].values[0]), 'courses': []
+    }
+    context_plane['intensity_ZET_check'] = check_number(context_plane['intensity_ZET'])
+    context_plane['intensity_hours_check'] = check_number(context_plane['intensity_hours'])
+    context_plane['total_homework_hours_check'] = check_number(context_plane['total_homework_hours'])
+
+    for key in header:
+        if "семестр" in key:
+            if not pd.isna(context_plane_df[header[key]].values[0]):
+                context_plane['courses'].append({
+                    'ZET': hours_to_zet(int(context_plane_df[header[key]].values[0]) + int(
+                        context_plane_df[header['СРС']].values[0])),
+                    'hours': int(context_plane_df[header[key]].values[0]) + int(
+                        context_plane_df[header['СРС']].values[0]),
+                    'homework_time': int(context_plane_df[header['СРС']].values[0]),
+                    'semester': number_to_words(int(key.split(" ")[0])),
+                    'course': number_to_words(int(round(int(key.split(" ")[0]) / 2 + 0.1))),
+                    'exam': context_plane_df[header['Экзамены']].values[0] if not pd.isna(
+                        context_plane_df[header['Экзамены']].values[0]) and key.split(" ")[0] in context_plane_df[
+                                                                                  header['Экзамены']].values[0] else "",
+                    'test': context_plane_df[header['Зачёты']].values[0] if not pd.isna(
+                        context_plane_df[header['Зачёты']].values[0]) and key.split(" ")[0] in
+                                                                            context_plane_df[header['Зачёты']].values[
+                                                                                0] else ""
+                })
+    for i, _ in enumerate(context_plane['courses']):
+        context_plane['courses'][i]['ZET_check'] = check_number(context_plane['courses'][i]['ZET'])
+        context_plane['courses'][i]['hours_check'] = check_number(context_plane['courses'][i]['hours'])
+        context_plane['courses'][i]['homework_time_check'] = check_number(
+            context_plane['courses'][i]['homework_time'])
+    try:
+        context_plane["hours"] = hours[discipline]
+    except KeyError:
+        for error_key in data_df[header['Название дисциплины']]:
+            if SequenceMatcher(None, discipline, error_key).ratio() >= 0.75:
+                context_plane["hours"] = hours[error_key]
+                break
+    doc = DocxTemplate(TEMPLATE_PATH)
+    data = dict(data[discipline], **xml_parser(author_id, request.POST.get('document')))
+    user = CustomUser.objects.get(pk=author_id)
+    data['all_comp'] = all_competencies[discipline]
+    data['dean'] = "Д.Г. Демидов"
+    data['head_of_faculty'] = "Е.В. Пухова"
+    data['rop'] = "М.В. Даньшина"
+    data['author'] = f'{user.first_name[0]}.{user.second_name[0]}. {user.last_name}'
+    data["program_name"] = discipline
+    data["current_year"] = datetime.date.today().year
+    data["program_code"] = Document.objects.get(pk=request.POST.get('document')).program_code
+    data["profile_name"] = Document.objects.get(pk=request.POST.get('document')).profile_name
+    data["year_start"] = data['current_year']
+    doc.render(dict(data, **context_plane))
+    for i in range(len(doc.tables)):
+        table = doc.tables[i]._tbl
+        for row in doc.tables[i].rows:
+            if len(row.cells) and len(row.cells[0].text.strip()) == 0 and len(set(row.cells)) == 1:
+                table.remove(row._tr)
+    discipline = translit(discipline, "ru", reversed=True)
+    doc.save(join(str(BASE_DIR), folder, "{}.docx".format(discipline)))
+    context['path'] = join(folder, "{}.docx".format(discipline))
+    context['name'] = discipline + '.docx'
+    return redirect("/download/?file={}&name={}".format(context['path'], context["name"]))
 
 @login_required(login_url='/login/')
 def documents(request):
     context = {"documents": Document.objects.filter(user_id=request.user.id),
                "custom_user": CustomUser.objects.get(user=request.user), "disciplines": get_current_disciplines()}
     context["role"] = Role.objects.get(pk=context["custom_user"].role_id)
-    if request.method == "POST":
-        if request.POST.get("generate"):
-            folder = join(str(BASE_DIR), "excel_to_doc_parser/media/generated_files/docx")
-            data_df = parse_plane(PLANE_PATH)["Основные дисциплины"]
-            header = get_header(PLANE_PATH)
-            hours = {}
-            for i, row in data_df[header['Название дисциплины']].items():
-                if not ("блок" in row.lower() or "часть" in row.lower() or "дисциплины" in row.lower()):
-                    if "*" in row:
-                        row = row[:row.find("*")].strip()
-                    hours[row] = {}
-                    hours[row]["lections"] = []
-                    hours[row]["seminars"] = []
-                    hours[row]["labs"] = []
-                    hours[row]["srs"] = []
-                    hours[row]["exam"] = []
-                    hours[row]["test"] = []
-                    if not pd.isna(data_df.iloc[i - 1][header["Лекции"]]):
-                        hours[row]["lections"].append(data_df.iloc[i - 1][header["Лекции"]])
-                    if not pd.isna(data_df.iloc[i - 1][header["Семинары и практические занятия"]]):
-                        hours[row]["seminars"].append(data_df.iloc[i - 1][header["Семинары и практические занятия"]])
-                    if not pd.isna(data_df.iloc[i - 1][header["Лабораторные работы"]]):
-                        hours[row]["labs"].append(data_df.iloc[i - 1][header["Лабораторные работы"]])
-                    if not pd.isna(data_df.iloc[i - 1][header["СРС"]]):
-                        hours[row]["srs"].append(data_df.iloc[i - 1][header["СРС"]])
-                    if not pd.isna(data_df.iloc[i - 1][header["Экзамены"]]):
-                        hours[row]["exam"].append(data_df.iloc[i - 1][header["Экзамены"]])
-                    if not pd.isna(data_df.iloc[i - 1][header["Зачёты"]]):
-                        hours[row]["test"].append(data_df.iloc[i - 1][header["Зачёты"]])
-            for filename in os.listdir(folder):
-                file_path = os.path.join(folder, filename)
-                if filename == ".gitkeep":
-                    continue
-                try:
-                    if os.path.isfile(file_path) or os.path.islink(file_path):
-                        os.unlink(file_path)
-                    elif os.path.isdir(file_path):
-                        shutil.rmtree(file_path)
-                except Exception as e:
-                    print('An error appear ' + str(e))
-            data, all_competencies = parse_matrix(MATRIX_PATH)
-            discipline = Document.objects.get(pk=request.POST.get('document')).document_name
-            try:
-                context_plane_df = data_df[data_df[header['Название дисциплины']] == discipline]
-            except KeyError:
-                for error_key in data_df[header['Название дисциплины']]:
-                    if SequenceMatcher(None, discipline, error_key).ratio() >= 0.75:
-                        context_plane_df = data_df[data_df[header['Название дисциплины']] == error_key]
-                        break
-            context_plane = {
-                'intensity_ZET': int(context_plane_df[header['Всего, ЗЕТ']].values[0]),
-                'intensity_hours': int(context_plane_df[header['ВСЕГО по структуре']].values[0]),
-                'total_homework_hours': int(context_plane_df[header['СРС']].values[0]), 'courses': []
-            }
-            context_plane['intensity_ZET_check'] = check_number(context_plane['intensity_ZET'])
-            context_plane['intensity_hours_check'] = check_number(context_plane['intensity_hours'])
-            context_plane['total_homework_hours_check'] = check_number(context_plane['total_homework_hours'])
+    if context["role"].role_type == 'HOD':
+        context["all_teachers"] = CustomUser.objects.filter(role=5)
+        context['all_documents'] = Document.objects.all()
+        if request.method == "POST":
+            new_doc = Document()
+            new_doc.user = CustomUser.objects.get(pk=request.POST.get("teacher_id"))
+            new_doc.link_to_xml = Link.objects.get(pk=request.POST.get("link"))
+            new_doc.status = Status.objects.get(pk=request.POST.get("status"))
+            new_doc.document_name = request.POST.get("program_name")
+            new_doc.profile_name = get_profile_name()
+            new_doc.program_code = get_program_code()
+            new_doc.save()
+            root = etree.Element("root")
+            tree = etree.ElementTree(root)
+            path_to_save = join(str(BASE_DIR),
+                                "excel_to_doc_parser\\media\\generated_files\\xml\\{}".format(request.POST.get("teacher_id")))
+            Path(path_to_save).mkdir(parents=True, exist_ok=True)
+            # filename = "{}-{}.xml".format(Document.objects.get(pk=request.POST.get("document")).program_name.program_name,
+            #                               datetime.date.today().strftime("%m.%d.%Y"))
+            filename = translit(
+                "{}.xml".format(request.POST.get("program_name")).replace(" ", "_"),
+                "ru", reversed=True)
+            tree.write(join(str(BASE_DIR), path_to_save, filename), encoding="UTF-8", xml_declaration=True,
+                       pretty_print=True)
+            upload_xml_to_s3(request.POST.get("teacher_id"), filename, path_to_save)
+            os.remove(join(str(BASE_DIR), path_to_save, filename))
 
-            for key in header:
-                if "семестр" in key:
-                    if not pd.isna(context_plane_df[header[key]].values[0]):
-                        context_plane['courses'].append({
-                            'ZET': hours_to_zet(int(context_plane_df[header[key]].values[0]) + int(
-                                context_plane_df[header['СРС']].values[0])),
-                            'hours': int(context_plane_df[header[key]].values[0]) + int(
-                                context_plane_df[header['СРС']].values[0]),
-                            'homework_time': int(context_plane_df[header['СРС']].values[0]),
-                            'semester': number_to_words(int(key.split(" ")[0])),
-                            'course': number_to_words(int(round(int(key.split(" ")[0]) / 2 + 0.1))),
-                            'exam': context_plane_df[header['Экзамены']].values[0] if not pd.isna(
-                                context_plane_df[header['Экзамены']].values[0]) and key.split(" ")[0] in context_plane_df[header['Экзамены']].values[0] else "",
-                            'test': context_plane_df[header['Зачёты']].values[0] if not pd.isna(
-                                context_plane_df[header['Зачёты']].values[0]) and key.split(" ")[0] in context_plane_df[header['Зачёты']].values[0] else ""
-                        })
-            for i, _ in enumerate(context_plane['courses']):
-                context_plane['courses'][i]['ZET_check'] = check_number(context_plane['courses'][i]['ZET'])
-                context_plane['courses'][i]['hours_check'] = check_number(context_plane['courses'][i]['hours'])
-                context_plane['courses'][i]['homework_time_check'] = check_number(
-                    context_plane['courses'][i]['homework_time'])
-            try:
-                context_plane["hours"] = hours[discipline]
-            except KeyError:
-                for error_key in data_df[header['Название дисциплины']]:
-                    if SequenceMatcher(None, discipline, error_key).ratio() >= 0.75:
-                        context_plane["hours"] = hours[error_key]
-                        break
-            doc = DocxTemplate(TEMPLATE_PATH)
-            data = dict(data[discipline], **xml_parser(request))
-            data['all_comp'] = all_competencies[discipline]
-            data['dean'] = "Д.Г. Демидов"
-            data['head_of_faculty'] = "Е.В. Пухова"
-            data['rop'] = "М.В. Даньшина"
-            data["program_name"] = discipline
-            data["current_year"] = datetime.date.today().year
-            data["program_code"] = Document.objects.get(pk=request.POST.get('document')).program_code
-            data["profile_name"] = Document.objects.get(pk=request.POST.get('document')).profile_name
-            data["year_start"] = data['current_year']
-            doc.render(dict(data, **context_plane))
-            for i in range(len(doc.tables)):
-                table = doc.tables[i]._tbl
-                for row in doc.tables[i].rows:
-                    if len(row.cells) and len(row.cells[0].text.strip()) == 0 and len(set(row.cells)) == 1:
-                        table.remove(row._tr)
-            discipline = translit(discipline, "ru", reversed=True)
-            doc.save(join(str(BASE_DIR), folder, "{}.docx".format(discipline)))
-            context['path'] = join(folder, "{}.docx".format(discipline))
-            context['name'] = discipline + '.docx'
-            return redirect("/download/?file={}&name=".format(context['path'], context["name"]))
-        program_name = request.POST.get("program_name")
-        link = request.POST.get("link")
-        status = request.POST.get("status")
-        user = request.user.id
-        new_document = Document(link_to_xml_id=link, status_id=status, user_id=user, document_name=program_name,
-                                profile_name=get_profile_name(), program_code=get_program_code())
-        new_document.save()
-
-        root = etree.Element("root")
-        tree = etree.ElementTree(root)
-        path_to_save = join(str(BASE_DIR),
-                            "excel_to_doc_parser\\media\\generated_files\\xml\\{}".format(request.user.id))
-        Path(path_to_save).mkdir(parents=True, exist_ok=True)
-        # filename = "{}-{}.xml".format(Document.objects.get(pk=request.POST.get("document")).program_name.program_name,
-        #                               datetime.date.today().strftime("%m.%d.%Y"))
-        filename = translit(
-            "{}.xml".format(program_name).replace(" ", "_"),
-            "ru", reversed=True)
-        tree.write(join(str(BASE_DIR), path_to_save, filename), encoding="UTF-8", xml_declaration=True,
-                   pretty_print=True)
-        upload_xml_to_s3(request, filename, path_to_save)
-        os.remove(join(str(BASE_DIR), path_to_save, filename))
-        return redirect('/documents')
+    else:
+        if request.method == "POST" and request.POST.get("generate"):
+            return generate_docx(request, context, request.user.id)
     return render(request, "./docx_creation/document.html", context)
 
 
@@ -558,13 +601,13 @@ def fos_parser(part, content):
     return content
 
 
-def xml_parser(request) -> dict:
+def xml_parser(author_id, document_id) -> dict:
     root = etree.fromstring(
         requests.get(download_xml_from_s3(
-            request,
+            author_id,
             translit("{}.xml".format(
                 Document.objects.get(
-                    pk=request.POST.get("document")
+                    pk=document_id
                 ).document_name).replace(" ", "_"), "ru", reversed=True))
         ).content
     )
@@ -1055,11 +1098,11 @@ def generate_xml(request):
         "{}.xml".format(Document.objects.get(pk=request.POST.get("document")).document_name).replace(" ", "_"),
         "ru", reversed=True)
     tree.write(join(str(BASE_DIR), path_to_save, filename), encoding="UTF-8", xml_declaration=True, pretty_print=True)
-    upload_xml_to_s3(request, filename, path_to_save)
+    upload_xml_to_s3(request.user.id, filename, path_to_save)
     os.remove(join(str(BASE_DIR), path_to_save, filename))
 
 
-def upload_xml_to_s3(request, filename, filepath):
+def upload_xml_to_s3(author_id, filename, filepath):
     session = boto3.session.Session()
     s3 = session.client(
         service_name='s3',
@@ -1068,11 +1111,11 @@ def upload_xml_to_s3(request, filename, filepath):
         aws_secret_access_key=os.environ.get('S3_SECRET_KEY'),
     )
     with open(join(str(BASE_DIR), filepath, filename), "rb") as xml:
-        s3.put_object(Bucket=os.environ.get('BUCKET_NAME'), Key='xml/{}/{}'.format(request.user.id, filename),
+        s3.put_object(Bucket=os.environ.get('BUCKET_NAME'), Key='xml/{}/{}'.format(author_id, filename),
                       Body=xml.read().decode("UTF-8"))
 
 
-def download_xml_from_s3(request, filename):
+def download_xml_from_s3(user_id, filename):
     session = boto3.session.Session()
     s3 = session.client(
         service_name='s3',
@@ -1082,7 +1125,7 @@ def download_xml_from_s3(request, filename):
     )
     return s3.generate_presigned_url('get_object', Params={
         'Bucket': os.environ.get('BUCKET_NAME'),
-        'Key': 'xml/{}/{}'.format(request.user.id, filename)},
+        'Key': 'xml/{}/{}'.format(user_id, filename)},
                                      ExpiresIn=60)
 
 
